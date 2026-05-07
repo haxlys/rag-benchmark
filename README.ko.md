@@ -87,6 +87,12 @@ uv run rag-benchmark summary
 uv run rag-benchmark report
 ```
 
+최신 한국어 report 출력:
+
+```bash
+uv run rag-benchmark report-ko
+```
+
 운영 추천 ranking 출력:
 
 ```bash
@@ -122,6 +128,7 @@ uv run --extra dev pytest -q
 - `runs/<run_id>/results.csv`: question별 metric.
 - `runs/<run_id>/traces.jsonl`: retrieval, answer, evaluation trace 전체.
 - `runs/<run_id>/report.md`: 운영 관점 Markdown report.
+- `runs/<run_id>/report.ko.md`: 한국어 운영 관점 Markdown report.
 
 최신 실행 결과는 다음 위치에도 복사됩니다.
 
@@ -131,6 +138,7 @@ uv run --extra dev pytest -q
 - `results/failure_summary.csv`
 - `results/results.csv`
 - `results/report.md`
+- `results/report.ko.md`
 - `results/discrimination.md`
 
 ## 결과 해석 방법

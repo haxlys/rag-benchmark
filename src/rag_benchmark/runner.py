@@ -19,6 +19,7 @@ from .reporting import (
     write_failure_csv,
     write_jsonl,
     write_markdown_report,
+    write_markdown_report_ko,
     write_recommendations_csv,
     write_results,
     write_summary_csv,
@@ -109,6 +110,15 @@ def run_benchmark(
         run_id,
         interpretation_warnings,
     )
+    write_markdown_report_ko(
+        out_dir / "report.ko.md",
+        summary_rows,
+        category_rows,
+        recommendation_rows,
+        failure_rows,
+        run_id,
+        interpretation_warnings,
+    )
     copy_latest(root, out_dir)
     return out_dir
 
@@ -123,6 +133,7 @@ def copy_latest(root: Path, out_dir: Path) -> None:
         "failure_summary.csv",
         "results.csv",
         "report.md",
+        "report.ko.md",
     ]:
         source = out_dir / name
         target = results_dir / name

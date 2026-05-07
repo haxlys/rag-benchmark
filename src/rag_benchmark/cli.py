@@ -78,6 +78,12 @@ def report(path: Path = Path("results/report.md")) -> None:
     console.print(read_report(path))
 
 
+@app.command("report-ko")
+def report_ko(path: Path = Path("results/report.ko.md")) -> None:
+    """Print the latest Korean markdown report."""
+    console.print(read_report(path))
+
+
 @app.command("discrimination")
 def discrimination(
     results_dir: Path = typer.Option(Path("results"), "--results-dir", help="Directory with benchmark CSV files."),

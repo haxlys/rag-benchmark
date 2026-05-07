@@ -50,6 +50,8 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
     assert (out_dir / "recommendations.csv").exists()
     assert (out_dir / "failure_summary.csv").exists()
     assert (out_dir / "report.md").exists()
+    assert (out_dir / "report.ko.md").exists()
+    assert "RAG 벤치마크 리포트" in (out_dir / "report.ko.md").read_text(encoding="utf-8")
 
     discrimination_report = build_discrimination_report(out_dir)
     assert "`finance`: **strongly discriminative**" in discrimination_report

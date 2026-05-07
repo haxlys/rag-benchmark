@@ -70,6 +70,7 @@
    uv run rag-benchmark run --domain my-domain --top-k 4
    uv run rag-benchmark recommend
    uv run rag-benchmark report
+   uv run rag-benchmark report-ko
    uv run rag-benchmark discrimination
    ```
 

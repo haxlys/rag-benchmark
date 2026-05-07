@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from statistics import mean
@@ -336,6 +337,138 @@ def write_markdown_report(
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def write_markdown_report_ko(
+    path: Path,
+    summary_rows: list[dict],
+    category_rows: list[dict],
+    recommendation_rows: list[dict],
+    failure_rows: list[dict],
+    run_id: str,
+    warnings: list[str] | None = None,
+) -> None:
+    lines = [
+        f"# RAG 벤치마크 리포트: {run_id}",
+        "",
+        "이 리포트는 실무 운영 의사결정을 위해 여러 RAG 전략을 비교합니다.",
+        "점수는 로컬 fixture 데이터셋과 결정론적 extractive answerer로 생성됩니다.",
+        "",
+        "## 점수표",
+        "",
+        "| 도메인 | 시스템 | 답변 | Evidence Recall | Context Precision | Citation | 지연시간 ms | 비용 | 실패율 |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for row in summary_rows:
+        lines.append(
+            "| {domain} | {system_id} | {answer_correctness:.3f} | {evidence_recall:.3f} | "
+            "{context_precision:.3f} | {citation_validity:.3f} | {query_wall_time_ms:.2f} | "
+            "{estimated_cost:.6f} | {failure_rate:.3f} |".format(**row)
+        )
+
+    lines.extend(
+        [
+            "",
+            "## 추천 순위",
+            "",
+            "추천 점수는 품질, 효율, 안정성을 조합한 값입니다. 절대 정답이 아니라 의사결정 보조 지표입니다.",
+            "",
+            "| 도메인 | 순위 | 시스템 | 추천 점수 | 품질 | 효율 | 안정성 | 역할 |",
+            "|---|---:|---|---:|---:|---:|---:|---|",
+        ]
+    )
+    rank_by_domain: dict[str, int] = defaultdict(int)
+    for row in recommendation_rows:
+        rank_by_domain[row["domain"]] += 1
+        row_ko = {
+            **row,
+            "rank": rank_by_domain[row["domain"]],
+            "role": recommendation_role_ko(row["system_id"]),
+        }
+        lines.append(
+            "| {domain} | {rank} | `{system_id}` | {recommendation_score:.3f} | "
+            "{quality_score:.3f} | {efficiency_score:.3f} | {stability_score:.3f} | {role} |".format(**row_ko)
+        )
+
+    lines.extend(["", "## 실패 유형", ""])
+    if failure_rows:
+        lines.extend(["| 도메인 | 시스템 | 실패 유형 | 건수 |", "|---|---|---|---:|"])
+        for row in failure_rows:
+            row_ko = {**row, "failure_type": failure_type_ko(row["failure_type"])}
+            lines.append(
+                "| {domain} | `{system_id}` | {failure_type} | {count} |".format(**row_ko)
+            )
+    else:
+        lines.append("이번 실행에서는 실패가 기록되지 않았습니다.")
+
+    lines.extend(
+        [
+            "",
+            "## 카테고리별 보기",
+            "",
+            "| 도메인 | 카테고리 | 최고 시스템 | 최고 답변 점수 | 실패율이 가장 높은 시스템 |",
+            "|---|---|---:|---:|---:|",
+        ]
+    )
+    category_keys = sorted({(row["domain"], row["category"]) for row in category_rows})
+    for domain, category in category_keys:
+        rows = [row for row in category_rows if row["domain"] == domain and row["category"] == category]
+        best = max(rows, key=lambda row: (row["answer_correctness"], row["evidence_recall"]))
+        hardest = max(rows, key=lambda row: row["failure_rate"])
+        lines.append(
+            "| {domain} | {category} | `{best_system}` | {best_answer:.3f} | "
+            "`{hard_system}` {hard_failure:.3f} |".format(
+                domain=domain,
+                category=category,
+                best_system=best["system_id"],
+                best_answer=best["answer_correctness"],
+                hard_system=hardest["system_id"],
+                hard_failure=hardest["failure_rate"],
+            )
+        )
+
+    lines.extend(["", "## 운영 가이드", ""])
+    for domain in sorted({row["domain"] for row in summary_rows}):
+        domain_rows = [row for row in summary_rows if row["domain"] == domain]
+        best_quality = max(domain_rows, key=lambda row: (row["answer_correctness"], row["evidence_recall"]))
+        cheapest = min(domain_rows, key=lambda row: row["estimated_cost"])
+        fastest = min(domain_rows, key=lambda row: row["query_wall_time_ms"])
+        recommended = next(row for row in recommendation_rows if row["domain"] == domain)
+        lines.extend(
+            [
+                f"### {domain}",
+                "",
+                f"- 추천 기본값: `{recommended['system_id']}` "
+                f"(score={recommended['recommendation_score']:.3f}; "
+                f"{recommendation_role_ko(recommended['system_id'])}).",
+                f"- 최고 품질: `{best_quality['system_id']}` "
+                f"(answer={best_quality['answer_correctness']:.3f}, "
+                f"evidence={best_quality['evidence_recall']:.3f}).",
+                f"- 최저 query cost: `{cheapest['system_id']}` "
+                f"(cost={cheapest['estimated_cost']:.6f}).",
+                f"- 가장 빠른 query path: `{fastest['system_id']}` "
+                f"(latency={fastest['query_wall_time_ms']:.2f} ms).",
+                "",
+            ]
+        )
+
+    if warnings:
+        lines.extend(["", "## 해석 시 주의사항", ""])
+        for warning in warnings:
+            lines.append(f"- {warning_ko(warning)}")
+
+    lines.extend(
+        [
+            "",
+            "## 메모",
+            "",
+            "- `pageindex-oss`는 로컬 PageIndex-style tree adapter만 사용합니다. Hosted PageIndex API는 제외되어 있습니다.",
+            "- 현재 answerer는 결정론적이므로 retrieval failure를 재현하고 분석하기 쉽습니다.",
+            "- 실제 production 근거로 사용하려면 대표 corpus와 사람이 검수한 question/evidence label을 추가해야 합니다.",
+            "",
+        ]
+    )
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def avg(items: list[EvaluationResult], field: str) -> float:
     return mean(float(getattr(item, field)) for item in items)
 
@@ -363,3 +496,45 @@ def recommendation_role(system_id: str) -> str:
         "pageindex-oss": "structured long-document and multi-section navigation",
     }
     return roles.get(system_id, "candidate RAG strategy")
+
+
+def recommendation_role_ko(system_id: str) -> str:
+    roles = {
+        "bm25": "빠른 exact-term baseline",
+        "dense-vector": "의미 기반 유사도 baseline",
+        "hybrid": "exact와 semantic query가 섞인 경우의 균형형 기본값",
+        "hybrid-rerank": "rerank latency를 감수할 수 있을 때의 품질 우선 retrieval",
+        "parent-child": "작은 chunk 검색과 더 넓은 answer context",
+        "pageindex-oss": "구조화된 긴 문서와 multi-section navigation",
+    }
+    return roles.get(system_id, "후보 RAG 전략")
+
+
+def failure_type_ko(failure_type: str) -> str:
+    labels = {
+        "parse_failure": "문서 파싱 실패",
+        "retrieval_miss": "검색 누락",
+        "bad_ranking": "순위화 실패",
+        "context_bloat": "불필요한 context 과다",
+        "generation_hallucination": "생성 hallucination",
+        "citation_mismatch": "citation 불일치",
+        "timeout": "timeout",
+        "tool_or_json_error": "tool/json 오류",
+    }
+    return labels.get(failure_type, failure_type)
+
+
+def warning_ko(warning: str) -> str:
+    evidence_match = re.match(
+        r"(.+): at least one question needs (\d+) evidence items, but top_k=(\d+)\.",
+        warning,
+    )
+    if evidence_match:
+        domain, evidence_count, top_k = evidence_match.groups()
+        return f"{domain}: 최소 한 질문이 {evidence_count}개의 evidence item을 필요로 하지만 top_k={top_k}입니다."
+    if "answerable questions have no evidence labels" in warning:
+        return warning.replace(
+            "answerable questions have no evidence labels; retrieval scores are limited.",
+            "개의 answerable question에 evidence label이 없어 retrieval score 해석이 제한됩니다.",
+        )
+    return warning

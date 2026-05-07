@@ -94,6 +94,12 @@ Print the latest report:
 uv run rag-benchmark report
 ```
 
+Print the latest Korean report:
+
+```bash
+uv run rag-benchmark report-ko
+```
+
 Print the operations recommendation ranking:
 
 ```bash
@@ -129,6 +135,7 @@ Each run writes:
 - `runs/<run_id>/results.csv`: per-question metrics.
 - `runs/<run_id>/traces.jsonl`: full retrieval, answer, and evaluation traces.
 - `runs/<run_id>/report.md`: operations-oriented markdown report.
+- `runs/<run_id>/report.ko.md`: Korean operations-oriented markdown report.
 
 The latest run is also copied to:
 
@@ -138,6 +145,7 @@ The latest run is also copied to:
 - `results/failure_summary.csv`
 - `results/results.csv`
 - `results/report.md`
+- `results/report.ko.md`
 
 ## How To Interpret Results
 

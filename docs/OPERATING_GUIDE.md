@@ -72,6 +72,7 @@ The included fixture run shows:
    uv run rag-benchmark run --domain my-domain --top-k 4
    uv run rag-benchmark recommend
    uv run rag-benchmark report
+   uv run rag-benchmark report-ko
    ```
 
 The recommendation ranking combines quality, efficiency, and stability. Use it

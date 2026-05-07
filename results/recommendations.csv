@@ -1,0 +1,13 @@
+domain,system_id,recommendation_score,quality_score,efficiency_score,stability_score,role
+finance,parent-child,0.877842457048901,0.9277777777777778,0.6239345074667269,1.0,small-chunk search with broader answer context
+finance,bm25,0.8676162915898763,0.9277777777777778,0.5728036801716038,1.0,fast exact-term baseline
+finance,dense-vector,0.8564555625813212,0.9277777777777778,0.5170000351288278,1.0,semantic similarity baseline
+finance,hybrid,0.8398357249102789,0.9277777777777778,0.4339008467736165,1.0,balanced default for mixed queries
+finance,pageindex-oss,0.8294173626697886,0.925,0.3908368133489428,1.0,structured long-document and multi-section navigation
+finance,hybrid-rerank,0.7530555555555556,0.9277777777777778,0.0,1.0,quality-first retrieval when rerank latency is acceptable
+general-docs,parent-child,0.7163348015609176,0.7157142857142856,0.719888293518874,0.7142857142857143,small-chunk search with broader answer context
+general-docs,bm25,0.7123939172404465,0.7133333333333333,0.707921967154614,0.7142857142857143,fast exact-term baseline
+general-docs,dense-vector,0.6892551195913826,0.7121428571428571,0.5960970265283423,0.7142857142857143,semantic similarity baseline
+general-docs,pageindex-oss,0.686854135566,0.8171428571428571,0.13569924925857113,0.8571428571428572,structured long-document and multi-section navigation
+general-docs,hybrid,0.6740468942716171,0.7121428571428571,0.5200558999295146,0.7142857142857143,balanced default for mixed queries
+general-docs,hybrid-rerank,0.6026179653649818,0.7121428571428571,0.16291125539633788,0.7142857142857143,quality-first retrieval when rerank latency is acceptable

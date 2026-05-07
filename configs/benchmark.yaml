@@ -1,0 +1,115 @@
+project:
+  name: rag-benchmark
+  objective: product_operations_comparison
+  pageindex_scope: oss_only
+
+tracks:
+  controlled:
+    description: Same normalized text and same generator prompt; vary retrieval/orchestration.
+  native_operations:
+    description: Each system uses its intended ingestion and retrieval path.
+
+domains:
+  finance:
+    enabled: true
+    categories:
+      - direct_lookup
+      - section_navigation
+      - multi_section
+      - table_numeric
+      - calculation
+      - no_answer
+    candidate_datasets:
+      - financebench_open_source
+  general-docs:
+    enabled: true
+    categories:
+      - direct_lookup
+      - section_navigation
+      - multi_section
+      - multi_document
+      - table_numeric
+      - no_answer
+      - global_summary
+    candidate_datasets:
+      - local_general_docs
+
+systems:
+  bm25:
+    stage: mvp
+    family: sparse
+    enabled: true
+  dense-vector:
+    stage: mvp
+    family: dense
+    enabled: true
+  hybrid:
+    stage: mvp
+    family: sparse_dense_fusion
+    enabled: true
+  hybrid-rerank:
+    stage: mvp
+    family: reranked_hybrid
+    enabled: true
+  parent-child:
+    stage: mvp
+    family: hierarchical_chunk
+    enabled: true
+  pageindex-oss:
+    stage: mvp
+    family: tree_reasoning
+    enabled: true
+    restrictions:
+      - no_pageindex_cloud
+      - no_hosted_mcp
+      - no_hosted_ocr
+      - no_hosted_chat_api
+  raptor:
+    stage: expansion
+    family: recursive_summary_tree
+    enabled: false
+  graphrag:
+    stage: expansion
+    family: graph
+    enabled: false
+  agentic-vector:
+    stage: expansion
+    family: iterative_agentic_retrieval
+    enabled: false
+
+metrics:
+  retrieval:
+    - hit_rate_at_k
+    - evidence_recall_at_k
+    - context_precision_at_k
+    - mrr
+    - ndcg
+    - retrieved_token_count
+  answer:
+    - answer_correctness
+    - faithfulness
+    - groundedness
+    - citation_validity
+    - abstention_correctness
+  operations:
+    - ingestion_wall_time
+    - index_wall_time
+    - query_wall_time_p50
+    - query_wall_time_p95
+    - llm_input_tokens
+    - llm_output_tokens
+    - embedding_tokens
+    - estimated_cost
+    - index_size_bytes
+    - failure_rate
+
+failure_taxonomy:
+  - parse_failure
+  - retrieval_miss
+  - bad_ranking
+  - context_bloat
+  - generation_hallucination
+  - citation_mismatch
+  - timeout
+  - tool_or_json_error
+

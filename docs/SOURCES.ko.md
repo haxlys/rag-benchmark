@@ -1,8 +1,8 @@
-# Sources
+# 리서치 출처
 
 [English](SOURCES.md) | [한국어](SOURCES.ko.md)
 
-Working research sources for the initial design.
+초기 설계와 구현 방향을 잡기 위해 참고한 자료입니다.
 
 ## PageIndex
 
@@ -14,7 +14,7 @@ Working research sources for the initial design.
 - https://docs.pageindex.ai/tree-search/hybrid
 - https://docs.pageindex.ai/doc-search
 
-## Traditional RAG Frameworks
+## 전통적인 RAG Framework
 
 - https://langchain-5e9cc07a.mintlify.app/oss/python/langchain/rag
 - https://docs.llamaindex.ai/en/stable/module_guides/indexing/vector_store_index/
@@ -29,7 +29,7 @@ Working research sources for the initial design.
 - https://microsoft.github.io/graphrag/index/overview/
 - https://microsoft.github.io/graphrag/query/overview/
 
-## Evaluation
+## 평가
 
 - https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/
 - https://www.trulens.org/getting_started/core_concepts/rag_triad/
@@ -40,7 +40,7 @@ Working research sources for the initial design.
 - https://github.com/patronus-ai/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench
 
-## Document Parsing
+## 문서 Parsing
 
 - https://www.docling.ai/
 - https://docling-project.github.io/docling/

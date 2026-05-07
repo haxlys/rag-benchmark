@@ -1,5 +1,7 @@
 # RAG Benchmark
 
+[English](README.md) | [한국어](README.ko.md)
+
 Operational benchmark for comparing retrieval-augmented generation approaches,
 including the open-source VectifyAI PageIndex repository.
 
@@ -47,7 +49,7 @@ Expansion systems:
 
 ## Project Layout
 
-- `docs/`: design notes and implementation plan.
+- `docs/`: design notes and implementation plan. Korean versions use `.ko.md`.
 - `configs/`: benchmark configuration.
 - `src/rag_benchmark/`: future benchmark harness package.
 - `scripts/`: future command-line helpers.

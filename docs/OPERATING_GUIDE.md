@@ -1,5 +1,7 @@
 # Operating Guide
 
+[English](OPERATING_GUIDE.md) | [한국어](OPERATING_GUIDE.ko.md)
+
 ## Purpose
 
 This benchmark helps decide which RAG pattern is appropriate for a practical

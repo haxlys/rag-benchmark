@@ -1,5 +1,7 @@
 # Implementation Plan
 
+[English](IMPLEMENTATION_PLAN.md) | [한국어](IMPLEMENTATION_PLAN.ko.md)
+
 Date: 2026-05-07
 
 ## Decisions

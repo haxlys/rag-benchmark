@@ -4,36 +4,40 @@ This audit checks whether the benchmark actually separates RAG systems.
 
 ## Verdict
 
-- `finance`: **not discriminative**. All systems produced effectively the same quality scores; use this only as a smoke test.
-- `general-docs`: **weakly discriminative**. Some systems separate, but too few questions drive the difference.
+- `finance`: **strongly discriminative**. Multiple systems separate on answer or evidence quality.
+- `general-docs`: **strongly discriminative**. Multiple systems separate on answer or evidence quality.
 
 ## Domain Metric Spread
 
 | Domain | Metric | Min | Max | Range | Unique Values |
 |---|---|---:|---:|---:|---:|
-| finance | answer_correctness | 1.000 | 1.000 | 0.000 | 1 |
-| finance | evidence_recall | 1.000 | 1.000 | 0.000 | 1 |
-| finance | context_precision | 0.250 | 0.278 | 0.028 | 2 |
-| finance | citation_validity | 1.000 | 1.000 | 0.000 | 1 |
-| finance | failure_rate | 0.000 | 0.000 | 0.000 | 1 |
-| general-docs | answer_correctness | 0.714 | 0.857 | 0.143 | 2 |
-| general-docs | evidence_recall | 0.814 | 0.914 | 0.100 | 2 |
-| general-docs | context_precision | 0.286 | 0.429 | 0.143 | 4 |
-| general-docs | citation_validity | 0.714 | 0.857 | 0.143 | 2 |
-| general-docs | failure_rate | 0.143 | 0.286 | 0.143 | 2 |
+| finance | answer_correctness | 0.632 | 1.000 | 0.368 | 4 |
+| finance | evidence_recall | 0.632 | 1.000 | 0.368 | 4 |
+| finance | context_precision | 0.175 | 0.329 | 0.154 | 5 |
+| finance | citation_validity | 0.632 | 1.000 | 0.368 | 4 |
+| finance | failure_rate | 0.000 | 0.368 | 0.368 | 4 |
+| general-docs | answer_correctness | 0.600 | 0.900 | 0.300 | 4 |
+| general-docs | evidence_recall | 0.660 | 0.945 | 0.285 | 5 |
+| general-docs | context_precision | 0.254 | 0.417 | 0.163 | 5 |
+| general-docs | citation_validity | 0.600 | 0.900 | 0.300 | 4 |
+| general-docs | failure_rate | 0.100 | 0.400 | 0.300 | 4 |
 
 ## Question-Level Discrimination
 
 | Domain | Questions | Quality-Diff Questions | Answer-Diff Questions | Recall-Diff Questions | Precision-Diff Questions |
 |---|---:|---:|---:|---:|---:|
-| finance | 6 | 0 | 0 | 0 | 2 |
-| general-docs | 7 | 2 | 1 | 2 | 6 |
+| finance | 19 | 7 | 7 | 7 | 9 |
+| general-docs | 20 | 7 | 6 | 7 | 13 |
 
 ## Categories That Separated Systems
 
 | Domain | Category | Answer Range | Best Answer | Worst Answer |
 |---|---|---:|---:|---:|
-| general-docs | multi_document | 1.000 | 1.000 | 0.000 |
+| finance | direct_lookup | 0.500 | 1.000 | 0.500 |
+| finance | section_navigation | 0.500 | 1.000 | 0.500 |
+| finance | table_numeric | 0.750 | 1.000 | 0.250 |
+| general-docs | multi_section | 0.500 | 1.000 | 0.500 |
+| general-docs | section_navigation | 0.556 | 1.000 | 0.444 |
 
 ## Practical Reading
 

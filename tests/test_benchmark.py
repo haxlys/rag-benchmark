@@ -16,15 +16,17 @@ def test_fixture_domains_load() -> None:
     finance_docs, finance_questions = load_domain(ROOT, "finance")
     general_docs, general_questions = load_domain(ROOT, "general-docs")
 
-    assert len(finance_docs) == 2
-    assert len(general_docs) == 2
-    assert len(finance_questions) >= 6
-    assert len(general_questions) >= 7
+    assert len(finance_docs) == 4
+    assert len(general_docs) == 5
+    assert len(finance_questions) >= 19
+    assert len(general_questions) >= 20
 
 
 def test_semantic_token_aliases() -> None:
     assert "rate_limit" in tokenize("API throttle quota limit", semantic=True)
     assert "recovery" in tokenize("RTO recovery target", semantic=True)
+    assert "capital_expenditure" in tokenize("capex property equipment additions", semantic=True)
+    assert "export_window" in tokenize("portability package bundle expires", semantic=True)
 
 
 def test_full_benchmark_smoke(tmp_path: Path) -> None:
@@ -38,7 +40,9 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
     assert len(summary_rows) == 12
 
     rows_by_key = {(row["domain"], row["system_id"]): row for row in summary_rows}
-    assert float(rows_by_key[("finance", "bm25")]["answer_correctness"]) >= 0.8
+    assert float(rows_by_key[("finance", "bm25")]["answer_correctness"]) < float(
+        rows_by_key[("finance", "pageindex-oss")]["answer_correctness"]
+    )
     assert float(rows_by_key[("general-docs", "pageindex-oss")]["answer_correctness"]) >= float(
         rows_by_key[("general-docs", "bm25")]["answer_correctness"]
     )
@@ -48,8 +52,8 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
     assert (out_dir / "report.md").exists()
 
     discrimination_report = build_discrimination_report(out_dir)
-    assert "`finance`: **not discriminative**" in discrimination_report
-    assert "`general-docs`: **weakly discriminative**" in discrimination_report
+    assert "`finance`: **strongly discriminative**" in discrimination_report
+    assert "`general-docs`: **strongly discriminative**" in discrimination_report
 
 
 def test_import_text_documents_and_questions(tmp_path: Path) -> None:

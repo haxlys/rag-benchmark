@@ -1,8 +1,14 @@
 domain,system_id,failure_type,count
-general-docs,bm25,context_bloat,2
+finance,bm25,retrieval_miss,7
+finance,hybrid,retrieval_miss,2
+finance,parent-child,retrieval_miss,6
+general-docs,bm25,context_bloat,3
+general-docs,bm25,retrieval_miss,4
 general-docs,dense-vector,context_bloat,2
-general-docs,hybrid,context_bloat,2
+general-docs,hybrid,context_bloat,3
 general-docs,hybrid-rerank,context_bloat,2
+general-docs,pageindex-oss,context_bloat,1
 general-docs,pageindex-oss,generation_hallucination,1
-general-docs,parent-child,context_bloat,1
+general-docs,parent-child,context_bloat,2
 general-docs,parent-child,generation_hallucination,1
+general-docs,parent-child,retrieval_miss,5

@@ -1,4 +1,4 @@
-# RAG Benchmark Report: 20260507T081639Z
+# RAG Benchmark Report: 20260507T083403Z
 
 This report compares RAG strategies for practical operations decisions.
 Scores are generated from local fixture datasets and deterministic extractive answering.
@@ -7,18 +7,18 @@ Scores are generated from local fixture datasets and deterministic extractive an
 
 | Domain | System | Answer | Evidence Recall | Context Precision | Citation | Latency ms | Cost | Failure |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| finance | bm25 | 1.000 | 1.000 | 0.278 | 1.000 | 0.03 | 0.000001 | 0.000 |
-| finance | dense-vector | 1.000 | 1.000 | 0.278 | 1.000 | 0.04 | 0.000001 | 0.000 |
-| finance | hybrid | 1.000 | 1.000 | 0.278 | 1.000 | 0.05 | 0.000001 | 0.000 |
-| finance | hybrid-rerank | 1.000 | 1.000 | 0.278 | 1.000 | 0.08 | 0.000114 | 0.000 |
-| finance | pageindex-oss | 1.000 | 1.000 | 0.250 | 1.000 | 0.03 | 0.000061 | 0.000 |
-| finance | parent-child | 1.000 | 1.000 | 0.278 | 1.000 | 0.02 | 0.000001 | 0.000 |
-| general-docs | bm25 | 0.714 | 0.814 | 0.405 | 0.714 | 0.01 | 0.000000 | 0.286 |
-| general-docs | dense-vector | 0.714 | 0.814 | 0.393 | 0.714 | 0.03 | 0.000001 | 0.286 |
-| general-docs | hybrid | 0.714 | 0.814 | 0.393 | 0.714 | 0.04 | 0.000001 | 0.286 |
-| general-docs | hybrid-rerank | 0.714 | 0.814 | 0.393 | 0.714 | 0.05 | 0.000049 | 0.286 |
-| general-docs | pageindex-oss | 0.857 | 0.914 | 0.286 | 0.857 | 0.03 | 0.000061 | 0.143 |
-| general-docs | parent-child | 0.714 | 0.814 | 0.429 | 0.714 | 0.02 | 0.000000 | 0.286 |
+| finance | bm25 | 0.632 | 0.632 | 0.175 | 0.632 | 0.02 | 0.000001 | 0.368 |
+| finance | dense-vector | 1.000 | 1.000 | 0.329 | 1.000 | 0.03 | 0.000001 | 0.000 |
+| finance | hybrid | 0.895 | 0.895 | 0.303 | 0.895 | 0.06 | 0.000001 | 0.105 |
+| finance | hybrid-rerank | 1.000 | 1.000 | 0.329 | 1.000 | 0.09 | 0.000110 | 0.000 |
+| finance | pageindex-oss | 1.000 | 1.000 | 0.250 | 1.000 | 0.05 | 0.000061 | 0.000 |
+| finance | parent-child | 0.684 | 0.684 | 0.189 | 0.684 | 0.03 | 0.000001 | 0.316 |
+| general-docs | bm25 | 0.650 | 0.710 | 0.258 | 0.650 | 0.02 | 0.000000 | 0.350 |
+| general-docs | dense-vector | 0.900 | 0.935 | 0.417 | 0.900 | 0.04 | 0.000001 | 0.100 |
+| general-docs | hybrid | 0.850 | 0.910 | 0.404 | 0.850 | 0.06 | 0.000001 | 0.150 |
+| general-docs | hybrid-rerank | 0.900 | 0.935 | 0.417 | 0.900 | 0.08 | 0.000080 | 0.100 |
+| general-docs | pageindex-oss | 0.900 | 0.945 | 0.263 | 0.900 | 0.07 | 0.000061 | 0.100 |
+| general-docs | parent-child | 0.600 | 0.660 | 0.254 | 0.600 | 0.03 | 0.000000 | 0.400 |
 
 ## Recommendation Ranking
 
@@ -26,64 +26,70 @@ Recommendation score combines quality, efficiency, and stability. It is a decisi
 
 | Domain | Rank | System | Recommendation | Quality | Efficiency | Stability | Role |
 |---|---:|---|---:|---:|---:|---:|---|
-| finance | 1 | `parent-child` | 0.878 | 0.928 | 0.624 | 1.000 | small-chunk search with broader answer context |
-| finance | 2 | `bm25` | 0.868 | 0.928 | 0.573 | 1.000 | fast exact-term baseline |
-| finance | 3 | `dense-vector` | 0.856 | 0.928 | 0.517 | 1.000 | semantic similarity baseline |
-| finance | 4 | `hybrid` | 0.840 | 0.928 | 0.434 | 1.000 | balanced default for mixed queries |
-| finance | 5 | `pageindex-oss` | 0.829 | 0.925 | 0.391 | 1.000 | structured long-document and multi-section navigation |
-| finance | 6 | `hybrid-rerank` | 0.753 | 0.928 | 0.000 | 1.000 | quality-first retrieval when rerank latency is acceptable |
-| general-docs | 1 | `parent-child` | 0.716 | 0.716 | 0.720 | 0.714 | small-chunk search with broader answer context |
-| general-docs | 2 | `bm25` | 0.712 | 0.713 | 0.708 | 0.714 | fast exact-term baseline |
-| general-docs | 3 | `dense-vector` | 0.689 | 0.712 | 0.596 | 0.714 | semantic similarity baseline |
-| general-docs | 4 | `pageindex-oss` | 0.687 | 0.817 | 0.136 | 0.857 | structured long-document and multi-section navigation |
-| general-docs | 5 | `hybrid` | 0.674 | 0.712 | 0.520 | 0.714 | balanced default for mixed queries |
-| general-docs | 6 | `hybrid-rerank` | 0.603 | 0.712 | 0.163 | 0.714 | quality-first retrieval when rerank latency is acceptable |
+| finance | 1 | `dense-vector` | 0.868 | 0.933 | 0.557 | 1.000 | semantic similarity baseline |
+| finance | 2 | `pageindex-oss` | 0.811 | 0.925 | 0.299 | 1.000 | structured long-document and multi-section navigation |
+| finance | 3 | `hybrid` | 0.766 | 0.836 | 0.442 | 0.895 | balanced default for mixed queries |
+| finance | 4 | `hybrid-rerank` | 0.759 | 0.933 | 0.013 | 1.000 | quality-first retrieval when rerank latency is acceptable |
+| finance | 5 | `parent-child` | 0.642 | 0.635 | 0.636 | 0.684 | small-chunk search with broader answer context |
+| finance | 6 | `bm25` | 0.601 | 0.586 | 0.629 | 0.632 | fast exact-term baseline |
+| general-docs | 1 | `dense-vector` | 0.809 | 0.862 | 0.569 | 0.900 | semantic similarity baseline |
+| general-docs | 2 | `hybrid` | 0.753 | 0.823 | 0.451 | 0.850 | balanced default for mixed queries |
+| general-docs | 3 | `pageindex-oss` | 0.719 | 0.850 | 0.161 | 0.900 | structured long-document and multi-section navigation |
+| general-docs | 4 | `hybrid-rerank` | 0.708 | 0.862 | 0.061 | 0.900 | quality-first retrieval when rerank latency is acceptable |
+| general-docs | 5 | `bm25` | 0.642 | 0.629 | 0.677 | 0.650 | fast exact-term baseline |
+| general-docs | 6 | `parent-child` | 0.604 | 0.583 | 0.673 | 0.600 | small-chunk search with broader answer context |
 
 ## Failure Breakdown
 
 | Domain | System | Failure Type | Count |
 |---|---|---|---:|
-| general-docs | `bm25` | context_bloat | 2 |
+| finance | `bm25` | retrieval_miss | 7 |
+| finance | `hybrid` | retrieval_miss | 2 |
+| finance | `parent-child` | retrieval_miss | 6 |
+| general-docs | `bm25` | context_bloat | 3 |
+| general-docs | `bm25` | retrieval_miss | 4 |
 | general-docs | `dense-vector` | context_bloat | 2 |
-| general-docs | `hybrid` | context_bloat | 2 |
+| general-docs | `hybrid` | context_bloat | 3 |
 | general-docs | `hybrid-rerank` | context_bloat | 2 |
+| general-docs | `pageindex-oss` | context_bloat | 1 |
 | general-docs | `pageindex-oss` | generation_hallucination | 1 |
-| general-docs | `parent-child` | context_bloat | 1 |
+| general-docs | `parent-child` | context_bloat | 2 |
 | general-docs | `parent-child` | generation_hallucination | 1 |
+| general-docs | `parent-child` | retrieval_miss | 5 |
 
 ## Category View
 
 | Domain | Category | Best System | Best Answer | Hardest System Failure |
 |---|---|---:|---:|---:|
 | finance | calculation | `bm25` | 1.000 | `bm25` 0.000 |
-| finance | direct_lookup | `bm25` | 1.000 | `bm25` 0.000 |
+| finance | direct_lookup | `dense-vector` | 1.000 | `bm25` 0.500 |
 | finance | multi_section | `bm25` | 1.000 | `bm25` 0.000 |
 | finance | no_answer | `bm25` | 1.000 | `bm25` 0.000 |
-| finance | section_navigation | `bm25` | 1.000 | `bm25` 0.000 |
-| finance | table_numeric | `bm25` | 1.000 | `bm25` 0.000 |
+| finance | section_navigation | `dense-vector` | 1.000 | `bm25` 0.500 |
+| finance | table_numeric | `dense-vector` | 1.000 | `bm25` 0.750 |
 | general-docs | direct_lookup | `bm25` | 1.000 | `bm25` 0.000 |
 | general-docs | global_summary | `pageindex-oss` | 0.000 | `bm25` 1.000 |
-| general-docs | multi_document | `pageindex-oss` | 1.000 | `bm25` 1.000 |
-| general-docs | multi_section | `bm25` | 1.000 | `bm25` 0.000 |
+| general-docs | multi_document | `bm25` | 0.500 | `bm25` 0.500 |
+| general-docs | multi_section | `dense-vector` | 1.000 | `bm25` 0.500 |
 | general-docs | no_answer | `bm25` | 1.000 | `bm25` 0.000 |
-| general-docs | section_navigation | `bm25` | 1.000 | `bm25` 0.000 |
+| general-docs | section_navigation | `dense-vector` | 1.000 | `parent-child` 0.556 |
 | general-docs | table_numeric | `bm25` | 1.000 | `bm25` 0.000 |
 
 ## Operational Guidance
 
 ### finance
 
-- Recommended default: `parent-child` (score=0.878; small-chunk search with broader answer context).
-- Best quality: `bm25` (answer=1.000, evidence=1.000).
+- Recommended default: `dense-vector` (score=0.868; semantic similarity baseline).
+- Best quality: `dense-vector` (answer=1.000, evidence=1.000).
 - Lowest query cost: `parent-child` (cost=0.000001).
-- Fastest query path: `parent-child` (latency=0.02 ms).
+- Fastest query path: `bm25` (latency=0.02 ms).
 
 ### general-docs
 
-- Recommended default: `parent-child` (score=0.716; small-chunk search with broader answer context).
-- Best quality: `pageindex-oss` (answer=0.857, evidence=0.914).
+- Recommended default: `dense-vector` (score=0.809; semantic similarity baseline).
+- Best quality: `pageindex-oss` (answer=0.900, evidence=0.945).
 - Lowest query cost: `parent-child` (cost=0.000000).
-- Fastest query path: `bm25` (latency=0.01 ms).
+- Fastest query path: `bm25` (latency=0.02 ms).
 
 
 ## Interpretation Warnings

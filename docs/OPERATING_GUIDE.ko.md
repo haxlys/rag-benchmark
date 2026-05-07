@@ -29,10 +29,11 @@
 
 포함된 fixture run 기준:
 
-- Finance fixture 질문은 현재 너무 쉽습니다. 모든 MVP 시스템이 충분한 evidence를 가져옵니다.
-- General-docs는 더 현실적인 차이를 보여줍니다.
-- fixture에서는 `pageindex-oss`가 multi-document/section-navigation style retrieval에서 더 좋게 나왔습니다.
-- `parent-child`는 context를 더 작고 싸게 유지하지만, broad global-summary question을 해결하지는 못합니다.
+- 두 fixture domain은 이제 단순 smoke test가 아니라 의도적으로 변별력이 생기도록 구성되어 있습니다.
+- Finance에는 capex, deferred revenue, backlog, covenant, lease obligation 같은 semantic financial term이 포함됩니다.
+- General-docs에는 semantic question, section-navigation, multi-section, multi-document distractor가 포함됩니다.
+- synonym-heavy 또는 structure-heavy question에서 `pageindex-oss`, dense-style retrieval, reranking이 BM25와 분리됩니다.
+- `parent-child`는 context를 더 작고 싸게 유지하지만, title-only 또는 synonym-heavy evidence를 놓칠 수 있습니다.
 - Top-k가 중요합니다. global summary question은 context budget이 모든 evidence를 담지 못해서 실패할 수 있습니다.
 
 ## 내 데이터로 실행하기

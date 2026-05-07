@@ -71,6 +71,8 @@ against six MVP systems across both domains, then produce a scorecard covering:
 - failure rate and operational notes
 
 Status: complete for the local fixture benchmark.
+The packaged fixtures are now intentionally discriminative: both default domains
+separate systems on answer quality, evidence recall, and failure rate.
 
 ## Quick Start
 

@@ -31,10 +31,11 @@ number.
 
 The included fixture run shows:
 
-- Finance fixture questions are currently easy; all MVP systems retrieve enough evidence.
-- General-docs exposes more realistic differences.
-- `pageindex-oss` is better on multi-document/section-navigation style retrieval in the fixture.
-- `parent-child` keeps context smaller and cheaper, but does not solve broad global-summary questions.
+- Both fixture domains are now intentionally discriminative rather than smoke-test easy.
+- Finance includes semantic financial terms such as capex, deferred revenue, backlog, covenant, and lease obligations.
+- General-docs includes semantic, section-navigation, multi-section, and multi-document distractors.
+- `pageindex-oss`, dense-style retrieval, and reranking separate from BM25 on synonym-heavy and structure-heavy questions.
+- `parent-child` keeps context smaller and cheaper, but can miss title-only or synonym-heavy evidence.
 - Top-k matters: global summary questions can fail simply because the context budget cannot include all evidence.
 
 ## Running On Your Own Data

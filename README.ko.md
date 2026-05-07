@@ -65,6 +65,7 @@ MVP 시스템:
 - discrimination audit
 
 상태: local fixture benchmark 기준 완료.
+포함된 fixture는 이제 의도적으로 변별력이 생기도록 구성되어 있으며, 기본 두 도메인 모두 answer quality, evidence recall, failure rate에서 시스템 차이를 보여줍니다.
 
 ## 빠른 시작
 

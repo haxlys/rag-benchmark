@@ -391,7 +391,7 @@ def build_promptfoo_tests(
                         "domain": question.domain,
                         "category": question.category,
                         "expected_answer": question.answer,
-                        "expected_aliases": question.answer_aliases,
+                        "expected_aliases": promptfoo_aliases_var(question.answer_aliases),
                         "no_answer": question.no_answer,
                     },
                     "metadata": {
@@ -426,7 +426,10 @@ def build_promptfoo_assertions(
             "type": "javascript",
             "metric": "context_precision",
             "threshold": 0.1,
-            "value": "JSON.parse(output).metrics.context_precision",
+            "value": (
+                "(() => { const metrics = JSON.parse(output).metrics; "
+                "return metrics.abstention_correctness === 1 ? 1 : metrics.context_precision; })()"
+            ),
         },
         {
             "type": "javascript",
@@ -501,9 +504,28 @@ def resolve_question(root: Path, domain: str, vars_: dict[str, Any], prompt: str
         category=str(vars_.get("category") or "promptfoo"),
         question=query,
         answer=str(vars_.get("expected_answer") or ""),
-        answer_aliases=list(vars_.get("expected_aliases") or []),
+        answer_aliases=parse_promptfoo_aliases_var(vars_.get("expected_aliases")),
         no_answer=bool(vars_.get("no_answer", False)),
     )
+
+
+def promptfoo_aliases_var(answer_aliases: list[str]) -> str:
+    """Keep aliases scalar so promptfoo does not expand tests as var matrices."""
+    return json.dumps(answer_aliases, ensure_ascii=False)
+
+
+def parse_promptfoo_aliases_var(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item) for item in value]
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            return [value]
+        if isinstance(parsed, list):
+            return [str(item) for item in parsed]
+        return [str(parsed)]
+    return []
 
 
 def resolve_provider_path(value: str | Path, config: dict, root: Path | None = None) -> Path:

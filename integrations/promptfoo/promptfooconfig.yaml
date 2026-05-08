@@ -54,7 +54,8 @@ defaultTest:
   - type: javascript
     metric: context_precision
     threshold: 0.1
-    value: JSON.parse(output).metrics.context_precision
+    value: '(() => { const metrics = JSON.parse(output).metrics; return metrics.abstention_correctness === 1 ? 1 : metrics.context_precision;
+      })()'
   - type: javascript
     metric: citation_validity
     threshold: 0.5

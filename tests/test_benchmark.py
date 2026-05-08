@@ -209,6 +209,9 @@ def test_promptfoo_export_and_provider(tmp_path: Path) -> None:
     assert exported_config["providers"][0]["id"] == "file://./rag_benchmark_provider.py"
     assert exported_config["defaultTest"]["assert"][1]["metric"] == "answer_correctness"
     assert exported_tests[0]["vars"]["question_id"] == "fin_direct_revenue"
+    assert exported_tests[0]["vars"]["expected_aliases"] == json.dumps(
+        ["12.4 billion", "ACME revenue in fiscal 2025 was $12.4 billion"]
+    )
 
     provider_response = call_promptfoo_provider(
         "What was ACME Robotics revenue in fiscal 2025?",

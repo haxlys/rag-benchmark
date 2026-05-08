@@ -5,7 +5,7 @@ import yaml
 from rich.console import Console
 from rich.table import Table
 
-from .datasets import enabled_domains
+from .datasets import enabled_domains, enabled_mvp_embeddings, enabled_mvp_generators, enabled_tracks
 from .discrimination import build_discrimination_report
 from .importers import import_financebench, import_questions, import_text_documents
 from .runner import read_report, read_summary, run_benchmark
@@ -44,12 +44,44 @@ def plan(config: Path = Path("configs/benchmark.yaml")) -> None:
         if system.get("enabled") and system.get("stage") == "mvp":
             console.print(f"- {name} ({system.get('family')})")
 
+    console.print("\n[bold]Enabled embedding profiles[/bold]")
+    for name in enabled_mvp_embeddings(data):
+        item = data.get("embeddings", {}).get(name, {})
+        console.print(f"- {name} ({item.get('model_ref', 'local')})")
+
+    console.print("\n[bold]Enabled generator profiles[/bold]")
+    for name in enabled_mvp_generators(data):
+        item = data.get("generators", {}).get(name, {})
+        console.print(f"- {name} ({item.get('family', 'profile')})")
+
+    console.print("\n[bold]Enabled experiment tracks[/bold]")
+    for name in enabled_tracks(data):
+        console.print(f"- {name}")
+
 
 @app.command()
 def run(
     config: Path = Path("configs/benchmark.yaml"),
     domain: list[str] | None = typer.Option(None, "--domain", "-d", help="Domain to run."),
     system: list[str] | None = typer.Option(None, "--system", "-s", help="System to run."),
+    embedding: list[str] | None = typer.Option(
+        None,
+        "--embedding",
+        "-e",
+        help="Embedding profile to run for embedding-aware systems.",
+    ),
+    generator: list[str] | None = typer.Option(
+        None,
+        "--generator",
+        "-g",
+        help="Generator profile to run.",
+    ),
+    track: list[str] | None = typer.Option(
+        None,
+        "--track",
+        "-t",
+        help="Experiment track: retrieval-only, generator-oracle, end-to-end.",
+    ),
     top_k: int = typer.Option(4, "--top-k", help="Number of contexts to retrieve."),
     output_dir: Path | None = typer.Option(None, "--output-dir", help="Run output directory."),
 ) -> None:
@@ -59,10 +91,14 @@ def run(
         config_path=config,
         domains=domain or None,
         systems=system or None,
+        embeddings=embedding or None,
+        generators=generator or None,
+        tracks=track or None,
         top_k=top_k,
         output_dir=output_dir,
     )
     console.print(f"[bold green]Benchmark complete:[/bold green] {out_dir}")
+    console.print(f"[bold cyan]Dashboard:[/bold cyan] {out_dir / 'dashboard.html'}")
     show_summary(out_dir / "summary.csv")
 
 
@@ -106,7 +142,10 @@ def recommend(path: Path = Path("results/recommendations.csv")) -> None:
     rows = read_summary(path)
     table = Table(title=f"RAG Recommendation Ranking: {path}")
     table.add_column("Domain")
+    table.add_column("Track")
     table.add_column("System")
+    table.add_column("Embedding")
+    table.add_column("Generator")
     table.add_column("Score", justify="right")
     table.add_column("Quality", justify="right")
     table.add_column("Efficiency", justify="right")
@@ -115,7 +154,10 @@ def recommend(path: Path = Path("results/recommendations.csv")) -> None:
     for row in rows:
         table.add_row(
             row["domain"],
+            row.get("track", "end-to-end"),
             row["system_id"],
+            row.get("embedding_model", "none"),
+            row.get("generator_model", "unknown"),
             f"{float(row['recommendation_score']):.3f}",
             f"{float(row['quality_score']):.3f}",
             f"{float(row['efficiency_score']):.3f}",
@@ -222,8 +264,11 @@ def import_financebench_file(
 def show_summary(path: Path) -> None:
     rows = read_summary(path)
     table = Table(title=f"RAG Benchmark Summary: {path}")
+    table.add_column("Track")
     table.add_column("Domain")
     table.add_column("System")
+    table.add_column("Embedding")
+    table.add_column("Generator")
     table.add_column("Answer", justify="right")
     table.add_column("Evidence", justify="right")
     table.add_column("Precision", justify="right")
@@ -233,8 +278,11 @@ def show_summary(path: Path) -> None:
     table.add_column("Failure", justify="right")
     for row in rows:
         table.add_row(
+            row.get("track", "end-to-end"),
             row["domain"],
             row["system_id"],
+            row.get("embedding_model", "none"),
+            row.get("generator_model", "unknown"),
             f"{float(row['answer_correctness']):.3f}",
             f"{float(row['evidence_recall']):.3f}",
             f"{float(row['context_precision']):.3f}",

@@ -4,6 +4,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
+from rag_benchmark.embeddings import embedding_query_cost
 from rag_benchmark.schemas import Document, Question, RetrievedContext, RetrievalTrace
 from rag_benchmark.text import token_count
 
@@ -21,9 +22,18 @@ class RetrieverStats:
 class Retriever(ABC):
     system_id: str
 
-    def __init__(self, documents: list[Document], *, top_k: int = 4) -> None:
+    def __init__(
+        self,
+        documents: list[Document],
+        *,
+        top_k: int = 4,
+        embedding_model: str = "none",
+        reranker_model: str = "none",
+    ) -> None:
         self.documents = documents
         self.top_k = top_k
+        self.embedding_model = embedding_model
+        self.reranker_model = reranker_model
         start = time.perf_counter()
         self.stats = self.build(documents)
         self.stats.index_wall_time_ms = (time.perf_counter() - start) * 1000
@@ -49,12 +59,16 @@ class Retriever(ABC):
         tool_calls = self.stats.tool_calls - tool_before
         estimated_cost = estimate_cost(
             embedding_tokens=embedding_tokens,
+            embedding_model=self.embedding_model,
             reranker_calls=reranker_calls,
             tool_calls=tool_calls,
             retrieved_token_count=retrieved_token_count,
         )
         return RetrievalTrace(
             system_id=self.system_id,
+            rag_method=self.system_id,
+            embedding_model=self.embedding_model,
+            reranker_model=self.reranker_model,
             question_id=question.question_id,
             contexts=contexts,
             query_wall_time_ms=query_wall_time_ms,
@@ -71,13 +85,14 @@ class Retriever(ABC):
 def estimate_cost(
     *,
     embedding_tokens: int,
+    embedding_model: str,
     reranker_calls: int,
     tool_calls: int,
     retrieved_token_count: int,
 ) -> float:
     """Small normalized cost estimate for relative operations comparison."""
     return round(
-        embedding_tokens * 0.00000002
+        embedding_query_cost(embedding_model, embedding_tokens)
         + reranker_calls * 0.00002
         + tool_calls * 0.00001
         + retrieved_token_count * 0.00000001,

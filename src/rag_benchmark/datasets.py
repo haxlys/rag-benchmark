@@ -36,6 +36,29 @@ def enabled_mvp_systems(config: dict) -> list[str]:
     ]
 
 
+def enabled_mvp_embeddings(config: dict) -> list[str]:
+    embeddings = config.get("embeddings", {})
+    return [
+        name
+        for name, item in embeddings.items()
+        if item.get("enabled") and item.get("stage") == "mvp"
+    ]
+
+
+def enabled_mvp_generators(config: dict) -> list[str]:
+    generators = config.get("generators", {})
+    return [
+        name
+        for name, item in generators.items()
+        if item.get("enabled") and item.get("stage") == "mvp"
+    ]
+
+
+def enabled_tracks(config: dict) -> list[str]:
+    tracks = config.get("experiment_tracks", {})
+    return [name for name, item in tracks.items() if item.get("enabled")]
+
+
 def page_chunks(documents: list[Document]) -> list[CorpusChunk]:
     chunks = []
     for doc in documents:
@@ -83,4 +106,3 @@ def section_chunks(documents: list[Document]) -> list[CorpusChunk]:
                 )
             )
     return chunks
-

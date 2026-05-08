@@ -6,11 +6,12 @@ Date: 2026-05-07
 
 ## 결정 사항
 
-- 도메인: `finance`와 `general-docs`를 모두 구현합니다.
+- 도메인: `finance`, `financebench-open-source`, `general-docs`를 구현합니다.
 - PageIndex 범위: OSS only.
 - 벤치마크 목적: 제품 운영 관점 비교.
 - 첫 구현 언어: Python.
 - 첫 평가 방식: offline, reproducible, trace-heavy benchmark run.
+- 모델 비교 방식: retrieval-only, generator-oracle, end-to-end track을 분리합니다.
 
 ## 설계 원칙
 
@@ -287,6 +288,10 @@ Status: local/imported text fixture와 FinanceBench evidence-page import 기준 
 - citation validation 추가.
 - failure taxonomy 추가.
 - domain, system, question category별 scorecard 생성.
+- embedding profile과 generator profile 축 추가.
+- retrieval-only와 oracle-context generator track 추가.
+
+Status: deterministic local profile 기준 complete.
 
 ### Phase 6: Operations Report
 
@@ -297,10 +302,19 @@ Status: local/imported text fixture와 FinanceBench evidence-page import 기준 
   - maintenance note
   - 각 접근법을 쓰지 말아야 하는 경우
 
+Status: 영어/한국어 report와 정적 시각화 dashboard 기준 complete.
+
+### Phase 7: Real Model Adapter Expansion
+
+- deterministic embedding proxy를 optional local model adapter로 교체 가능하게 만들기.
+- config flag 뒤에 sentence-transformers 또는 동급 OSS backend 추가.
+- 하드웨어가 있을 때 open-weight generator adapter 추가.
+- deterministic profile은 빠른 CI와 smoke-test mode로 유지.
+
 ## 다음 작업 후보
 
-1. 실제 FinanceBench full dataset으로 benchmark run.
-2. domain/category별 최소 50-100개 question 확보.
-3. PDF/table-native ingestion track 추가.
-4. expansion system인 RAPTOR, GraphRAG, agentic-vector 추가.
-5. generated report의 Korean output option 추가.
+1. table-native extraction을 포함한 full-PDF FinanceBench ingestion 추가.
+2. 최소 두 개 이상의 실제 OSS embedding adapter 추가.
+3. open-weight instruction model용 optional local generator adapter 추가.
+4. 주요 도메인별 100개 이상 labeled question으로 사용자 문서 run 확장.
+5. 실제 모델 run 기준 p95 latency와 memory tracking 추가.

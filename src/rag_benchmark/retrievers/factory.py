@@ -19,11 +19,35 @@ RETRIEVERS: dict[str, type[Retriever]] = {
     "pageindex-oss": PageIndexOSSRetriever,
 }
 
+EMBEDDING_AWARE_SYSTEMS = {
+    "dense-vector",
+    "hybrid",
+    "hybrid-rerank",
+    "pageindex-oss",
+}
 
-def build_retriever(system_id: str, documents: list[Document], *, top_k: int) -> Retriever:
+
+def build_retriever(
+    system_id: str,
+    documents: list[Document],
+    *,
+    top_k: int,
+    embedding_model: str = "none",
+    reranker_model: str = "none",
+) -> Retriever:
     try:
         retriever_cls = RETRIEVERS[system_id]
     except KeyError as exc:
         raise ValueError(f"Unknown retriever system: {system_id}") from exc
-    return retriever_cls(documents, top_k=top_k)
+    if not uses_embedding(system_id):
+        embedding_model = "none"
+    return retriever_cls(
+        documents,
+        top_k=top_k,
+        embedding_model=embedding_model,
+        reranker_model=reranker_model,
+    )
 
+
+def uses_embedding(system_id: str) -> bool:
+    return system_id in EMBEDDING_AWARE_SYSTEMS

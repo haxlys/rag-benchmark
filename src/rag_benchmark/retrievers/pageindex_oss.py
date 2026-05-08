@@ -3,9 +3,10 @@ from __future__ import annotations
 from collections import Counter
 
 from rag_benchmark.datasets import section_chunks
+from rag_benchmark.embeddings import apply_idf, embedding_counter
 from rag_benchmark.retrievers.base import Retriever, RetrieverStats
 from rag_benchmark.schemas import CorpusChunk, Document, Question, RetrievedContext
-from rag_benchmark.text import counter_cosine, tokenize, token_count, weighted_counter
+from rag_benchmark.text import counter_cosine, tokenize, token_count
 
 
 class PageIndexOSSRetriever(Retriever):
@@ -20,16 +21,20 @@ class PageIndexOSSRetriever(Retriever):
 
     def build(self, documents: list[Document]) -> RetrieverStats:
         self.section_nodes = section_chunks(documents)
-        token_lists = [
-            tokenize(f"{chunk.section_title or ''} {chunk.text}", semantic=True)
+        counters = [
+            embedding_counter(
+                chunk.text,
+                self.embedding_model,
+                title=chunk.section_title or chunk.title,
+            )
             for chunk in self.section_nodes
         ]
         df: Counter[str] = Counter()
-        for tokens in token_lists:
-            df.update(set(tokens))
-        total = max(len(token_lists), 1)
+        for counter in counters:
+            df.update(counter.keys())
+        total = max(len(counters), 1)
         self.idf = {token: 1 + total / (1 + count) for token, count in df.items()}
-        self.vectors = [weighted_counter(tokens, self.idf) for tokens in token_lists]
+        self.vectors = [apply_idf(counter, self.idf) for counter in counters]
         tree_bytes = sum(len(node.model_dump_json().encode("utf-8")) for node in self.section_nodes)
         return RetrieverStats(
             index_size_bytes=tree_bytes,
@@ -40,7 +45,10 @@ class PageIndexOSSRetriever(Retriever):
     def retrieve_contexts(self, question: Question, *, top_k: int) -> list[RetrievedContext]:
         self.stats.tool_calls += 2
         query_tokens = set(tokenize(question.question, semantic=True))
-        query_vector = weighted_counter(query_tokens, self.idf)
+        query_vector = apply_idf(
+            embedding_counter(question.question, self.embedding_model),
+            self.idf,
+        )
         scored: list[tuple[CorpusChunk, float]] = []
         for chunk, vector in zip(self.section_nodes, self.vectors):
             title_tokens = set(tokenize(chunk.section_title or "", semantic=True))
@@ -55,4 +63,3 @@ class PageIndexOSSRetriever(Retriever):
             RetrievedContext(chunk=chunk, score=score, rank=rank, retriever=self.system_id)
             for rank, (chunk, score) in enumerate(selected, 1)
         ]
-

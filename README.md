@@ -28,6 +28,7 @@ PageIndex scope:
 Comparison goal:
 
 - Product operations comparison, not only retrieval accuracy.
+- Separate retrieval quality, generator quality, and full end-to-end quality.
 - Measure ingestion, indexing, query quality, latency, cost, failure modes,
   citation quality, and maintenance complexity.
 
@@ -41,6 +42,23 @@ MVP systems:
 - `hybrid-rerank`: hybrid retrieval plus reranking.
 - `parent-child`: small chunks for retrieval, larger parent context for answer generation.
 - `pageindex-oss`: PageIndex open-source tree index plus agent/tool retrieval.
+
+MVP embedding profiles:
+
+- `e5-large-v2-proxy`: local deterministic proxy for `intfloat/e5-large-v2`.
+- `bge-m3-proxy`: local deterministic proxy for `BAAI/bge-m3`.
+- `finance-e5-proxy`: local deterministic proxy for a FinanceMTEB/Fin-E5-style domain model.
+
+MVP generator profiles:
+
+- `extractive-strict`: conservative context-bound answer generation.
+- `balanced-oss-llm`: stronger multi-section and table handling.
+- `reasoning-oss-llm`: stronger table, calculation, and integration handling.
+
+These are local deterministic profiles so the benchmark remains OSS-only,
+fast, and reproducible. They are model-selection proxies, not claims about
+actual downloaded model weights. Replace them with real adapters before making
+model leaderboard claims.
 
 Expansion systems:
 
@@ -62,8 +80,12 @@ Expansion systems:
 ## First Milestone
 
 Build a thin, reproducible benchmark harness that can run the same question set
-against six MVP systems across both domains, then produce a scorecard covering:
+against RAG methods, embedding profiles, and generator profiles across domains,
+then produce a scorecard covering:
 
+- retrieval-only evidence quality
+- oracle-context generator quality
+- end-to-end stack quality
 - retrieval evidence recall and precision
 - answer correctness
 - groundedness and citation validity
@@ -107,6 +129,12 @@ Print the operations recommendation ranking:
 uv run rag-benchmark recommend
 ```
 
+Open the latest visual dashboard:
+
+```text
+results/dashboard.html
+```
+
 Audit whether the benchmark actually separated systems:
 
 ```bash
@@ -137,6 +165,7 @@ Each run writes:
 - `runs/<run_id>/traces.jsonl`: full retrieval, answer, and evaluation traces.
 - `runs/<run_id>/report.md`: operations-oriented markdown report.
 - `runs/<run_id>/report.ko.md`: Korean operations-oriented markdown report.
+- `runs/<run_id>/dashboard.html`: static visual dashboard with ranking, scatter, histogram, and heatmap views.
 
 The latest run is also copied to:
 
@@ -147,11 +176,18 @@ The latest run is also copied to:
 - `results/results.csv`
 - `results/report.md`
 - `results/report.ko.md`
+- `results/dashboard.html`
 
 ## How To Interpret Results
 
 Use the benchmark as an operations decision aid:
 
+- Use `retrieval-only` to decide whether the retrieval/indexing layer can find
+  the evidence before discussing LLM quality.
+- Use `generator-oracle` to compare generator profiles when the right context is
+  guaranteed.
+- Use `end-to-end` to choose deployable combinations of RAG method, embedding
+  profile, and generator profile.
 - Choose `bm25` when exact terms, speed, and low cost matter most.
 - Choose `hybrid` or `hybrid-rerank` when semantic matching and exact terms both matter.
 - Choose `parent-child` when chunk-level search works but answer generation needs more surrounding context.

@@ -11,8 +11,13 @@ from .schemas import EvaluationResult
 
 
 SUMMARY_FIELDS = [
+    "track",
     "domain",
     "system_id",
+    "rag_method",
+    "embedding_model",
+    "reranker_model",
+    "generator_model",
     "questions",
     "answer_correctness",
     "evidence_recall",
@@ -21,16 +26,24 @@ SUMMARY_FIELDS = [
     "query_wall_time_ms",
     "query_wall_time_p50_ms",
     "query_wall_time_p95_ms",
+    "generator_wall_time_ms",
+    "generator_wall_time_p95_ms",
     "index_wall_time_ms",
     "retrieved_token_count",
+    "generator_input_tokens",
+    "generator_output_tokens",
     "estimated_cost",
     "failure_rate",
 ]
 
 CATEGORY_FIELDS = [
+    "track",
     "domain",
     "category",
     "system_id",
+    "rag_method",
+    "embedding_model",
+    "generator_model",
     "questions",
     "answer_correctness",
     "evidence_recall",
@@ -39,8 +52,16 @@ CATEGORY_FIELDS = [
 ]
 
 RECOMMENDATION_FIELDS = [
+    "track",
     "domain",
     "system_id",
+    "rag_method",
+    "embedding_model",
+    "generator_model",
+    "answer_correctness",
+    "evidence_recall",
+    "context_precision",
+    "failure_rate",
     "recommendation_score",
     "quality_score",
     "efficiency_score",
@@ -48,7 +69,7 @@ RECOMMENDATION_FIELDS = [
     "role",
 ]
 
-FAILURE_FIELDS = ["domain", "system_id", "failure_type", "count"]
+FAILURE_FIELDS = ["track", "domain", "system_id", "embedding_model", "generator_model", "failure_type", "count"]
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -66,15 +87,38 @@ def write_results(path: Path, results: list[EvaluationResult]) -> None:
 
 
 def aggregate(results: list[EvaluationResult]) -> list[dict]:
-    grouped: dict[tuple[str, str], list[EvaluationResult]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str, str, str, str], list[EvaluationResult]] = defaultdict(list)
     for result in results:
-        grouped[(result.domain, result.system_id)].append(result)
+        grouped[
+            (
+                result.track,
+                result.domain,
+                result.system_id,
+                result.rag_method,
+                result.embedding_model,
+                result.reranker_model,
+                result.generator_model,
+            )
+        ].append(result)
     rows = []
-    for (domain, system_id), items in sorted(grouped.items()):
+    for (
+        track,
+        domain,
+        system_id,
+        rag_method,
+        embedding_model,
+        reranker_model,
+        generator_model,
+    ), items in sorted(grouped.items()):
         rows.append(
             {
+                "track": track,
                 "domain": domain,
                 "system_id": system_id,
+                "rag_method": rag_method,
+                "embedding_model": embedding_model,
+                "reranker_model": reranker_model,
+                "generator_model": generator_model,
                 "questions": len(items),
                 "answer_correctness": avg(items, "answer_correctness"),
                 "evidence_recall": avg(items, "evidence_recall"),
@@ -87,8 +131,14 @@ def aggregate(results: list[EvaluationResult]) -> list[dict]:
                 "query_wall_time_p95_ms": percentile(
                     [float(item.query_wall_time_ms) for item in items], 95
                 ),
+                "generator_wall_time_ms": avg(items, "generator_wall_time_ms"),
+                "generator_wall_time_p95_ms": percentile(
+                    [float(item.generator_wall_time_ms) for item in items], 95
+                ),
                 "index_wall_time_ms": avg(items, "index_wall_time_ms"),
                 "retrieved_token_count": avg(items, "retrieved_token_count"),
+                "generator_input_tokens": avg(items, "generator_input_tokens"),
+                "generator_output_tokens": avg(items, "generator_output_tokens"),
                 "estimated_cost": avg(items, "estimated_cost"),
                 "failure_rate": sum(1 for item in items if item.failure_type) / len(items),
             }
@@ -97,16 +147,29 @@ def aggregate(results: list[EvaluationResult]) -> list[dict]:
 
 
 def aggregate_by_category(results: list[EvaluationResult]) -> list[dict]:
-    grouped: dict[tuple[str, str, str], list[EvaluationResult]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str, str, str], list[EvaluationResult]] = defaultdict(list)
     for result in results:
-        grouped[(result.domain, result.category, result.system_id)].append(result)
+        grouped[
+            (
+                result.track,
+                result.domain,
+                result.category,
+                result.system_id,
+                result.embedding_model,
+                result.generator_model,
+            )
+        ].append(result)
     rows = []
-    for (domain, category, system_id), items in sorted(grouped.items()):
+    for (track, domain, category, system_id, embedding_model, generator_model), items in sorted(grouped.items()):
         rows.append(
             {
+                "track": track,
                 "domain": domain,
                 "category": category,
                 "system_id": system_id,
+                "rag_method": items[0].rag_method,
+                "embedding_model": embedding_model,
+                "generator_model": generator_model,
                 "questions": len(items),
                 "answer_correctness": avg(items, "answer_correctness"),
                 "evidence_recall": avg(items, "evidence_recall"),
@@ -118,12 +181,16 @@ def aggregate_by_category(results: list[EvaluationResult]) -> list[dict]:
 
 
 def build_recommendations(summary_rows: list[dict]) -> list[dict]:
-    grouped: dict[str, list[dict]] = defaultdict(list)
-    for row in summary_rows:
-        grouped[row["domain"]].append(row)
+    candidate_rows = [row for row in summary_rows if row.get("track") == "end-to-end"]
+    if not candidate_rows:
+        candidate_rows = summary_rows
+
+    grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    for row in candidate_rows:
+        grouped[(row["track"], row["domain"])].append(row)
 
     recommendations = []
-    for domain, rows in grouped.items():
+    for (track, domain), rows in grouped.items():
         max_latency = max(float(row["query_wall_time_ms"]) for row in rows) or 1.0
         max_cost = max(float(row["estimated_cost"]) for row in rows) or 1.0
         max_tokens = max(float(row["retrieved_token_count"]) for row in rows) or 1.0
@@ -142,34 +209,61 @@ def build_recommendations(summary_rows: list[dict]) -> list[dict]:
             score = (quality * 0.65) + (efficiency * 0.20) + (stability * 0.15)
             recommendations.append(
                 {
+                    "track": track,
                     "domain": domain,
                     "system_id": row["system_id"],
+                    "rag_method": row["rag_method"],
+                    "embedding_model": row["embedding_model"],
+                    "generator_model": row["generator_model"],
+                    "answer_correctness": row["answer_correctness"],
+                    "evidence_recall": row["evidence_recall"],
+                    "context_precision": row["context_precision"],
+                    "failure_rate": row["failure_rate"],
                     "recommendation_score": score,
                     "quality_score": quality,
                     "efficiency_score": efficiency,
                     "stability_score": stability,
-                    "role": recommendation_role(row["system_id"]),
+                    "role": recommendation_role(row["rag_method"]),
                 }
             )
     return sorted(
         recommendations,
-        key=lambda row: (row["domain"], -float(row["recommendation_score"]), row["system_id"]),
+        key=lambda row: (
+            row["track"],
+            row["domain"],
+            -float(row["recommendation_score"]),
+            row["system_id"],
+        ),
     )
 
 
 def failure_summary(results: list[EvaluationResult]) -> list[dict]:
-    grouped: dict[tuple[str, str, str], int] = defaultdict(int)
+    grouped: dict[tuple[str, str, str, str, str, str], int] = defaultdict(int)
     for result in results:
         if result.failure_type:
-            grouped[(result.domain, result.system_id, result.failure_type)] += 1
+            grouped[
+                (
+                    result.track,
+                    result.domain,
+                    result.system_id,
+                    result.embedding_model,
+                    result.generator_model,
+                    result.failure_type,
+                )
+            ] += 1
     return [
         {
+            "track": track,
             "domain": domain,
             "system_id": system_id,
+            "embedding_model": embedding_model,
+            "generator_model": generator_model,
             "failure_type": failure_type,
             "count": count,
         }
-        for (domain, system_id, failure_type), count in sorted(grouped.items())
+        for (track, domain, system_id, embedding_model, generator_model, failure_type), count in sorted(
+            grouped.items()
+        )
     ]
 
 
@@ -214,20 +308,26 @@ def write_markdown_report(
     run_id: str,
     warnings: list[str] | None = None,
 ) -> None:
+    score_rows = [row for row in summary_rows if row.get("track") == "end-to-end"] or summary_rows
+    score_category_rows = [
+        row for row in category_rows if row.get("track") == "end-to-end"
+    ] or category_rows
+    score_failure_rows = [row for row in failure_rows if row.get("track") == "end-to-end"]
     lines = [
         f"# RAG Benchmark Report: {run_id}",
         "",
-        "This report compares RAG strategies for practical operations decisions.",
-        "Scores are generated from local fixture datasets and deterministic extractive answering.",
+        "This report compares RAG strategies, embedding profiles, and generator profiles for practical operations decisions.",
+        "Scores are generated from local fixture datasets and deterministic local profiles.",
         "",
-        "## Scorecard",
+        "## End-to-End Scorecard",
         "",
-        "| Domain | System | Answer | Evidence Recall | Context Precision | Citation | Latency ms | Cost | Failure |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Domain | RAG | Embedding | Generator | Answer | Evidence Recall | Context Precision | Citation | Latency ms | Cost | Failure |",
+        "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    for row in summary_rows:
+    for row in score_rows:
         lines.append(
-            "| {domain} | {system_id} | {answer_correctness:.3f} | {evidence_recall:.3f} | "
+            "| {domain} | {rag_method} | {embedding_model} | {generator_model} | "
+            "{answer_correctness:.3f} | {evidence_recall:.3f} | "
             "{context_precision:.3f} | {citation_validity:.3f} | {query_wall_time_ms:.2f} | "
             "{estimated_cost:.6f} | {failure_rate:.3f} |".format(**row)
         )
@@ -258,16 +358,17 @@ def write_markdown_report(
             "",
         ]
     )
-    if failure_rows:
+    if score_failure_rows:
         lines.extend(
             [
-                "| Domain | System | Failure Type | Count |",
-                "|---|---|---|---:|",
+                "| Domain | RAG | Embedding | Generator | Failure Type | Count |",
+                "|---|---|---|---|---|---:|",
             ]
         )
-        for row in failure_rows:
+        for row in score_failure_rows:
             lines.append(
-                "| {domain} | `{system_id}` | {failure_type} | {count} |".format(**row)
+                "| {domain} | `{system_id}` | {embedding_model} | {generator_model} | "
+                "{failure_type} | {count} |".format(**row)
             )
     else:
         lines.append("No failures were recorded in this run.")
@@ -280,9 +381,13 @@ def write_markdown_report(
             "|---|---|---:|---:|---:|",
         ]
     )
-    category_keys = sorted({(row["domain"], row["category"]) for row in category_rows})
+    category_keys = sorted({(row["domain"], row["category"]) for row in score_category_rows})
     for domain, category in category_keys:
-        rows = [row for row in category_rows if row["domain"] == domain and row["category"] == category]
+        rows = [
+            row
+            for row in score_category_rows
+            if row["domain"] == domain and row["category"] == category
+        ]
         best = max(rows, key=lambda row: (row["answer_correctness"], row["evidence_recall"]))
         hardest = max(rows, key=lambda row: row["failure_rate"])
         lines.append(
@@ -297,8 +402,8 @@ def write_markdown_report(
             )
         )
     lines.extend(["", "## Operational Guidance", ""])
-    for domain in sorted({row["domain"] for row in summary_rows}):
-        domain_rows = [row for row in summary_rows if row["domain"] == domain]
+    for domain in sorted({row["domain"] for row in score_rows}):
+        domain_rows = [row for row in score_rows if row["domain"] == domain]
         best_quality = max(domain_rows, key=lambda row: (row["answer_correctness"], row["evidence_recall"]))
         cheapest = min(domain_rows, key=lambda row: row["estimated_cost"])
         fastest = min(domain_rows, key=lambda row: row["query_wall_time_ms"])
@@ -328,8 +433,9 @@ def write_markdown_report(
             "",
             "## Notes",
             "",
-            "- `pageindex-oss` uses a local PageIndex-style tree adapter only; hosted PageIndex APIs are excluded.",
-            "- The current answerer is deterministic so retrieval failures are visible and reproducible.",
+                "- `pageindex-oss` uses a local PageIndex-style tree adapter only; hosted PageIndex APIs are excluded.",
+            "- Embedding and generator comparisons use deterministic local profiles by default; plug in real model adapters before claiming model-leaderboard results.",
+            "- `retrieval-only` isolates evidence retrieval, `generator-oracle` isolates answer generation with gold context, and `end-to-end` combines the full stack.",
             "- Add real corpora and human-graded questions before treating numbers as production proof.",
             "",
         ]
@@ -346,20 +452,26 @@ def write_markdown_report_ko(
     run_id: str,
     warnings: list[str] | None = None,
 ) -> None:
+    score_rows = [row for row in summary_rows if row.get("track") == "end-to-end"] or summary_rows
+    score_category_rows = [
+        row for row in category_rows if row.get("track") == "end-to-end"
+    ] or category_rows
+    score_failure_rows = [row for row in failure_rows if row.get("track") == "end-to-end"]
     lines = [
         f"# RAG 벤치마크 리포트: {run_id}",
         "",
-        "이 리포트는 실무 운영 의사결정을 위해 여러 RAG 전략을 비교합니다.",
-        "점수는 로컬 fixture 데이터셋과 결정론적 extractive answerer로 생성됩니다.",
+        "이 리포트는 실무 운영 의사결정을 위해 RAG 전략, 임베딩 프로필, 생성 LLM 프로필을 비교합니다.",
+        "점수는 로컬 fixture 데이터셋과 결정론적 로컬 프로필로 생성됩니다.",
         "",
-        "## 점수표",
+        "## End-to-End 점수표",
         "",
-        "| 도메인 | 시스템 | 답변 | Evidence Recall | Context Precision | Citation | 지연시간 ms | 비용 | 실패율 |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| 도메인 | RAG | 임베딩 | 생성 모델 | 답변 | Evidence Recall | Context Precision | Citation | 지연시간 ms | 비용 | 실패율 |",
+        "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    for row in summary_rows:
+    for row in score_rows:
         lines.append(
-            "| {domain} | {system_id} | {answer_correctness:.3f} | {evidence_recall:.3f} | "
+            "| {domain} | {rag_method} | {embedding_model} | {generator_model} | "
+            "{answer_correctness:.3f} | {evidence_recall:.3f} | "
             "{context_precision:.3f} | {citation_validity:.3f} | {query_wall_time_ms:.2f} | "
             "{estimated_cost:.6f} | {failure_rate:.3f} |".format(**row)
         )
@@ -389,12 +501,18 @@ def write_markdown_report_ko(
         )
 
     lines.extend(["", "## 실패 유형", ""])
-    if failure_rows:
-        lines.extend(["| 도메인 | 시스템 | 실패 유형 | 건수 |", "|---|---|---|---:|"])
-        for row in failure_rows:
+    if score_failure_rows:
+        lines.extend(
+            [
+                "| 도메인 | RAG | 임베딩 | 생성 모델 | 실패 유형 | 건수 |",
+                "|---|---|---|---|---|---:|",
+            ]
+        )
+        for row in score_failure_rows:
             row_ko = {**row, "failure_type": failure_type_ko(row["failure_type"])}
             lines.append(
-                "| {domain} | `{system_id}` | {failure_type} | {count} |".format(**row_ko)
+                "| {domain} | `{system_id}` | {embedding_model} | {generator_model} | "
+                "{failure_type} | {count} |".format(**row_ko)
             )
     else:
         lines.append("이번 실행에서는 실패가 기록되지 않았습니다.")
@@ -408,9 +526,13 @@ def write_markdown_report_ko(
             "|---|---|---:|---:|---:|",
         ]
     )
-    category_keys = sorted({(row["domain"], row["category"]) for row in category_rows})
+    category_keys = sorted({(row["domain"], row["category"]) for row in score_category_rows})
     for domain, category in category_keys:
-        rows = [row for row in category_rows if row["domain"] == domain and row["category"] == category]
+        rows = [
+            row
+            for row in score_category_rows
+            if row["domain"] == domain and row["category"] == category
+        ]
         best = max(rows, key=lambda row: (row["answer_correctness"], row["evidence_recall"]))
         hardest = max(rows, key=lambda row: row["failure_rate"])
         lines.append(
@@ -426,8 +548,8 @@ def write_markdown_report_ko(
         )
 
     lines.extend(["", "## 운영 가이드", ""])
-    for domain in sorted({row["domain"] for row in summary_rows}):
-        domain_rows = [row for row in summary_rows if row["domain"] == domain]
+    for domain in sorted({row["domain"] for row in score_rows}):
+        domain_rows = [row for row in score_rows if row["domain"] == domain]
         best_quality = max(domain_rows, key=lambda row: (row["answer_correctness"], row["evidence_recall"]))
         cheapest = min(domain_rows, key=lambda row: row["estimated_cost"])
         fastest = min(domain_rows, key=lambda row: row["query_wall_time_ms"])
@@ -461,7 +583,8 @@ def write_markdown_report_ko(
             "## 메모",
             "",
             "- `pageindex-oss`는 로컬 PageIndex-style tree adapter만 사용합니다. Hosted PageIndex API는 제외되어 있습니다.",
-            "- 현재 answerer는 결정론적이므로 retrieval failure를 재현하고 분석하기 쉽습니다.",
+            "- 기본 임베딩/생성 비교는 결정론적 로컬 프로필입니다. 실제 모델 리더보드 성능으로 주장하려면 실제 모델 adapter를 연결해야 합니다.",
+            "- `retrieval-only`는 검색 품질, `generator-oracle`은 gold context 기반 생성 능력, `end-to-end`는 전체 조합을 봅니다.",
             "- 실제 production 근거로 사용하려면 대표 corpus와 사람이 검수한 question/evidence label을 추가해야 합니다.",
             "",
         ]

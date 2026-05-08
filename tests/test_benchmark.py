@@ -2,6 +2,7 @@ from pathlib import Path
 
 from rag_benchmark.datasets import load_domain, read_jsonl
 from rag_benchmark.discrimination import build_discrimination_report
+from rag_benchmark.embeddings import embedding_counter
 from rag_benchmark.importers import import_financebench, import_questions, import_text_documents
 from rag_benchmark.runner import read_summary, run_benchmark
 from rag_benchmark.schemas import Document
@@ -32,6 +33,17 @@ def test_semantic_token_aliases() -> None:
     assert "export_window" in tokenize("portability package bundle expires", semantic=True)
 
 
+def test_embedding_profiles_shape_tokens_differently() -> None:
+    text = "Revenue increased 12% while cash and debt changed."
+    e5 = embedding_counter(text, "e5-large-v2-proxy")
+    bge = embedding_counter(text, "bge-m3-proxy")
+    finance = embedding_counter(text, "finance-e5-proxy")
+
+    assert e5["revenue"] > 0
+    assert bge["percentage"] > e5["percentage"]
+    assert finance["revenue"] > e5["revenue"]
+
+
 def test_full_benchmark_smoke(tmp_path: Path) -> None:
     out_dir = run_benchmark(
         root=ROOT,
@@ -41,26 +53,61 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
         copy_to_results=False,
     )
     summary_rows = read_summary(out_dir / "summary.csv")
-    assert len(summary_rows) == 18
+    assert len(summary_rows) == 177
 
-    rows_by_key = {(row["domain"], row["system_id"]): row for row in summary_rows}
-    assert float(rows_by_key[("finance", "bm25")]["answer_correctness"]) < float(
-        rows_by_key[("finance", "pageindex-oss")]["answer_correctness"]
+    rows_by_key = {
+        (
+            row["track"],
+            row["domain"],
+            row["system_id"],
+            row["embedding_model"],
+            row["generator_model"],
+        ): row
+        for row in summary_rows
+    }
+    assert float(
+        rows_by_key[("end-to-end", "finance", "bm25", "none", "reasoning-oss-llm")][
+            "answer_correctness"
+        ]
+    ) < float(
+        rows_by_key[
+            (
+                "end-to-end",
+                "finance",
+                "pageindex-oss",
+                "bge-m3-proxy",
+                "reasoning-oss-llm",
+            )
+        ]["answer_correctness"]
     )
-    assert float(rows_by_key[("general-docs", "pageindex-oss")]["answer_correctness"]) >= float(
-        rows_by_key[("general-docs", "bm25")]["answer_correctness"]
+    assert float(
+        rows_by_key[
+            (
+                "retrieval-only",
+                "general-docs",
+                "pageindex-oss",
+                "bge-m3-proxy",
+                "retrieval-probe",
+            )
+        ]["evidence_recall"]
+    ) >= float(
+        rows_by_key[("retrieval-only", "general-docs", "bm25", "none", "retrieval-probe")][
+            "evidence_recall"
+        ]
     )
     assert (out_dir / "category_summary.csv").exists()
     assert (out_dir / "recommendations.csv").exists()
     assert (out_dir / "failure_summary.csv").exists()
     assert (out_dir / "report.md").exists()
     assert (out_dir / "report.ko.md").exists()
+    assert (out_dir / "dashboard.html").exists()
     assert "RAG 벤치마크 리포트" in (out_dir / "report.ko.md").read_text(encoding="utf-8")
+    assert "RAG Benchmark Dashboard" in (out_dir / "dashboard.html").read_text(encoding="utf-8")
 
     discrimination_report = build_discrimination_report(out_dir)
-    assert "`finance`: **strongly discriminative**" in discrimination_report
-    assert "`financebench-open-source`: **moderately discriminative**" in discrimination_report
-    assert "`general-docs`: **strongly discriminative**" in discrimination_report
+    assert "`end-to-end` / `finance`: **strongly discriminative**" in discrimination_report
+    assert "`end-to-end` / `financebench-open-source`: **moderately discriminative**" in discrimination_report
+    assert "`retrieval-only` / `general-docs`: **strongly discriminative**" in discrimination_report
 
 
 def test_import_text_documents_and_questions(tmp_path: Path) -> None:

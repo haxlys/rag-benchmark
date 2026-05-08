@@ -79,6 +79,9 @@ class RetrievedContext(BaseModel):
 
 class RetrievalTrace(BaseModel):
     system_id: str
+    rag_method: str
+    embedding_model: str = "none"
+    reranker_model: str = "none"
     question_id: str
     contexts: list[RetrievedContext]
     query_wall_time_ms: float
@@ -95,12 +98,22 @@ class AnswerTrace(BaseModel):
     answer: str
     cited_chunk_ids: list[str]
     abstained: bool
+    generator_model: str = "extractive-strict"
+    input_token_count: int = 0
+    output_token_count: int = 0
+    wall_time_ms: float = 0.0
+    estimated_cost: float = 0.0
 
 
 class EvaluationResult(BaseModel):
     run_id: str
+    track: str
     domain: str
     system_id: str
+    rag_method: str
+    embedding_model: str
+    reranker_model: str
+    generator_model: str
     question_id: str
     category: str
     hit_rate: float
@@ -115,10 +128,12 @@ class EvaluationResult(BaseModel):
     abstention_correctness: float
     retrieved_token_count: int
     query_wall_time_ms: float
+    generator_wall_time_ms: float
     index_wall_time_ms: float
     embedding_tokens: int
+    generator_input_tokens: int
+    generator_output_tokens: int
     reranker_calls: int
     tool_calls: int
     estimated_cost: float
     failure_type: str | None
-

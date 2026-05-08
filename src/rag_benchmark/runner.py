@@ -8,7 +8,16 @@ from typing import Iterable
 import yaml
 
 from .answer import generate_answer
-from .datasets import enabled_domains, enabled_mvp_systems, load_domain
+from .dashboard import write_dashboard
+from .datasets import (
+    enabled_domains,
+    enabled_mvp_embeddings,
+    enabled_mvp_generators,
+    enabled_mvp_systems,
+    enabled_tracks,
+    load_domain,
+    page_chunks,
+)
 from .evaluation import evaluate
 from .reporting import (
     aggregate,
@@ -25,7 +34,9 @@ from .reporting import (
     write_summary_csv,
 )
 from .retrievers import build_retriever
-from .schemas import EvaluationResult
+from .retrievers.factory import uses_embedding
+from .schemas import EvaluationResult, Question, RetrievedContext, RetrievalTrace
+from .text import token_count
 
 
 def load_config(path: Path) -> dict:
@@ -39,6 +50,9 @@ def run_benchmark(
     config_path: Path,
     domains: Iterable[str] | None = None,
     systems: Iterable[str] | None = None,
+    embeddings: Iterable[str] | None = None,
+    generators: Iterable[str] | None = None,
+    tracks: Iterable[str] | None = None,
     top_k: int = 4,
     output_dir: Path | None = None,
     copy_to_results: bool = True,
@@ -46,6 +60,9 @@ def run_benchmark(
     config = load_config(config_path)
     selected_domains = list(domains) if domains else enabled_domains(config)
     selected_systems = list(systems) if systems else enabled_mvp_systems(config)
+    selected_embeddings = list(embeddings) if embeddings else enabled_mvp_embeddings(config)
+    selected_generators = list(generators) if generators else enabled_mvp_generators(config)
+    selected_tracks = list(tracks) if tracks else enabled_tracks(config)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_dir = output_dir or root / "runs" / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -66,31 +83,80 @@ def run_benchmark(
             interpretation_warnings.append(
                 f"{domain}: {unlabeled} answerable questions have no evidence labels; retrieval scores are limited."
             )
-        for system_id in selected_systems:
-            retriever = build_retriever(system_id, documents, top_k=top_k)
+        if "retrieval-only" in selected_tracks:
+            for system_id, embedding_model in system_embedding_matrix(
+                selected_systems,
+                selected_embeddings,
+            ):
+                retriever = build_retriever(
+                    system_id,
+                    documents,
+                    top_k=top_k,
+                    embedding_model=embedding_model,
+                )
+                for question in questions:
+                    retrieval = retriever.retrieve(question, top_k=top_k)
+                    answer = generate_answer(question, retrieval, "retrieval-probe")
+                    append_result(
+                        all_results=all_results,
+                        traces=traces,
+                        run_id=run_id,
+                        track="retrieval-only",
+                        domain=domain,
+                        system_id=system_id,
+                        question=question,
+                        retrieval=retrieval,
+                        answer=answer,
+                    )
+
+        if "generator-oracle" in selected_tracks:
             for question in questions:
-                retrieval = retriever.retrieve(question, top_k=top_k)
-                answer = generate_answer(question, retrieval)
-                result = evaluate(
+                retrieval = oracle_retrieval(
+                    question,
+                    documents,
+                    top_k=top_k,
                     run_id=run_id,
-                    domain=domain,
-                    system_id=system_id,
-                    question=question,
-                    retrieval=retrieval,
-                    answer=answer,
                 )
-                all_results.append(result)
-                traces.append(
-                    {
-                        "run_id": run_id,
-                        "domain": domain,
-                        "system_id": system_id,
-                        "question": question.model_dump(),
-                        "retrieval": retrieval.model_dump(),
-                        "answer": answer.model_dump(),
-                        "evaluation": result.model_dump(),
-                    }
+                for generator_model in selected_generators:
+                    answer = generate_answer(question, retrieval, generator_model)
+                    append_result(
+                        all_results=all_results,
+                        traces=traces,
+                        run_id=run_id,
+                        track="generator-oracle",
+                        domain=domain,
+                        system_id="oracle-context",
+                        question=question,
+                        retrieval=retrieval,
+                        answer=answer,
+                    )
+
+        if "end-to-end" in selected_tracks:
+            for system_id, embedding_model in system_embedding_matrix(
+                selected_systems,
+                selected_embeddings,
+            ):
+                retriever = build_retriever(
+                    system_id,
+                    documents,
+                    top_k=top_k,
+                    embedding_model=embedding_model,
                 )
+                for question in questions:
+                    retrieval = retriever.retrieve(question, top_k=top_k)
+                    for generator_model in selected_generators:
+                        answer = generate_answer(question, retrieval, generator_model)
+                        append_result(
+                            all_results=all_results,
+                            traces=traces,
+                            run_id=run_id,
+                            track="end-to-end",
+                            domain=domain,
+                            system_id=system_id,
+                            question=question,
+                            retrieval=retrieval,
+                            answer=answer,
+                        )
 
     summary_rows = aggregate(all_results)
     category_rows = aggregate_by_category(all_results)
@@ -120,9 +186,112 @@ def run_benchmark(
         run_id,
         interpretation_warnings,
     )
+    write_dashboard(
+        out_dir / "dashboard.html",
+        summary_rows=summary_rows,
+        category_rows=category_rows,
+        recommendation_rows=recommendation_rows,
+        result_rows=[result.model_dump() for result in all_results],
+        run_id=run_id,
+    )
     if copy_to_results:
         copy_latest(root, out_dir)
     return out_dir
+
+
+def append_result(
+    *,
+    all_results: list[EvaluationResult],
+    traces: list[dict],
+    run_id: str,
+    track: str,
+    domain: str,
+    system_id: str,
+    question: Question,
+    retrieval: RetrievalTrace,
+    answer,
+) -> None:
+    result = evaluate(
+        run_id=run_id,
+        track=track,
+        domain=domain,
+        system_id=system_id,
+        question=question,
+        retrieval=retrieval,
+        answer=answer,
+    )
+    all_results.append(result)
+    traces.append(
+        {
+            "run_id": run_id,
+            "track": track,
+            "domain": domain,
+            "system_id": system_id,
+            "question": question.model_dump(),
+            "retrieval": retrieval.model_dump(),
+            "answer": answer.model_dump(),
+            "evaluation": result.model_dump(),
+        }
+    )
+
+
+def system_embedding_matrix(
+    systems: list[str],
+    embeddings: list[str],
+) -> list[tuple[str, str]]:
+    pairs = []
+    for system_id in systems:
+        if uses_embedding(system_id):
+            for embedding_model in embeddings:
+                pairs.append((system_id, embedding_model))
+        else:
+            pairs.append((system_id, "none"))
+    return pairs
+
+
+def oracle_retrieval(
+    question: Question,
+    documents,
+    *,
+    top_k: int,
+    run_id: str,
+) -> RetrievalTrace:
+    chunks = page_chunks(documents)
+    selected = []
+    seen = set()
+    for evidence in question.evidence:
+        for chunk in chunks:
+            if chunk.chunk_id in seen:
+                continue
+            if chunk.overlaps(evidence):
+                seen.add(chunk.chunk_id)
+                selected.append(chunk)
+                break
+    contexts = [
+        RetrievedContext(
+            chunk=chunk,
+            score=1.0,
+            rank=rank,
+            retriever="oracle-context",
+        )
+        for rank, chunk in enumerate(selected[:top_k], 1)
+    ]
+    return RetrievalTrace(
+        system_id="oracle-context",
+        rag_method="oracle-context",
+        embedding_model="gold-context",
+        reranker_model="none",
+        question_id=question.question_id,
+        contexts=contexts,
+        query_wall_time_ms=0.0,
+        index_wall_time_ms=0.0,
+        retrieved_token_count=sum(token_count(context.chunk.text) for context in contexts),
+        embedding_tokens=0,
+        reranker_calls=0,
+        tool_calls=0,
+        estimated_cost=0.0,
+        warnings=[f"{run_id}: oracle context uses gold evidence labels."],
+    )
 
 
 def copy_latest(root: Path, out_dir: Path) -> None:
@@ -136,6 +305,7 @@ def copy_latest(root: Path, out_dir: Path) -> None:
         "results.csv",
         "report.md",
         "report.ko.md",
+        "dashboard.html",
     ]:
         source = out_dir / name
         target = results_dir / name

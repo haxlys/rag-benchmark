@@ -31,15 +31,26 @@ Working research sources for the initial design.
 
 ## Evaluation
 
+- https://huggingface.co/mteb
+- https://github.com/embeddings-benchmark/mteb
 - https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/
 - https://www.trulens.org/getting_started/core_concepts/rag_triad/
 - https://arxiv.org/abs/2311.09476
 - https://github.com/stanford-futuredata/ARES
 - https://arxiv.org/abs/2104.08663
 - https://arxiv.org/abs/2311.11944
+- https://arxiv.org/abs/2603.06198
+- https://arxiv.org/abs/2502.10990
 - https://github.com/patronus-ai/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench/blob/main/financebench_merged.jsonl
+
+## OSS Embedding Candidates
+
+- https://huggingface.co/intfloat/e5-large-v2
+- https://huggingface.co/BAAI/bge-m3
+- https://huggingface.co/FinanceMTEB/Fin-e5-tokenizer
+- https://huggingface.co/nomic-ai/nomic-embed-text-v1.5
 
 ## Document Parsing
 

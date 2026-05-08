@@ -11,7 +11,11 @@ class HybridRetriever(Retriever):
 
     def build(self, documents: list[Document]) -> RetrieverStats:
         self.bm25 = BM25Retriever(documents, top_k=max(self.top_k * 4, 12))
-        self.dense = DenseVectorRetriever(documents, top_k=max(self.top_k * 4, 12))
+        self.dense = DenseVectorRetriever(
+            documents,
+            top_k=max(self.top_k * 4, 12),
+            embedding_model=self.embedding_model,
+        )
         return RetrieverStats(
             embedding_tokens=self.dense.stats.embedding_tokens,
             index_size_bytes=self.bm25.stats.index_size_bytes + self.dense.stats.index_size_bytes,
@@ -41,4 +45,3 @@ def reciprocal_rank_fusion(
         RetrievedContext(chunk=item.chunk, score=score, rank=rank, retriever=retriever)
         for rank, (item, score) in enumerate(ranked, 1)
     ]
-

@@ -9,6 +9,17 @@ tracks:
   native_operations:
     description: Each system uses its intended ingestion and retrieval path.
 
+experiment_tracks:
+  retrieval-only:
+    enabled: true
+    description: Isolate whether retrieval can find labeled evidence without judging LLM generation.
+  generator-oracle:
+    enabled: true
+    description: Give gold evidence context to generator profiles to isolate answer synthesis.
+  end-to-end:
+    enabled: true
+    description: Run full RAG method x embedding profile x generator profile combinations.
+
 domains:
   finance:
     enabled: true
@@ -89,6 +100,52 @@ systems:
     stage: expansion
     family: iterative_agentic_retrieval
     enabled: false
+
+embeddings:
+  e5-large-v2-proxy:
+    stage: mvp
+    enabled: true
+    model_ref: intfloat/e5-large-v2
+    family: general_dense
+    notes:
+      - deterministic_local_proxy_no_model_download
+      - replace_with_sentence_transformers_adapter_for_true_model_scores
+  bge-m3-proxy:
+    stage: mvp
+    enabled: true
+    model_ref: BAAI/bge-m3
+    family: hybrid_multifunction
+    notes:
+      - deterministic_local_proxy_no_model_download
+      - inspired_by_dense_sparse_multifunction_retrieval
+  finance-e5-proxy:
+    stage: mvp
+    enabled: true
+    model_ref: FinanceMTEB/Fin-e5-tokenizer
+    family: finance_domain_dense
+    notes:
+      - deterministic_local_proxy_no_model_download
+      - tests_domain_adapted_finance_embedding_hypothesis
+
+generators:
+  extractive-strict:
+    stage: mvp
+    enabled: true
+    family: small_grounded_oss_llm_profile
+    notes:
+      - conservative_context_bound_answering
+  balanced-oss-llm:
+    stage: mvp
+    enabled: true
+    family: balanced_instruction_oss_llm_profile
+    notes:
+      - better_multi_section_and_table_handling
+  reasoning-oss-llm:
+    stage: mvp
+    enabled: true
+    family: reasoning_table_oss_llm_profile
+    notes:
+      - stronger_table_calculation_and_integration_profile
 
 metrics:
   retrieval:

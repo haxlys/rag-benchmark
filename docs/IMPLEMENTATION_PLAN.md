@@ -6,11 +6,12 @@ Date: 2026-05-07
 
 ## Decisions
 
-- Domains: implement both `finance` and `general-docs`.
+- Domains: implement `finance`, `financebench-open-source`, and `general-docs`.
 - PageIndex scope: OSS only.
 - Benchmark objective: product operations comparison.
 - First implementation language: Python.
 - First evaluation style: offline, reproducible, trace-heavy benchmark runs.
+- Model comparison style: separate retrieval-only, generator-oracle, and end-to-end tracks.
 
 ## Design Principle
 
@@ -298,6 +299,10 @@ production-readiness expansion.
 - Add citation validation.
 - Add failure taxonomy.
 - Generate scorecards by domain, system, and question category.
+- Add embedding profile and generator profile axes.
+- Add retrieval-only and oracle-context generator tracks.
+
+Status: complete for deterministic local profiles.
 
 ### Phase 6: Operations Report
 
@@ -308,11 +313,19 @@ production-readiness expansion.
   - maintenance notes
   - when not to use each approach
 
+Status: complete for English/Korean reports and static visual dashboard.
+
+### Phase 7: Real Model Adapter Expansion
+
+- Replace deterministic embedding proxies with optional local model adapters.
+- Add sentence-transformers or equivalent OSS backend behind a config flag.
+- Add local generator adapters for open-weight models when hardware is available.
+- Keep deterministic profiles as fast CI and smoke-test mode.
+
 ## Immediate Next Tasks
 
-1. Create `pyproject.toml` and minimal CLI.
-2. Define JSONL schemas for documents, questions, and traces.
-3. Implement `configs/benchmark.yaml` loader.
-4. Add FinanceBench data import command.
-5. Implement BM25 baseline first.
-6. Add one tiny fixture dataset for smoke tests.
+1. Add full-PDF FinanceBench ingestion, including table-native extraction.
+2. Add actual OSS embedding adapters for at least two open-weight models.
+3. Add optional local generator adapters for open-weight instruction models.
+4. Expand user-document import runs with 100+ labeled questions per major domain.
+5. Add deployment-oriented p95 latency and memory tracking for real model runs.

@@ -8,6 +8,7 @@ from .schemas import AnswerTrace, EvaluationResult, Question, RetrievalTrace
 def evaluate(
     *,
     run_id: str,
+    track: str,
     domain: str,
     system_id: str,
     question: Question,
@@ -46,8 +47,13 @@ def evaluate(
 
     return EvaluationResult(
         run_id=run_id,
+        track=track,
         domain=domain,
         system_id=system_id,
+        rag_method=retrieval.rag_method,
+        embedding_model=retrieval.embedding_model,
+        reranker_model=retrieval.reranker_model,
+        generator_model=answer.generator_model,
         question_id=question.question_id,
         category=question.category,
         hit_rate=hit_rate,
@@ -62,11 +68,14 @@ def evaluate(
         abstention_correctness=abstention_correctness,
         retrieved_token_count=retrieval.retrieved_token_count,
         query_wall_time_ms=retrieval.query_wall_time_ms,
+        generator_wall_time_ms=answer.wall_time_ms,
         index_wall_time_ms=retrieval.index_wall_time_ms,
         embedding_tokens=retrieval.embedding_tokens,
+        generator_input_tokens=answer.input_token_count,
+        generator_output_tokens=answer.output_token_count,
         reranker_calls=retrieval.reranker_calls,
         tool_calls=retrieval.tool_calls,
-        estimated_cost=retrieval.estimated_cost,
+        estimated_cost=retrieval.estimated_cost + answer.estimated_cost,
         failure_type=failure_type,
     )
 
@@ -126,4 +135,3 @@ def classify_failure(
     if context_precision < 0.34:
         return "context_bloat"
     return "generation_hallucination"
-

@@ -24,6 +24,7 @@ PageIndex 범위:
 비교 목표:
 
 - 검색 정확도만이 아니라 제품 운영 관점으로 비교합니다.
+- retrieval 품질, generator 품질, end-to-end 품질을 분리해서 봅니다.
 - ingestion, indexing, query quality, latency, cost, failure mode, citation quality, maintenance complexity를 함께 측정합니다.
 
 ## 비교 대상
@@ -36,6 +37,20 @@ MVP 시스템:
 - `hybrid-rerank`: hybrid retrieval + reranking.
 - `parent-child`: 작은 chunk로 검색하고 큰 parent context로 답변.
 - `pageindex-oss`: PageIndex 오픈소스 tree index + agent/tool retrieval.
+
+MVP 임베딩 프로필:
+
+- `e5-large-v2-proxy`: `intfloat/e5-large-v2` 계열을 흉내 내는 로컬 결정론적 proxy.
+- `bge-m3-proxy`: `BAAI/bge-m3` 계열을 흉내 내는 로컬 결정론적 proxy.
+- `finance-e5-proxy`: FinanceMTEB/Fin-E5 스타일의 금융 특화 모델 가설을 검증하는 로컬 proxy.
+
+MVP 생성 LLM 프로필:
+
+- `extractive-strict`: 보수적인 context-bound 답변 생성.
+- `balanced-oss-llm`: multi-section, table 처리 능력을 더 높게 둔 profile.
+- `reasoning-oss-llm`: table, calculation, evidence integration을 더 강하게 둔 profile.
+
+이 프로필들은 OSS-only, 빠른 실행, 재현성을 위해 만든 결정론적 로컬 proxy입니다. 실제 모델 weight를 다운로드해서 측정한 값은 아니므로, 모델 리더보드 성능 주장에는 실제 adapter 연결이 필요합니다.
 
 확장 후보:
 
@@ -55,8 +70,11 @@ MVP 시스템:
 
 ## 현재 상태
 
-동일한 질문 세트를 두 도메인과 여섯 MVP 시스템에 실행하고, 다음 항목을 포함한 scorecard를 생성합니다.
+동일한 질문 세트를 여러 도메인, RAG 방식, 임베딩 프로필, 생성 LLM 프로필 조합에 실행하고, 다음 항목을 포함한 scorecard를 생성합니다.
 
+- retrieval-only evidence quality
+- oracle-context generator quality
+- end-to-end stack quality
 - retrieval evidence recall and precision
 - answer correctness
 - groundedness and citation validity
@@ -100,6 +118,12 @@ uv run rag-benchmark report-ko
 uv run rag-benchmark recommend
 ```
 
+최신 시각화 대시보드 열기:
+
+```text
+results/dashboard.html
+```
+
 테스트가 시스템을 실제로 구분했는지 진단:
 
 ```bash
@@ -130,6 +154,7 @@ uv run --extra dev pytest -q
 - `runs/<run_id>/traces.jsonl`: retrieval, answer, evaluation trace 전체.
 - `runs/<run_id>/report.md`: 운영 관점 Markdown report.
 - `runs/<run_id>/report.ko.md`: 한국어 운영 관점 Markdown report.
+- `runs/<run_id>/dashboard.html`: ranking, scatter, histogram, heatmap을 포함한 정적 시각화 대시보드.
 
 최신 실행 결과는 다음 위치에도 복사됩니다.
 
@@ -140,12 +165,16 @@ uv run --extra dev pytest -q
 - `results/results.csv`
 - `results/report.md`
 - `results/report.ko.md`
+- `results/dashboard.html`
 - `results/discrimination.md`
 
 ## 결과 해석 방법
 
 벤치마크는 운영 의사결정 보조 도구로 사용합니다.
 
+- `retrieval-only`는 LLM 이야기를 하기 전에 검색/indexing layer가 정답 근거를 찾는지 확인합니다.
+- `generator-oracle`은 정답 근거가 주어졌을 때 generator profile 차이를 봅니다.
+- `end-to-end`는 실제 배포 후보인 RAG 방식, 임베딩 프로필, 생성 프로필 조합을 비교합니다.
 - 정확한 용어, 숫자, ID, 짧은 정책이 중요하면 `bm25`를 먼저 봅니다.
 - exact match와 semantic match가 모두 필요하면 `hybrid` 또는 `hybrid-rerank`를 봅니다.
 - 검색 chunk는 잘 잡히지만 답변 context가 부족하면 `parent-child`를 봅니다.

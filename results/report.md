@@ -1,4 +1,4 @@
-# RAG Benchmark Report: 20260507T084114Z
+# RAG Benchmark Report: 20260508T024125Z
 
 This report compares RAG strategies for practical operations decisions.
 Scores are generated from local fixture datasets and deterministic extractive answering.
@@ -8,17 +8,23 @@ Scores are generated from local fixture datasets and deterministic extractive an
 | Domain | System | Answer | Evidence Recall | Context Precision | Citation | Latency ms | Cost | Failure |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | finance | bm25 | 0.632 | 0.632 | 0.175 | 0.632 | 0.02 | 0.000001 | 0.368 |
-| finance | dense-vector | 1.000 | 1.000 | 0.329 | 1.000 | 0.04 | 0.000001 | 0.000 |
+| finance | dense-vector | 1.000 | 1.000 | 0.329 | 1.000 | 0.03 | 0.000001 | 0.000 |
 | finance | hybrid | 0.895 | 0.895 | 0.303 | 0.895 | 0.06 | 0.000001 | 0.105 |
 | finance | hybrid-rerank | 1.000 | 1.000 | 0.329 | 1.000 | 0.09 | 0.000110 | 0.000 |
-| finance | pageindex-oss | 1.000 | 1.000 | 0.250 | 1.000 | 0.06 | 0.000061 | 0.000 |
+| finance | pageindex-oss | 1.000 | 1.000 | 0.250 | 1.000 | 0.05 | 0.000061 | 0.000 |
 | finance | parent-child | 0.684 | 0.684 | 0.189 | 0.684 | 0.03 | 0.000001 | 0.316 |
+| financebench-open-source | bm25 | 0.393 | 0.419 | 0.117 | 0.393 | 1.39 | 0.000024 | 0.607 |
+| financebench-open-source | dense-vector | 0.387 | 0.418 | 0.125 | 0.380 | 2.35 | 0.000021 | 0.613 |
+| financebench-open-source | hybrid | 0.420 | 0.442 | 0.127 | 0.413 | 3.92 | 0.000023 | 0.580 |
+| financebench-open-source | hybrid-rerank | 0.380 | 0.400 | 0.110 | 0.373 | 5.42 | 0.000345 | 0.620 |
+| financebench-open-source | pageindex-oss | 0.407 | 0.421 | 0.128 | 0.393 | 2.68 | 0.000081 | 0.593 |
+| financebench-open-source | parent-child | 0.333 | 0.343 | 0.100 | 0.320 | 2.43 | 0.000023 | 0.667 |
 | general-docs | bm25 | 0.650 | 0.710 | 0.258 | 0.650 | 0.02 | 0.000000 | 0.350 |
 | general-docs | dense-vector | 0.900 | 0.935 | 0.417 | 0.900 | 0.04 | 0.000001 | 0.100 |
 | general-docs | hybrid | 0.850 | 0.910 | 0.404 | 0.850 | 0.07 | 0.000001 | 0.150 |
 | general-docs | hybrid-rerank | 0.900 | 0.935 | 0.417 | 0.900 | 0.09 | 0.000080 | 0.100 |
 | general-docs | pageindex-oss | 0.900 | 0.945 | 0.263 | 0.900 | 0.07 | 0.000061 | 0.100 |
-| general-docs | parent-child | 0.600 | 0.660 | 0.254 | 0.600 | 0.04 | 0.000000 | 0.400 |
+| general-docs | parent-child | 0.600 | 0.660 | 0.254 | 0.600 | 0.03 | 0.000000 | 0.400 |
 
 ## Recommendation Ranking
 
@@ -26,18 +32,24 @@ Recommendation score combines quality, efficiency, and stability. It is a decisi
 
 | Domain | Rank | System | Recommendation | Quality | Efficiency | Stability | Role |
 |---|---:|---|---:|---:|---:|---:|---|
-| finance | 1 | `dense-vector` | 0.869 | 0.933 | 0.562 | 1.000 | semantic similarity baseline |
-| finance | 2 | `pageindex-oss` | 0.810 | 0.925 | 0.294 | 1.000 | structured long-document and multi-section navigation |
-| finance | 3 | `hybrid` | 0.765 | 0.836 | 0.438 | 0.895 | balanced default for mixed queries |
+| finance | 1 | `dense-vector` | 0.867 | 0.933 | 0.552 | 1.000 | semantic similarity baseline |
+| finance | 2 | `pageindex-oss` | 0.810 | 0.925 | 0.295 | 1.000 | structured long-document and multi-section navigation |
+| finance | 3 | `hybrid` | 0.766 | 0.836 | 0.441 | 0.895 | balanced default for mixed queries |
 | finance | 4 | `hybrid-rerank` | 0.759 | 0.933 | 0.013 | 1.000 | quality-first retrieval when rerank latency is acceptable |
-| finance | 5 | `parent-child` | 0.643 | 0.635 | 0.637 | 0.684 | small-chunk search with broader answer context |
-| finance | 6 | `bm25` | 0.602 | 0.586 | 0.631 | 0.632 | fast exact-term baseline |
-| general-docs | 1 | `dense-vector` | 0.810 | 0.862 | 0.574 | 0.900 | semantic similarity baseline |
-| general-docs | 2 | `hybrid` | 0.754 | 0.823 | 0.458 | 0.850 | balanced default for mixed queries |
-| general-docs | 3 | `pageindex-oss` | 0.720 | 0.850 | 0.164 | 0.900 | structured long-document and multi-section navigation |
+| finance | 5 | `parent-child` | 0.643 | 0.635 | 0.640 | 0.684 | small-chunk search with broader answer context |
+| finance | 6 | `bm25` | 0.603 | 0.586 | 0.638 | 0.632 | fast exact-term baseline |
+| financebench-open-source | 1 | `bm25` | 0.419 | 0.373 | 0.589 | 0.393 | fast exact-term baseline |
+| financebench-open-source | 2 | `dense-vector` | 0.410 | 0.369 | 0.563 | 0.387 | semantic similarity baseline |
+| financebench-open-source | 3 | `pageindex-oss` | 0.406 | 0.381 | 0.488 | 0.407 | structured long-document and multi-section navigation |
+| financebench-open-source | 4 | `hybrid` | 0.405 | 0.396 | 0.423 | 0.420 | balanced default for mixed queries |
+| financebench-open-source | 5 | `parent-child` | 0.355 | 0.311 | 0.515 | 0.333 | small-chunk search with broader answer context |
+| financebench-open-source | 6 | `hybrid-rerank` | 0.290 | 0.358 | 0.000 | 0.380 | quality-first retrieval when rerank latency is acceptable |
+| general-docs | 1 | `dense-vector` | 0.808 | 0.862 | 0.562 | 0.900 | semantic similarity baseline |
+| general-docs | 2 | `hybrid` | 0.753 | 0.823 | 0.452 | 0.850 | balanced default for mixed queries |
+| general-docs | 3 | `pageindex-oss` | 0.722 | 0.850 | 0.172 | 0.900 | structured long-document and multi-section navigation |
 | general-docs | 4 | `hybrid-rerank` | 0.708 | 0.862 | 0.061 | 0.900 | quality-first retrieval when rerank latency is acceptable |
-| general-docs | 5 | `bm25` | 0.643 | 0.629 | 0.683 | 0.650 | fast exact-term baseline |
-| general-docs | 6 | `parent-child` | 0.598 | 0.583 | 0.643 | 0.600 | small-chunk search with broader answer context |
+| general-docs | 5 | `bm25` | 0.644 | 0.629 | 0.690 | 0.650 | fast exact-term baseline |
+| general-docs | 6 | `parent-child` | 0.606 | 0.583 | 0.685 | 0.600 | small-chunk search with broader answer context |
 
 ## Failure Breakdown
 
@@ -46,6 +58,20 @@ Recommendation score combines quality, efficiency, and stability. It is a decisi
 | finance | `bm25` | retrieval_miss | 7 |
 | finance | `hybrid` | retrieval_miss | 2 |
 | finance | `parent-child` | retrieval_miss | 6 |
+| financebench-open-source | `bm25` | context_bloat | 8 |
+| financebench-open-source | `bm25` | retrieval_miss | 83 |
+| financebench-open-source | `dense-vector` | context_bloat | 10 |
+| financebench-open-source | `dense-vector` | generation_hallucination | 1 |
+| financebench-open-source | `dense-vector` | retrieval_miss | 81 |
+| financebench-open-source | `hybrid` | context_bloat | 9 |
+| financebench-open-source | `hybrid` | retrieval_miss | 78 |
+| financebench-open-source | `hybrid-rerank` | context_bloat | 8 |
+| financebench-open-source | `hybrid-rerank` | retrieval_miss | 85 |
+| financebench-open-source | `pageindex-oss` | context_bloat | 7 |
+| financebench-open-source | `pageindex-oss` | generation_hallucination | 1 |
+| financebench-open-source | `pageindex-oss` | retrieval_miss | 81 |
+| financebench-open-source | `parent-child` | context_bloat | 7 |
+| financebench-open-source | `parent-child` | retrieval_miss | 93 |
 | general-docs | `bm25` | context_bloat | 3 |
 | general-docs | `bm25` | retrieval_miss | 4 |
 | general-docs | `dense-vector` | context_bloat | 2 |
@@ -67,6 +93,10 @@ Recommendation score combines quality, efficiency, and stability. It is a decisi
 | finance | no_answer | `bm25` | 1.000 | `bm25` 0.000 |
 | finance | section_navigation | `dense-vector` | 1.000 | `bm25` 0.500 |
 | finance | table_numeric | `dense-vector` | 1.000 | `bm25` 0.750 |
+| financebench-open-source | calculation | `pageindex-oss` | 0.299 | `bm25` 0.866 |
+| financebench-open-source | direct_lookup | `hybrid` | 0.737 | `pageindex-oss` 0.526 |
+| financebench-open-source | section_navigation | `bm25` | 0.660 | `dense-vector` 0.440 |
+| financebench-open-source | table_numeric | `hybrid` | 0.357 | `parent-child` 0.857 |
 | general-docs | direct_lookup | `bm25` | 1.000 | `bm25` 0.000 |
 | general-docs | global_summary | `pageindex-oss` | 0.000 | `bm25` 1.000 |
 | general-docs | multi_document | `bm25` | 0.500 | `bm25` 0.500 |
@@ -79,14 +109,21 @@ Recommendation score combines quality, efficiency, and stability. It is a decisi
 
 ### finance
 
-- Recommended default: `dense-vector` (score=0.869; semantic similarity baseline).
+- Recommended default: `dense-vector` (score=0.867; semantic similarity baseline).
 - Best quality: `dense-vector` (answer=1.000, evidence=1.000).
 - Lowest query cost: `parent-child` (cost=0.000001).
 - Fastest query path: `bm25` (latency=0.02 ms).
 
+### financebench-open-source
+
+- Recommended default: `bm25` (score=0.419; fast exact-term baseline).
+- Best quality: `hybrid` (answer=0.420, evidence=0.442).
+- Lowest query cost: `dense-vector` (cost=0.000021).
+- Fastest query path: `bm25` (latency=1.39 ms).
+
 ### general-docs
 
-- Recommended default: `dense-vector` (score=0.810; semantic similarity baseline).
+- Recommended default: `dense-vector` (score=0.808; semantic similarity baseline).
 - Best quality: `pageindex-oss` (answer=0.900, evidence=0.945).
 - Lowest query cost: `parent-child` (cost=0.000000).
 - Fastest query path: `bm25` (latency=0.02 ms).

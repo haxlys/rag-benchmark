@@ -1,13 +1,19 @@
 domain,system_id,recommendation_score,quality_score,efficiency_score,stability_score,role
-finance,dense-vector,0.8687586948236147,0.9328947368421053,0.5618855793812312,1.0,semantic similarity baseline
-finance,pageindex-oss,0.8101126822751338,0.925,0.2943134113756687,1.0,structured long-document and multi-section navigation
-finance,hybrid,0.7649269809788042,0.8355263157894737,0.4381217469992842,0.8947368421052632,balanced default for mixed queries
+finance,dense-vector,0.8668197374301377,0.9328947368421053,0.552190792413846,1.0,semantic similarity baseline
+finance,pageindex-oss,0.8102011357483491,0.925,0.29475567874174513,1.0,structured long-document and multi-section navigation
+finance,hybrid,0.7656009214422341,0.8355263157894737,0.441491449316434,0.8947368421052632,balanced default for mixed queries
 finance,hybrid-rerank,0.7589882862644417,0.9328947368421053,0.01303353658536599,1.0,quality-first retrieval when rerank latency is acceptable
-finance,parent-child,0.642524920129278,0.6346491228070176,0.6368570567867406,0.6842105263157895,small-chunk search with broader answer context
-finance,bm25,0.6017926302701713,0.5859649122807018,0.6308929759122597,0.631578947368421,fast exact-term baseline
-general-docs,dense-vector,0.810164978749258,0.8621666666666666,0.5737832270796235,0.9,semantic similarity baseline
-general-docs,hybrid,0.7543718229272862,0.8234166666666666,0.4582549479697653,0.85,balanced default for mixed queries
-general-docs,pageindex-oss,0.7201499220372034,0.84975,0.16406211018601669,0.9,structured long-document and multi-section navigation
+finance,parent-child,0.6432413403321463,0.6346491228070176,0.6404391578010823,0.6842105263157895,small-chunk search with broader answer context
+finance,bm25,0.6032949233674931,0.5859649122807018,0.6384044413988692,0.631578947368421,fast exact-term baseline
+financebench-open-source,bm25,0.419424928655654,0.3733333333333333,0.5887913099449369,0.3933333333333333,fast exact-term baseline
+financebench-open-source,dense-vector,0.41032958821233806,0.36883333333333335,0.5629396077283567,0.3866666666666667,semantic similarity baseline
+financebench-open-source,pageindex-oss,0.40638531183930976,0.38116666666666665,0.4881348925298822,0.4066666666666666,structured long-document and multi-section navigation
+financebench-open-source,hybrid,0.4052294575774051,0.3963333333333333,0.42306395455369206,0.42000000000000004,balanced default for mixed queries
+financebench-open-source,parent-child,0.35523335323693783,0.311,0.5154167661846891,0.33333333333333337,small-chunk search with broader answer context
+financebench-open-source,hybrid-rerank,0.28970000000000007,0.35800000000000004,0.0,0.38,quality-first retrieval when rerank latency is acceptable
+general-docs,dense-vector,0.807829638784571,0.8621666666666666,0.5621065272561885,0.9,semantic similarity baseline
+general-docs,hybrid,0.7530303981299715,0.8234166666666666,0.4515478239831915,0.85,balanced default for mixed queries
+general-docs,pageindex-oss,0.721678586473118,0.84975,0.17170543236558977,0.9,structured long-document and multi-section navigation
 general-docs,hybrid-rerank,0.7076020237221814,0.8621666666666666,0.06096845194424072,0.9,quality-first retrieval when rerank latency is acceptable
-general-docs,bm25,0.642776520015588,0.6288333333333335,0.6826742667446064,0.65,fast exact-term baseline
-general-docs,parent-child,0.597803770168794,0.5834166666666667,0.6429146841773035,0.6,small-chunk search with broader answer context
+general-docs,bm25,0.6442717960460121,0.6288333333333335,0.6901506468967268,0.65,fast exact-term baseline
+general-docs,parent-child,0.6061594237981806,0.5834166666666667,0.684692952324236,0.6,small-chunk search with broader answer context

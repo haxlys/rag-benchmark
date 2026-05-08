@@ -16,6 +16,7 @@ practical production question:
 Domains:
 
 - `finance`: financial filings and report-style documents.
+- `financebench-open-source`: PatronusAI FinanceBench open-source sample, 150 questions.
 - `general-docs`: general PDF, technical, policy, and knowledge-base documents.
 
 PageIndex scope:
@@ -183,6 +184,10 @@ uv run rag-benchmark import-financebench ~/financebench_merged.jsonl --domain fi
 That importer creates evidence-page documents from FinanceBench labels. It is a
 good OSS smoke test, but full-PDF ingestion is still needed for a harder
 production retrieval evaluation.
+
+The repository also includes a normalized `financebench-open-source` fixture
+created from the public 150-question FinanceBench sample. The closed 10k+
+FinanceBench dataset is not bundled.
 
 This writes:
 

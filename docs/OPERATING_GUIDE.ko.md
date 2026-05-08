@@ -30,6 +30,7 @@
 포함된 fixture run 기준:
 
 - 두 fixture domain은 이제 단순 smoke test가 아니라 의도적으로 변별력이 생기도록 구성되어 있습니다.
+- `financebench-open-source`는 더 큰 실제 데이터 retrieval run을 위해 공개 FinanceBench 150문항 sample을 추가합니다.
 - Finance에는 capex, deferred revenue, backlog, covenant, lease obligation 같은 semantic financial term이 포함됩니다.
 - General-docs에는 semantic question, section-navigation, multi-section, multi-document distractor가 포함됩니다.
 - synonym-heavy 또는 structure-heavy question에서 `pageindex-oss`, dense-style retrieval, reranking이 BM25와 분리됩니다.

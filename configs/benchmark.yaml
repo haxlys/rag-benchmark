@@ -21,6 +21,19 @@ domains:
       - no_answer
     candidate_datasets:
       - financebench_open_source
+  financebench-open-source:
+    enabled: true
+    categories:
+      - direct_lookup
+      - section_navigation
+      - multi_section
+      - table_numeric
+      - calculation
+    candidate_datasets:
+      - patronus_financebench_open_source_150
+    notes:
+      - imported_from_huggingface_financebench_merged_jsonl
+      - evidence_pages_only_not_full_pdf_ingestion
   general-docs:
     enabled: true
     categories:
@@ -112,4 +125,3 @@ failure_taxonomy:
   - citation_mismatch
   - timeout
   - tool_or_json_error
-

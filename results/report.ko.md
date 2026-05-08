@@ -1,4 +1,4 @@
-# RAG 벤치마크 리포트: 20260507T084114Z
+# RAG 벤치마크 리포트: 20260508T024125Z
 
 이 리포트는 실무 운영 의사결정을 위해 여러 RAG 전략을 비교합니다.
 점수는 로컬 fixture 데이터셋과 결정론적 extractive answerer로 생성됩니다.
@@ -8,17 +8,23 @@
 | 도메인 | 시스템 | 답변 | Evidence Recall | Context Precision | Citation | 지연시간 ms | 비용 | 실패율 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | finance | bm25 | 0.632 | 0.632 | 0.175 | 0.632 | 0.02 | 0.000001 | 0.368 |
-| finance | dense-vector | 1.000 | 1.000 | 0.329 | 1.000 | 0.04 | 0.000001 | 0.000 |
+| finance | dense-vector | 1.000 | 1.000 | 0.329 | 1.000 | 0.03 | 0.000001 | 0.000 |
 | finance | hybrid | 0.895 | 0.895 | 0.303 | 0.895 | 0.06 | 0.000001 | 0.105 |
 | finance | hybrid-rerank | 1.000 | 1.000 | 0.329 | 1.000 | 0.09 | 0.000110 | 0.000 |
-| finance | pageindex-oss | 1.000 | 1.000 | 0.250 | 1.000 | 0.06 | 0.000061 | 0.000 |
+| finance | pageindex-oss | 1.000 | 1.000 | 0.250 | 1.000 | 0.05 | 0.000061 | 0.000 |
 | finance | parent-child | 0.684 | 0.684 | 0.189 | 0.684 | 0.03 | 0.000001 | 0.316 |
+| financebench-open-source | bm25 | 0.393 | 0.419 | 0.117 | 0.393 | 1.39 | 0.000024 | 0.607 |
+| financebench-open-source | dense-vector | 0.387 | 0.418 | 0.125 | 0.380 | 2.35 | 0.000021 | 0.613 |
+| financebench-open-source | hybrid | 0.420 | 0.442 | 0.127 | 0.413 | 3.92 | 0.000023 | 0.580 |
+| financebench-open-source | hybrid-rerank | 0.380 | 0.400 | 0.110 | 0.373 | 5.42 | 0.000345 | 0.620 |
+| financebench-open-source | pageindex-oss | 0.407 | 0.421 | 0.128 | 0.393 | 2.68 | 0.000081 | 0.593 |
+| financebench-open-source | parent-child | 0.333 | 0.343 | 0.100 | 0.320 | 2.43 | 0.000023 | 0.667 |
 | general-docs | bm25 | 0.650 | 0.710 | 0.258 | 0.650 | 0.02 | 0.000000 | 0.350 |
 | general-docs | dense-vector | 0.900 | 0.935 | 0.417 | 0.900 | 0.04 | 0.000001 | 0.100 |
 | general-docs | hybrid | 0.850 | 0.910 | 0.404 | 0.850 | 0.07 | 0.000001 | 0.150 |
 | general-docs | hybrid-rerank | 0.900 | 0.935 | 0.417 | 0.900 | 0.09 | 0.000080 | 0.100 |
 | general-docs | pageindex-oss | 0.900 | 0.945 | 0.263 | 0.900 | 0.07 | 0.000061 | 0.100 |
-| general-docs | parent-child | 0.600 | 0.660 | 0.254 | 0.600 | 0.04 | 0.000000 | 0.400 |
+| general-docs | parent-child | 0.600 | 0.660 | 0.254 | 0.600 | 0.03 | 0.000000 | 0.400 |
 
 ## 추천 순위
 
@@ -26,18 +32,24 @@
 
 | 도메인 | 순위 | 시스템 | 추천 점수 | 품질 | 효율 | 안정성 | 역할 |
 |---|---:|---|---:|---:|---:|---:|---|
-| finance | 1 | `dense-vector` | 0.869 | 0.933 | 0.562 | 1.000 | 의미 기반 유사도 baseline |
-| finance | 2 | `pageindex-oss` | 0.810 | 0.925 | 0.294 | 1.000 | 구조화된 긴 문서와 multi-section navigation |
-| finance | 3 | `hybrid` | 0.765 | 0.836 | 0.438 | 0.895 | exact와 semantic query가 섞인 경우의 균형형 기본값 |
+| finance | 1 | `dense-vector` | 0.867 | 0.933 | 0.552 | 1.000 | 의미 기반 유사도 baseline |
+| finance | 2 | `pageindex-oss` | 0.810 | 0.925 | 0.295 | 1.000 | 구조화된 긴 문서와 multi-section navigation |
+| finance | 3 | `hybrid` | 0.766 | 0.836 | 0.441 | 0.895 | exact와 semantic query가 섞인 경우의 균형형 기본값 |
 | finance | 4 | `hybrid-rerank` | 0.759 | 0.933 | 0.013 | 1.000 | rerank latency를 감수할 수 있을 때의 품질 우선 retrieval |
-| finance | 5 | `parent-child` | 0.643 | 0.635 | 0.637 | 0.684 | 작은 chunk 검색과 더 넓은 answer context |
-| finance | 6 | `bm25` | 0.602 | 0.586 | 0.631 | 0.632 | 빠른 exact-term baseline |
-| general-docs | 1 | `dense-vector` | 0.810 | 0.862 | 0.574 | 0.900 | 의미 기반 유사도 baseline |
-| general-docs | 2 | `hybrid` | 0.754 | 0.823 | 0.458 | 0.850 | exact와 semantic query가 섞인 경우의 균형형 기본값 |
-| general-docs | 3 | `pageindex-oss` | 0.720 | 0.850 | 0.164 | 0.900 | 구조화된 긴 문서와 multi-section navigation |
+| finance | 5 | `parent-child` | 0.643 | 0.635 | 0.640 | 0.684 | 작은 chunk 검색과 더 넓은 answer context |
+| finance | 6 | `bm25` | 0.603 | 0.586 | 0.638 | 0.632 | 빠른 exact-term baseline |
+| financebench-open-source | 1 | `bm25` | 0.419 | 0.373 | 0.589 | 0.393 | 빠른 exact-term baseline |
+| financebench-open-source | 2 | `dense-vector` | 0.410 | 0.369 | 0.563 | 0.387 | 의미 기반 유사도 baseline |
+| financebench-open-source | 3 | `pageindex-oss` | 0.406 | 0.381 | 0.488 | 0.407 | 구조화된 긴 문서와 multi-section navigation |
+| financebench-open-source | 4 | `hybrid` | 0.405 | 0.396 | 0.423 | 0.420 | exact와 semantic query가 섞인 경우의 균형형 기본값 |
+| financebench-open-source | 5 | `parent-child` | 0.355 | 0.311 | 0.515 | 0.333 | 작은 chunk 검색과 더 넓은 answer context |
+| financebench-open-source | 6 | `hybrid-rerank` | 0.290 | 0.358 | 0.000 | 0.380 | rerank latency를 감수할 수 있을 때의 품질 우선 retrieval |
+| general-docs | 1 | `dense-vector` | 0.808 | 0.862 | 0.562 | 0.900 | 의미 기반 유사도 baseline |
+| general-docs | 2 | `hybrid` | 0.753 | 0.823 | 0.452 | 0.850 | exact와 semantic query가 섞인 경우의 균형형 기본값 |
+| general-docs | 3 | `pageindex-oss` | 0.722 | 0.850 | 0.172 | 0.900 | 구조화된 긴 문서와 multi-section navigation |
 | general-docs | 4 | `hybrid-rerank` | 0.708 | 0.862 | 0.061 | 0.900 | rerank latency를 감수할 수 있을 때의 품질 우선 retrieval |
-| general-docs | 5 | `bm25` | 0.643 | 0.629 | 0.683 | 0.650 | 빠른 exact-term baseline |
-| general-docs | 6 | `parent-child` | 0.598 | 0.583 | 0.643 | 0.600 | 작은 chunk 검색과 더 넓은 answer context |
+| general-docs | 5 | `bm25` | 0.644 | 0.629 | 0.690 | 0.650 | 빠른 exact-term baseline |
+| general-docs | 6 | `parent-child` | 0.606 | 0.583 | 0.685 | 0.600 | 작은 chunk 검색과 더 넓은 answer context |
 
 ## 실패 유형
 
@@ -46,6 +58,20 @@
 | finance | `bm25` | 검색 누락 | 7 |
 | finance | `hybrid` | 검색 누락 | 2 |
 | finance | `parent-child` | 검색 누락 | 6 |
+| financebench-open-source | `bm25` | 불필요한 context 과다 | 8 |
+| financebench-open-source | `bm25` | 검색 누락 | 83 |
+| financebench-open-source | `dense-vector` | 불필요한 context 과다 | 10 |
+| financebench-open-source | `dense-vector` | 생성 hallucination | 1 |
+| financebench-open-source | `dense-vector` | 검색 누락 | 81 |
+| financebench-open-source | `hybrid` | 불필요한 context 과다 | 9 |
+| financebench-open-source | `hybrid` | 검색 누락 | 78 |
+| financebench-open-source | `hybrid-rerank` | 불필요한 context 과다 | 8 |
+| financebench-open-source | `hybrid-rerank` | 검색 누락 | 85 |
+| financebench-open-source | `pageindex-oss` | 불필요한 context 과다 | 7 |
+| financebench-open-source | `pageindex-oss` | 생성 hallucination | 1 |
+| financebench-open-source | `pageindex-oss` | 검색 누락 | 81 |
+| financebench-open-source | `parent-child` | 불필요한 context 과다 | 7 |
+| financebench-open-source | `parent-child` | 검색 누락 | 93 |
 | general-docs | `bm25` | 불필요한 context 과다 | 3 |
 | general-docs | `bm25` | 검색 누락 | 4 |
 | general-docs | `dense-vector` | 불필요한 context 과다 | 2 |
@@ -67,6 +93,10 @@
 | finance | no_answer | `bm25` | 1.000 | `bm25` 0.000 |
 | finance | section_navigation | `dense-vector` | 1.000 | `bm25` 0.500 |
 | finance | table_numeric | `dense-vector` | 1.000 | `bm25` 0.750 |
+| financebench-open-source | calculation | `pageindex-oss` | 0.299 | `bm25` 0.866 |
+| financebench-open-source | direct_lookup | `hybrid` | 0.737 | `pageindex-oss` 0.526 |
+| financebench-open-source | section_navigation | `bm25` | 0.660 | `dense-vector` 0.440 |
+| financebench-open-source | table_numeric | `hybrid` | 0.357 | `parent-child` 0.857 |
 | general-docs | direct_lookup | `bm25` | 1.000 | `bm25` 0.000 |
 | general-docs | global_summary | `pageindex-oss` | 0.000 | `bm25` 1.000 |
 | general-docs | multi_document | `bm25` | 0.500 | `bm25` 0.500 |
@@ -79,14 +109,21 @@
 
 ### finance
 
-- 추천 기본값: `dense-vector` (score=0.869; 의미 기반 유사도 baseline).
+- 추천 기본값: `dense-vector` (score=0.867; 의미 기반 유사도 baseline).
 - 최고 품질: `dense-vector` (answer=1.000, evidence=1.000).
 - 최저 query cost: `parent-child` (cost=0.000001).
 - 가장 빠른 query path: `bm25` (latency=0.02 ms).
 
+### financebench-open-source
+
+- 추천 기본값: `bm25` (score=0.419; 빠른 exact-term baseline).
+- 최고 품질: `hybrid` (answer=0.420, evidence=0.442).
+- 최저 query cost: `dense-vector` (cost=0.000021).
+- 가장 빠른 query path: `bm25` (latency=1.39 ms).
+
 ### general-docs
 
-- 추천 기본값: `dense-vector` (score=0.810; 의미 기반 유사도 baseline).
+- 추천 기본값: `dense-vector` (score=0.808; 의미 기반 유사도 baseline).
 - 최고 품질: `pageindex-oss` (answer=0.900, evidence=0.945).
 - 최저 query cost: `parent-child` (cost=0.000000).
 - 가장 빠른 query path: `bm25` (latency=0.02 ms).

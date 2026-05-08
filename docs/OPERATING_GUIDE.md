@@ -32,6 +32,7 @@ number.
 The included fixture run shows:
 
 - Both fixture domains are now intentionally discriminative rather than smoke-test easy.
+- `financebench-open-source` adds the public 150-question FinanceBench sample for a larger real-data retrieval run.
 - Finance includes semantic financial terms such as capex, deferred revenue, backlog, covenant, and lease obligations.
 - General-docs includes semantic, section-navigation, multi-section, and multi-document distractors.
 - `pageindex-oss`, dense-style retrieval, and reranking separate from BM25 on synonym-heavy and structure-heavy questions.

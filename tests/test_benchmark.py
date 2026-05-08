@@ -14,11 +14,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_fixture_domains_load() -> None:
     finance_docs, finance_questions = load_domain(ROOT, "finance")
+    financebench_docs, financebench_questions = load_domain(ROOT, "financebench-open-source")
     general_docs, general_questions = load_domain(ROOT, "general-docs")
 
     assert len(finance_docs) == 4
+    assert len(financebench_docs) == 84
     assert len(general_docs) == 5
     assert len(finance_questions) >= 19
+    assert len(financebench_questions) == 150
     assert len(general_questions) >= 20
 
 
@@ -35,9 +38,10 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
         config_path=ROOT / "configs" / "benchmark.yaml",
         top_k=4,
         output_dir=tmp_path / "run",
+        copy_to_results=False,
     )
     summary_rows = read_summary(out_dir / "summary.csv")
-    assert len(summary_rows) == 12
+    assert len(summary_rows) == 18
 
     rows_by_key = {(row["domain"], row["system_id"]): row for row in summary_rows}
     assert float(rows_by_key[("finance", "bm25")]["answer_correctness"]) < float(
@@ -55,6 +59,7 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
 
     discrimination_report = build_discrimination_report(out_dir)
     assert "`finance`: **strongly discriminative**" in discrimination_report
+    assert "`financebench-open-source`: **moderately discriminative**" in discrimination_report
     assert "`general-docs`: **strongly discriminative**" in discrimination_report
 
 

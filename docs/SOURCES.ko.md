@@ -39,6 +39,7 @@
 - https://arxiv.org/abs/2311.11944
 - https://github.com/patronus-ai/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench
+- https://huggingface.co/datasets/PatronusAI/financebench/blob/main/financebench_merged.jsonl
 
 ## 문서 Parsing
 

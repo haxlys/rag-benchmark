@@ -13,6 +13,7 @@ VectifyAI PageIndex 오픈소스와 전통적인 RAG 방식을 비교하기 위�
 도메인:
 
 - `finance`: 금융 공시, 재무 보고서, 숫자 중심 문서.
+- `financebench-open-source`: PatronusAI FinanceBench 공개 sample 150문항.
 - `general-docs`: 일반 PDF, 기술 문서, 정책 문서, 지식베이스 문서.
 
 PageIndex 범위:
@@ -173,6 +174,8 @@ uv run rag-benchmark import-financebench ~/financebench_merged.jsonl --domain fi
 ```
 
 FinanceBench importer는 evidence label에서 evidence-page document를 만듭니다. OSS smoke test로는 좋지만, 더 어려운 production retrieval 평가는 full PDF ingestion이 필요합니다.
+
+이 저장소에는 공개 150문항 FinanceBench sample에서 정규화한 `financebench-open-source` fixture도 포함되어 있습니다. Closed 10k+ FinanceBench dataset은 포함하지 않습니다.
 
 위 명령은 다음 파일을 생성합니다.
 

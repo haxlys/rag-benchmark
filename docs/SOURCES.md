@@ -39,6 +39,7 @@ Working research sources for the initial design.
 - https://arxiv.org/abs/2311.11944
 - https://github.com/patronus-ai/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench
+- https://huggingface.co/datasets/PatronusAI/financebench/blob/main/financebench_merged.jsonl
 
 ## Document Parsing
 

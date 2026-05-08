@@ -41,6 +41,7 @@ def run_benchmark(
     systems: Iterable[str] | None = None,
     top_k: int = 4,
     output_dir: Path | None = None,
+    copy_to_results: bool = True,
 ) -> Path:
     config = load_config(config_path)
     selected_domains = list(domains) if domains else enabled_domains(config)
@@ -119,7 +120,8 @@ def run_benchmark(
         run_id,
         interpretation_warnings,
     )
-    copy_latest(root, out_dir)
+    if copy_to_results:
+        copy_latest(root, out_dir)
     return out_dir
 
 

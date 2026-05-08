@@ -13,6 +13,7 @@ Date: 2026-05-07
 - First evaluation style: offline, reproducible, trace-heavy benchmark runs.
 - Model comparison style: separate retrieval-only, generator-oracle, and end-to-end tracks.
 - Evaluation-model style: keep judge/evaluator reliability separate from product stack quality.
+- Promptfoo style: use promptfoo as an optional CI/eval/red-team integration, not as the canonical RAG benchmark engine.
 
 ## Design Principle
 
@@ -46,6 +47,17 @@ Purpose: compare how a system performs when operated as intended.
 - PageIndex OSS can use its own tree generation flow.
 - Vector systems can use their chosen parser/chunker stack.
 - Best for product-style decisions.
+
+### Promptfoo Integration
+
+Purpose: expose benchmark variants to promptfoo for regression checks, external
+eval views, and later red-team workflows.
+
+- Generate `integrations/promptfoo/promptfooconfig.yaml`.
+- Use a local Python provider that calls the benchmark runner for one question.
+- Default to deterministic local assertions to preserve OSS-only reproducibility.
+- Allow optional model-graded promptfoo assertions only when an explicit local or OSS grader is configured.
+- Keep `results/dashboard.html`, `axis_leaderboard.csv`, and `judge_audit.csv` as the canonical operations outputs.
 
 ## MVP Systems
 

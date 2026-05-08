@@ -12,4 +12,6 @@ data/processed/*
 runs/*
 !runs/.gitkeep
 
+integrations/promptfoo/promptfoo-results.*
+
 .DS_Store

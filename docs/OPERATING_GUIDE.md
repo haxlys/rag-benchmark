@@ -14,6 +14,7 @@ number.
 |---|---|---|
 | Unsure whether retrieval or LLM is the bottleneck | `retrieval-only` then `generator-oracle` | Separates search failures from answer synthesis failures. |
 | Unsure whether the evaluator is reliable | `judge_audit.csv` | Keeps judge reliability separate from product stack quality. |
+| Need a CI quality gate or external eval UI | `export-promptfoo` | Lets promptfoo call this benchmark through a local Python provider. |
 | Exact names, numbers, IDs, and short policies | `bm25` | Cheap, fast, strong lexical matching. |
 | Mixed exact and semantic questions | `hybrid` | Combines sparse and dense retrieval signals. |
 | High quality required and latency budget exists | `hybrid-rerank` | Reranking can improve candidate order at extra cost. |
@@ -43,6 +44,7 @@ The included fixture run shows:
 - End-to-end runs compare RAG method, embedding profile, and generator profile together.
 - `axis_leaderboard.csv` separates the best RAG method, embedding profile, and generator profile.
 - `judge_audit.csv` separates judge/evaluator reliability from product-stack quality.
+- `integrations/promptfoo/` exports a promptfoo config, tests, and Python provider for deterministic CI checks or optional model-graded RAG assertions.
 - `results/dashboard.html` provides ranking, scatter, distribution, category heatmap, axis leaderboard, and judge audit views.
 - Finance includes semantic financial terms such as capex, deferred revenue, backlog, covenant, and lease obligations.
 - General-docs includes semantic, section-navigation, multi-section, and multi-document distractors.
@@ -89,6 +91,14 @@ The included fixture run shows:
 
    Open `results/dashboard.html` for the visual dashboard.
 
+6. Export promptfoo checks when you want a CI gate or promptfoo's eval UI:
+
+   ```bash
+   uv run rag-benchmark export-promptfoo --domain my-domain
+   cd integrations/promptfoo
+   npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+   ```
+
 The recommendation ranking combines quality, efficiency, and stability. Use it
 to pick a starting point, then inspect `traces.jsonl` for the cases that failed.
 
@@ -104,6 +114,8 @@ Before using results for a real product decision:
 - Compare at least two embedding models or profiles before blaming the RAG method.
 - Run oracle-context generator checks before blaming the LLM.
 - Audit judge models against human labels before using an LLM judge as the source of truth.
+- Run promptfoo deterministic checks in CI after changing prompts, chunking, retrieval, generation, or judge settings.
+- Use promptfoo red-team workflows for prompt injection, overreliance, hallucination, PII leakage, and RAG poisoning before production launch.
 - Review at least 10-20% of answers manually.
 - Track parser failures separately from retrieval failures.
 - Re-run after changing chunking, parsing, embedding model, or reranker.

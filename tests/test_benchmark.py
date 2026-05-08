@@ -1,9 +1,13 @@
+import json
 from pathlib import Path
+
+import yaml
 
 from rag_benchmark.datasets import load_domain, read_jsonl
 from rag_benchmark.discrimination import build_discrimination_report
 from rag_benchmark.embeddings import embedding_counter
 from rag_benchmark.importers import import_financebench, import_questions, import_text_documents
+from rag_benchmark.promptfoo import call_promptfoo_provider, export_promptfoo_bundle
 from rag_benchmark.runner import read_summary, run_benchmark
 from rag_benchmark.schemas import Document
 from rag_benchmark.text import tokenize
@@ -178,3 +182,59 @@ def test_import_financebench_schema(tmp_path: Path) -> None:
     assert documents[0].pages[0].page == 5
     assert questions[0].evidence[0].page == 5
     assert validate_domain_data(tmp_path, "finance").ok
+
+
+def test_promptfoo_export_and_provider(tmp_path: Path) -> None:
+    out_dir = tmp_path / "promptfoo"
+    summary = export_promptfoo_bundle(
+        root=ROOT,
+        config_path=ROOT / "configs" / "benchmark.yaml",
+        output_dir=out_dir,
+        domains=["finance"],
+        systems=["hybrid", "pageindex-oss"],
+        embeddings=["bge-m3-proxy"],
+        generators=["reasoning-oss-llm"],
+        judges=["exact-match-gold"],
+        tracks=["end-to-end"],
+        max_questions_per_domain=2,
+    )
+
+    assert summary.providers == 2
+    assert summary.tests == 2
+    assert summary.config_path.exists()
+    assert summary.tests_path.exists()
+    assert summary.provider_path.exists()
+    exported_config = yaml.safe_load(summary.config_path.read_text(encoding="utf-8"))
+    exported_tests = yaml.safe_load(summary.tests_path.read_text(encoding="utf-8"))
+    assert exported_config["providers"][0]["id"] == "file://./rag_benchmark_provider.py"
+    assert exported_config["defaultTest"]["assert"][1]["metric"] == "answer_correctness"
+    assert exported_tests[0]["vars"]["question_id"] == "fin_direct_revenue"
+
+    provider_response = call_promptfoo_provider(
+        "What was ACME Robotics revenue in fiscal 2025?",
+        {
+            "config": {
+                "basePath": str(out_dir),
+                "repoRoot": str(ROOT),
+                "configPath": str(ROOT / "configs" / "benchmark.yaml"),
+                "track": "end-to-end",
+                "system": "hybrid",
+                "embedding": "bge-m3-proxy",
+                "generator": "reasoning-oss-llm",
+                "judge": "exact-match-gold",
+                "topK": 4,
+            }
+        },
+        {
+            "vars": {
+                "domain": "finance",
+                "question_id": "fin_direct_revenue",
+                "query": "What was ACME Robotics revenue in fiscal 2025?",
+            }
+        },
+    )
+    payload = json.loads(provider_response["output"])
+    assert payload["answer"] == "$12.4 billion"
+    assert payload["metrics"]["answer_correctness"] == 1.0
+    assert payload["metrics"]["evidence_recall"] == 1.0
+    assert provider_response["tokenUsage"]["total"] > 0

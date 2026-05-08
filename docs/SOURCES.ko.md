@@ -48,6 +48,14 @@
 - https://huggingface.co/datasets/PatronusAI/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench/blob/main/financebench_merged.jsonl
 
+## Promptfoo
+
+- https://github.com/promptfoo/promptfoo
+- https://www.promptfoo.dev/docs/guides/evaluate-rag/
+- https://www.promptfoo.dev/docs/configuration/expected-outputs/model-graded/
+- https://www.promptfoo.dev/docs/providers/python/
+- https://www.promptfoo.dev/docs/guides/llm-redteaming/
+
 ## OSS 임베딩 후보
 
 - https://huggingface.co/intfloat/e5-large-v2

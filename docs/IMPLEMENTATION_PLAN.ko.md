@@ -13,6 +13,7 @@ Date: 2026-05-07
 - 첫 평가 방식: offline, reproducible, trace-heavy benchmark run.
 - 모델 비교 방식: retrieval-only, generator-oracle, end-to-end track을 분리합니다.
 - 평가 모델 방식: judge/evaluator 신뢰성을 product stack 품질과 분리합니다.
+- Promptfoo 방식: promptfoo는 canonical RAG benchmark engine이 아니라 선택적 CI/eval/red-team 통합 레이어로 사용합니다.
 
 ## 설계 원칙
 
@@ -44,6 +45,17 @@ RAG 비교에서 자주 섞이는 세 가지 관심사를 분리합니다.
 - PageIndex OSS는 자체 tree generation flow를 사용할 수 있습니다.
 - Vector system은 선택한 parser/chunker stack을 사용할 수 있습니다.
 - product-style decision에 적합합니다.
+
+### Promptfoo 통합
+
+목적: benchmark variant를 promptfoo에 노출해 regression check, 외부 eval view,
+추후 red-team workflow에 사용합니다.
+
+- `integrations/promptfoo/promptfooconfig.yaml`을 생성합니다.
+- 로컬 Python provider가 question 1개 단위로 benchmark runner를 호출합니다.
+- OSS-only reproducibility를 유지하기 위해 기본값은 결정론적 로컬 assertion입니다.
+- model-graded promptfoo assertion은 명시적인 local 또는 OSS grader를 설정했을 때만 사용합니다.
+- canonical operations output은 계속 `results/dashboard.html`, `axis_leaderboard.csv`, `judge_audit.csv`입니다.
 
 ## MVP 시스템
 

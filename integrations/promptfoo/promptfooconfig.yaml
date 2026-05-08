@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: RAG benchmark quality gate generated from haxlys/rag-benchmark.
+prompts:
+- '{{query}}'
+providers:
+- id: file://./rag_benchmark_provider.py
+  label: end-to-end:bm25:reasoning-oss-llm:exact-match-gold
+  config:
+    repoRoot: ../..
+    configPath: ../../configs/benchmark.yaml
+    track: end-to-end
+    system: bm25
+    embedding: none
+    generator: reasoning-oss-llm
+    judge: exact-match-gold
+    topK: 4
+    pythonExecutable: ../../.venv/bin/python
+- id: file://./rag_benchmark_provider.py
+  label: end-to-end:hybrid:bge-m3-proxy:reasoning-oss-llm:exact-match-gold
+  config:
+    repoRoot: ../..
+    configPath: ../../configs/benchmark.yaml
+    track: end-to-end
+    system: hybrid
+    embedding: bge-m3-proxy
+    generator: reasoning-oss-llm
+    judge: exact-match-gold
+    topK: 4
+    pythonExecutable: ../../.venv/bin/python
+- id: file://./rag_benchmark_provider.py
+  label: end-to-end:pageindex-oss:bge-m3-proxy:reasoning-oss-llm:exact-match-gold
+  config:
+    repoRoot: ../..
+    configPath: ../../configs/benchmark.yaml
+    track: end-to-end
+    system: pageindex-oss
+    embedding: bge-m3-proxy
+    generator: reasoning-oss-llm
+    judge: exact-match-gold
+    topK: 4
+    pythonExecutable: ../../.venv/bin/python
+defaultTest:
+  assert:
+  - type: is-json
+    metric: response_json
+  - type: javascript
+    metric: answer_correctness
+    threshold: 0.5
+    value: JSON.parse(output).metrics.answer_correctness
+  - type: javascript
+    metric: evidence_recall
+    threshold: 0.5
+    value: JSON.parse(output).metrics.evidence_recall
+  - type: javascript
+    metric: context_precision
+    threshold: 0.1
+    value: JSON.parse(output).metrics.context_precision
+  - type: javascript
+    metric: citation_validity
+    threshold: 0.5
+    value: JSON.parse(output).metrics.citation_validity
+  - type: javascript
+    metric: failure_free
+    threshold: 1.0
+    value: 'JSON.parse(output).metrics.failure_type === null ? 1 : 0'
+derivedMetrics:
+- name: rag_quality
+  value: answer_correctness * 0.5 + evidence_recall * 0.3 + context_precision * 0.2
+- name: ops_score
+  value: rag_quality * 0.8 + citation_validity * 0.2
+tests: file://./tests.yaml

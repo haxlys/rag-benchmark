@@ -12,6 +12,7 @@
 |---|---|---|
 | retrieval 문제인지 LLM 문제인지 애매함 | `retrieval-only` 후 `generator-oracle` | 검색 실패와 답변 생성 실패를 분리해서 봅니다. |
 | 평가 모델이 믿을 만한지 애매함 | `judge_audit.csv` | judge 신뢰성을 product stack 품질과 분리해서 봅니다. |
+| CI quality gate 또는 외부 eval UI가 필요함 | `export-promptfoo` | promptfoo가 로컬 Python provider를 통해 이 benchmark를 호출하게 합니다. |
 | 정확한 이름, 숫자, ID, 짧은 정책 검색 | `bm25` | 저렴하고 빠르며 exact lexical matching이 강합니다. |
 | exact term과 semantic question이 섞임 | `hybrid` | sparse와 dense retrieval signal을 함께 씁니다. |
 | 품질이 중요하고 latency budget이 있음 | `hybrid-rerank` | 추가 비용과 지연시간을 감수하고 candidate order를 개선할 수 있습니다. |
@@ -41,6 +42,7 @@
 - end-to-end run은 RAG 방식, embedding profile, generator profile 조합을 함께 비교합니다.
 - `axis_leaderboard.csv`에서 최고의 RAG 방식, embedding profile, generator profile을 축별로 분리해서 봅니다.
 - `judge_audit.csv`에서 judge/evaluator 신뢰성을 product stack 품질과 분리해서 봅니다.
+- `integrations/promptfoo/`는 결정론적 CI check 또는 선택적 model-graded RAG assertion을 위한 promptfoo config, tests, Python provider를 export합니다.
 - `results/dashboard.html`에서 ranking, scatter, distribution, category heatmap, axis leaderboard, judge audit을 볼 수 있습니다.
 - Finance에는 capex, deferred revenue, backlog, covenant, lease obligation 같은 semantic financial term이 포함됩니다.
 - General-docs에는 semantic question, section-navigation, multi-section, multi-document distractor가 포함됩니다.
@@ -88,6 +90,14 @@
 
    시각화 대시보드는 `results/dashboard.html`을 열면 됩니다.
 
+6. CI gate 또는 promptfoo eval UI가 필요하면 promptfoo check를 export합니다.
+
+   ```bash
+   uv run rag-benchmark export-promptfoo --domain my-domain
+   cd integrations/promptfoo
+   npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+   ```
+
 recommendation ranking은 quality, efficiency, stability를 조합합니다. 이 값으로 시작점을 고르고, 실패한 case는 `traces.jsonl`에서 확인합니다.
 
 ## production readiness checklist
@@ -102,6 +112,8 @@ recommendation ranking은 quality, efficiency, stability를 조합합니다. 이
 - RAG 방식을 탓하기 전에 최소 두 개 이상의 embedding model/profile 비교.
 - LLM을 탓하기 전에 oracle-context generator check 실행.
 - LLM judge를 정답 채점 기준으로 쓰기 전에 human label 기준 judge audit 실행.
+- prompt, chunking, retrieval, generation, judge 설정을 바꾼 뒤 promptfoo deterministic check를 CI에서 실행.
+- production launch 전 promptfoo red-team workflow로 prompt injection, overreliance, hallucination, PII leakage, RAG poisoning 점검.
 - 답변의 10-20% 이상을 사람이 검토.
 - parser failure를 retrieval failure와 분리해서 기록.
 - chunking, parsing, embedding model, reranker를 바꿀 때마다 재실행.

@@ -155,6 +155,14 @@ Validate document/question/evidence labels:
 uv run rag-benchmark validate-data --top-k 4
 ```
 
+Export a promptfoo quality gate:
+
+```bash
+uv run rag-benchmark export-promptfoo
+cd integrations/promptfoo
+npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+```
+
 Run tests:
 
 ```bash
@@ -190,6 +198,12 @@ The latest run is also copied to:
 - `results/report.ko.md`
 - `results/dashboard.html`
 
+Promptfoo integration files are generated under:
+
+- `integrations/promptfoo/promptfooconfig.yaml`
+- `integrations/promptfoo/tests.yaml`
+- `integrations/promptfoo/rag_benchmark_provider.py`
+
 ## How To Interpret Results
 
 Use the benchmark as an operations decision aid:
@@ -205,6 +219,9 @@ Use the benchmark as an operations decision aid:
 - Use `judge_audit.csv` to compare evaluation models. Treat judges as measuring
   instruments; validate them against human labels before using them to rank
   production stacks.
+- Use `integrations/promptfoo/` as a CI quality gate or external eval view. The
+  default export uses deterministic local assertions; model-graded assertions
+  should use an OSS/local grader when the run must stay OSS-only.
 - Choose `bm25` when exact terms, speed, and low cost matter most.
 - Choose `hybrid` or `hybrid-rerank` when semantic matching and exact terms both matter.
 - Choose `parent-child` when chunk-level search works but answer generation needs more surrounding context.

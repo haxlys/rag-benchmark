@@ -14,6 +14,7 @@ from .datasets import (
 )
 from .discrimination import build_discrimination_report
 from .importers import import_financebench, import_questions, import_text_documents
+from .promptfoo import export_promptfoo_bundle
 from .runner import read_report, read_summary, run_benchmark
 from .validation import validate_domain_data
 
@@ -210,6 +211,80 @@ def validate_data(
         failed = failed or not report.ok
     if failed:
         raise typer.Exit(1)
+
+
+@app.command("export-promptfoo")
+def export_promptfoo(
+    config: Path = Path("configs/benchmark.yaml"),
+    output_dir: Path = typer.Option(
+        Path("integrations/promptfoo"),
+        "--output-dir",
+        help="Directory for promptfoo config, tests, and provider.",
+    ),
+    domain: list[str] | None = typer.Option(None, "--domain", "-d", help="Domain to export."),
+    system: list[str] | None = typer.Option(None, "--system", "-s", help="RAG system provider to export."),
+    embedding: list[str] | None = typer.Option(
+        None,
+        "--embedding",
+        "-e",
+        help="Embedding profile for embedding-aware systems.",
+    ),
+    generator: list[str] | None = typer.Option(
+        None,
+        "--generator",
+        "-g",
+        help="Generator profile to export.",
+    ),
+    judge: list[str] | None = typer.Option(
+        None,
+        "--judge",
+        "-j",
+        help="Judge/evaluator profile to export.",
+    ),
+    track: list[str] | None = typer.Option(
+        None,
+        "--track",
+        "-t",
+        help="Experiment track to expose to promptfoo.",
+    ),
+    top_k: int = typer.Option(4, "--top-k", help="Number of contexts to retrieve."),
+    max_questions_per_domain: int = typer.Option(
+        25,
+        "--max-questions-per-domain",
+        help="Limit exported tests per domain. Use 0 for all questions.",
+    ),
+    include_model_graded: bool = typer.Option(
+        False,
+        "--include-model-graded",
+        help="Add promptfoo model-graded RAG assertions.",
+    ),
+    grader_provider: str | None = typer.Option(
+        None,
+        "--grader-provider",
+        help="Promptfoo provider for model-graded assertions, e.g. ollama:chat:llama3.1.",
+    ),
+) -> None:
+    """Export a promptfoo config that calls this benchmark as a Python provider."""
+    summary = export_promptfoo_bundle(
+        root=Path.cwd(),
+        config_path=config,
+        output_dir=output_dir,
+        domains=domain or None,
+        systems=system or None,
+        embeddings=embedding or None,
+        generators=generator or None,
+        judges=judge or None,
+        tracks=track or None,
+        top_k=top_k,
+        max_questions_per_domain=None if max_questions_per_domain <= 0 else max_questions_per_domain,
+        include_model_graded=include_model_graded,
+        grader_provider=grader_provider,
+    )
+    console.print(f"[green]wrote[/green] promptfoo config to {summary.config_path}")
+    console.print(f"[green]wrote[/green] {summary.tests} tests to {summary.tests_path}")
+    console.print(f"[green]wrote[/green] {summary.providers} provider variants via {summary.provider_path}")
+    for warning in summary.warnings:
+        console.print(f"  [yellow]warning[/yellow] {warning}")
 
 
 @app.command("import-docs")

@@ -144,6 +144,14 @@ uv run rag-benchmark discrimination
 uv run rag-benchmark validate-data --top-k 4
 ```
 
+promptfoo quality gate export:
+
+```bash
+uv run rag-benchmark export-promptfoo
+cd integrations/promptfoo
+npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+```
+
 테스트 실행:
 
 ```bash
@@ -180,6 +188,12 @@ uv run --extra dev pytest -q
 - `results/dashboard.html`
 - `results/discrimination.md`
 
+Promptfoo 통합 파일은 다음 위치에 생성됩니다.
+
+- `integrations/promptfoo/promptfooconfig.yaml`
+- `integrations/promptfoo/tests.yaml`
+- `integrations/promptfoo/rag_benchmark_provider.py`
+
 ## 결과 해석 방법
 
 벤치마크는 운영 의사결정 보조 도구로 사용합니다.
@@ -189,6 +203,7 @@ uv run --extra dev pytest -q
 - `end-to-end`는 실제 배포 후보인 RAG 방식, 임베딩 프로필, 생성 프로필 조합을 비교합니다.
 - `axis_leaderboard.csv`는 최고의 RAG 방식, embedding model, generator model을 따로 볼 때 사용합니다.
 - `judge_audit.csv`는 평가 모델을 비교할 때 사용합니다. Judge는 제품 후보가 아니라 측정 도구이므로, production ranking에 쓰기 전 human label 기준 검증이 필요합니다.
+- `integrations/promptfoo/`는 CI quality gate 또는 외부 eval view로 사용합니다. 기본 export는 결정론적 로컬 assertion만 쓰며, OSS-only run이 필요하면 model-graded assertion에는 로컬/OSS grader를 지정해야 합니다.
 - 정확한 용어, 숫자, ID, 짧은 정책이 중요하면 `bm25`를 먼저 봅니다.
 - exact match와 semantic match가 모두 필요하면 `hybrid` 또는 `hybrid-rerank`를 봅니다.
 - 검색 chunk는 잘 잡히지만 답변 context가 부족하면 `parent-child`를 봅니다.

@@ -32,39 +32,55 @@ def build_discrimination_report(results_dir: Path) -> str:
         "## Verdict",
         "",
     ]
-    for track, domain in sorted({(row.get("track", "end-to-end"), row["domain"]) for row in summary_rows}):
+    for track, domain, judge in sorted(
+        {
+            (row.get("track", "end-to-end"), row["domain"], row.get("judge_model", "exact-match-gold"))
+            for row in summary_rows
+        }
+    ):
         domain_summary = [
             row
             for row in summary_rows
-            if row["domain"] == domain and row.get("track", "end-to-end") == track
+            if row["domain"] == domain
+            and row.get("track", "end-to-end") == track
+            and row.get("judge_model", "exact-match-gold") == judge
         ]
         domain_results = [
             row
             for row in result_rows
-            if row["domain"] == domain and row.get("track", "end-to-end") == track
+            if row["domain"] == domain
+            and row.get("track", "end-to-end") == track
+            and row.get("judge_model", "exact-match-gold") == judge
         ]
         verdict, reason = domain_verdict(domain_summary, domain_results)
-        lines.append(f"- `{track}` / `{domain}`: **{verdict}**. {reason}")
+        lines.append(f"- `{track}` / `{domain}` / `{judge}`: **{verdict}**. {reason}")
 
     lines.extend(
         [
             "",
             "## Domain Metric Spread",
             "",
-            "| Track | Domain | Metric | Min | Max | Range | Unique Values |",
-            "|---|---|---|---:|---:|---:|---:|",
+            "| Track | Domain | Judge | Metric | Min | Max | Range | Unique Values |",
+            "|---|---|---|---|---:|---:|---:|---:|",
         ]
     )
-    for track, domain in sorted({(row.get("track", "end-to-end"), row["domain"]) for row in summary_rows}):
+    for track, domain, judge in sorted(
+        {
+            (row.get("track", "end-to-end"), row["domain"], row.get("judge_model", "exact-match-gold"))
+            for row in summary_rows
+        }
+    ):
         domain_rows = [
             row
             for row in summary_rows
-            if row["domain"] == domain and row.get("track", "end-to-end") == track
+            if row["domain"] == domain
+            and row.get("track", "end-to-end") == track
+            and row.get("judge_model", "exact-match-gold") == judge
         ]
         for metric in QUALITY_METRICS:
             values = [float(row[metric]) for row in domain_rows]
             lines.append(
-                f"| {track} | {domain} | {metric} | {min(values):.3f} | {max(values):.3f} | "
+                f"| {track} | {domain} | {judge} | {metric} | {min(values):.3f} | {max(values):.3f} | "
                 f"{max(values) - min(values):.3f} | {len({round(value, 6) for value in values})} |"
             )
 
@@ -74,13 +90,13 @@ def build_discrimination_report(results_dir: Path) -> str:
             "",
             "## Question-Level Discrimination",
             "",
-            "| Track | Domain | Questions | Quality-Diff Questions | Answer-Diff Questions | Recall-Diff Questions | Precision-Diff Questions |",
-            "|---|---|---:|---:|---:|---:|---:|",
+            "| Track | Domain | Judge | Questions | Quality-Diff Questions | Answer-Diff Questions | Recall-Diff Questions | Precision-Diff Questions |",
+            "|---|---|---|---:|---:|---:|---:|---:|",
         ]
     )
     for row in question_rows:
         lines.append(
-            "| {track} | {domain} | {questions} | {quality_diff} | {answer_diff} | {recall_diff} | {precision_diff} |".format(
+            "| {track} | {domain} | {judge_model} | {questions} | {quality_diff} | {answer_diff} | {recall_diff} | {precision_diff} |".format(
                 **row
             )
         )
@@ -90,20 +106,20 @@ def build_discrimination_report(results_dir: Path) -> str:
             "",
             "## Categories That Separated Systems",
             "",
-            "| Track | Domain | Category | Answer Range | Best Answer | Worst Answer |",
-            "|---|---|---|---:|---:|---:|",
+            "| Track | Domain | Judge | Category | Answer Range | Best Answer | Worst Answer |",
+            "|---|---|---|---|---:|---:|---:|",
         ]
     )
     separating_categories = category_discrimination(category_rows)
     if separating_categories:
         for row in separating_categories:
             lines.append(
-                "| {track} | {domain} | {category} | {answer_range:.3f} | {best_answer:.3f} | {worst_answer:.3f} |".format(
+                "| {track} | {domain} | {judge_model} | {category} | {answer_range:.3f} | {best_answer:.3f} | {worst_answer:.3f} |".format(
                     **row
                 )
             )
     else:
-        lines.append("| none | none | none | 0.000 | 0.000 | 0.000 |")
+        lines.append("| none | none | none | none | 0.000 | 0.000 | 0.000 |")
 
     lines.extend(
         [
@@ -149,17 +165,25 @@ def domain_verdict(summary_rows: list[dict[str, str]], result_rows: list[dict[st
 
 
 def question_discrimination(result_rows: list[dict[str, str]]) -> list[dict[str, int | str]]:
-    by_question: dict[tuple[str, str, str], list[dict[str, str]]] = defaultdict(list)
+    by_question: dict[tuple[str, str, str, str], list[dict[str, str]]] = defaultdict(list)
     for row in result_rows:
-        by_question[(row.get("track", "end-to-end"), row["domain"], row["question_id"])].append(row)
+        by_question[
+            (
+                row.get("track", "end-to-end"),
+                row["domain"],
+                row.get("judge_model", "exact-match-gold"),
+                row["question_id"],
+            )
+        ].append(row)
 
-    by_domain: dict[tuple[str, str], dict[str, int | str]] = {}
-    for (track, domain, _question_id), rows in by_question.items():
+    by_domain: dict[tuple[str, str, str], dict[str, int | str]] = {}
+    for (track, domain, judge_model, _question_id), rows in by_question.items():
         current = by_domain.setdefault(
-            (track, domain),
+            (track, domain, judge_model),
             {
                 "track": track,
                 "domain": domain,
+                "judge_model": judge_model,
                 "questions": 0,
                 "quality_diff": 0,
                 "answer_diff": 0,
@@ -182,12 +206,19 @@ def question_discrimination(result_rows: list[dict[str, str]]) -> list[dict[str,
 
 
 def category_discrimination(category_rows: list[dict[str, str]]) -> list[dict[str, float | str]]:
-    by_category: dict[tuple[str, str, str], list[dict[str, str]]] = defaultdict(list)
+    by_category: dict[tuple[str, str, str, str], list[dict[str, str]]] = defaultdict(list)
     for row in category_rows:
-        by_category[(row.get("track", "end-to-end"), row["domain"], row["category"])].append(row)
+        by_category[
+            (
+                row.get("track", "end-to-end"),
+                row["domain"],
+                row.get("judge_model", "exact-match-gold"),
+                row["category"],
+            )
+        ].append(row)
 
     rows = []
-    for (track, domain, category), items in sorted(by_category.items()):
+    for (track, domain, judge_model, category), items in sorted(by_category.items()):
         values = [float(row["answer_correctness"]) for row in items]
         answer_range = max(values) - min(values)
         if answer_range > 0:
@@ -195,6 +226,7 @@ def category_discrimination(category_rows: list[dict[str, str]]) -> list[dict[st
                 {
                     "track": track,
                     "domain": domain,
+                    "judge_model": judge_model,
                     "category": category,
                     "answer_range": answer_range,
                     "best_answer": max(values),

@@ -147,6 +147,29 @@ generators:
     notes:
       - stronger_table_calculation_and_integration_profile
 
+judges:
+  exact-match-gold:
+    stage: mvp
+    enabled: true
+    family: deterministic_gold_label_evaluator
+    notes:
+      - canonical_quality_judge_for_product_stack_ranking
+      - strong_for_normalized_fact_labels_weak_for_paraphrases
+  llm-judge-balanced-proxy:
+    stage: mvp
+    enabled: true
+    family: balanced_llm_as_judge_profile
+    notes:
+      - deterministic_local_proxy_no_model_download
+      - tests_lenient_paraphrase_acceptance_and_false_accept_risk
+  citation-strict-judge-proxy:
+    stage: mvp
+    enabled: true
+    family: citation_first_llm_judge_profile
+    notes:
+      - deterministic_local_proxy_no_model_download
+      - tests_compliance_style_citation_strictness_and_false_reject_risk
+
 metrics:
   retrieval:
     - hit_rate_at_k

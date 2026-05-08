@@ -41,6 +41,9 @@ Working research sources for the initial design.
 - https://arxiv.org/abs/2311.11944
 - https://arxiv.org/abs/2603.06198
 - https://arxiv.org/abs/2502.10990
+- https://arxiv.org/abs/2306.05685
+- https://arxiv.org/abs/2303.16634
+- https://arxiv.org/abs/2510.11822
 - https://github.com/patronus-ai/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench
 - https://huggingface.co/datasets/PatronusAI/financebench/blob/main/financebench_merged.jsonl

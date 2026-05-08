@@ -13,19 +13,25 @@ from .datasets import (
     enabled_domains,
     enabled_mvp_embeddings,
     enabled_mvp_generators,
+    enabled_mvp_judges,
     enabled_mvp_systems,
     enabled_tracks,
     load_domain,
     page_chunks,
 )
 from .evaluation import evaluate
+from .judges import judge_answer
 from .reporting import (
     aggregate,
     aggregate_by_category,
+    build_axis_leaderboard,
+    build_judge_audit,
     build_recommendations,
     failure_summary,
+    write_axis_leaderboard_csv,
     write_category_csv,
     write_failure_csv,
+    write_judge_audit_csv,
     write_jsonl,
     write_markdown_report,
     write_markdown_report_ko,
@@ -52,6 +58,7 @@ def run_benchmark(
     systems: Iterable[str] | None = None,
     embeddings: Iterable[str] | None = None,
     generators: Iterable[str] | None = None,
+    judges: Iterable[str] | None = None,
     tracks: Iterable[str] | None = None,
     top_k: int = 4,
     output_dir: Path | None = None,
@@ -62,6 +69,7 @@ def run_benchmark(
     selected_systems = list(systems) if systems else enabled_mvp_systems(config)
     selected_embeddings = list(embeddings) if embeddings else enabled_mvp_embeddings(config)
     selected_generators = list(generators) if generators else enabled_mvp_generators(config)
+    selected_judges = list(judges) if judges else enabled_mvp_judges(config)
     selected_tracks = list(tracks) if tracks else enabled_tracks(config)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_dir = output_dir or root / "runs" / run_id
@@ -107,6 +115,7 @@ def run_benchmark(
                         question=question,
                         retrieval=retrieval,
                         answer=answer,
+                        judges=selected_judges,
                     )
 
         if "generator-oracle" in selected_tracks:
@@ -129,6 +138,7 @@ def run_benchmark(
                         question=question,
                         retrieval=retrieval,
                         answer=answer,
+                        judges=selected_judges,
                     )
 
         if "end-to-end" in selected_tracks:
@@ -156,16 +166,21 @@ def run_benchmark(
                             question=question,
                             retrieval=retrieval,
                             answer=answer,
+                            judges=selected_judges,
                         )
 
     summary_rows = aggregate(all_results)
     category_rows = aggregate_by_category(all_results)
     recommendation_rows = build_recommendations(summary_rows)
+    axis_leaderboard_rows = build_axis_leaderboard(summary_rows)
+    judge_audit_rows = build_judge_audit(summary_rows)
     failure_rows = failure_summary(all_results)
     write_results(out_dir / "results.csv", all_results)
     write_summary_csv(out_dir / "summary.csv", summary_rows)
     write_category_csv(out_dir / "category_summary.csv", category_rows)
     write_recommendations_csv(out_dir / "recommendations.csv", recommendation_rows)
+    write_axis_leaderboard_csv(out_dir / "axis_leaderboard.csv", axis_leaderboard_rows)
+    write_judge_audit_csv(out_dir / "judge_audit.csv", judge_audit_rows)
     write_failure_csv(out_dir / "failure_summary.csv", failure_rows)
     write_jsonl(out_dir / "traces.jsonl", traces)
     write_markdown_report(
@@ -173,6 +188,8 @@ def run_benchmark(
         summary_rows,
         category_rows,
         recommendation_rows,
+        axis_leaderboard_rows,
+        judge_audit_rows,
         failure_rows,
         run_id,
         interpretation_warnings,
@@ -182,6 +199,8 @@ def run_benchmark(
         summary_rows,
         category_rows,
         recommendation_rows,
+        axis_leaderboard_rows,
+        judge_audit_rows,
         failure_rows,
         run_id,
         interpretation_warnings,
@@ -191,6 +210,8 @@ def run_benchmark(
         summary_rows=summary_rows,
         category_rows=category_rows,
         recommendation_rows=recommendation_rows,
+        axis_leaderboard_rows=axis_leaderboard_rows,
+        judge_audit_rows=judge_audit_rows,
         result_rows=[result.model_dump() for result in all_results],
         run_id=run_id,
     )
@@ -210,29 +231,35 @@ def append_result(
     question: Question,
     retrieval: RetrievalTrace,
     answer,
+    judges: list[str],
 ) -> None:
-    result = evaluate(
-        run_id=run_id,
-        track=track,
-        domain=domain,
-        system_id=system_id,
-        question=question,
-        retrieval=retrieval,
-        answer=answer,
-    )
-    all_results.append(result)
-    traces.append(
-        {
-            "run_id": run_id,
-            "track": track,
-            "domain": domain,
-            "system_id": system_id,
-            "question": question.model_dump(),
-            "retrieval": retrieval.model_dump(),
-            "answer": answer.model_dump(),
-            "evaluation": result.model_dump(),
-        }
-    )
+    for judge_model in judges:
+        judgement = judge_answer(question, retrieval, answer, judge_model)
+        result = evaluate(
+            run_id=run_id,
+            track=track,
+            domain=domain,
+            system_id=system_id,
+            question=question,
+            retrieval=retrieval,
+            answer=answer,
+            judgement=judgement,
+        )
+        all_results.append(result)
+        traces.append(
+            {
+                "run_id": run_id,
+                "track": track,
+                "domain": domain,
+                "system_id": system_id,
+                "judge_model": judge_model,
+                "question": question.model_dump(),
+                "retrieval": retrieval.model_dump(),
+                "answer": answer.model_dump(),
+                "judgement": judgement.model_dump(),
+                "evaluation": result.model_dump(),
+            }
+        )
 
 
 def system_embedding_matrix(
@@ -301,6 +328,8 @@ def copy_latest(root: Path, out_dir: Path) -> None:
         "summary.csv",
         "category_summary.csv",
         "recommendations.csv",
+        "axis_leaderboard.csv",
+        "judge_audit.csv",
         "failure_summary.csv",
         "results.csv",
         "report.md",

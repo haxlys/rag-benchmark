@@ -11,6 +11,7 @@
 | 상황 | 먼저 볼 방식 | 이유 |
 |---|---|---|
 | retrieval 문제인지 LLM 문제인지 애매함 | `retrieval-only` 후 `generator-oracle` | 검색 실패와 답변 생성 실패를 분리해서 봅니다. |
+| 평가 모델이 믿을 만한지 애매함 | `judge_audit.csv` | judge 신뢰성을 product stack 품질과 분리해서 봅니다. |
 | 정확한 이름, 숫자, ID, 짧은 정책 검색 | `bm25` | 저렴하고 빠르며 exact lexical matching이 강합니다. |
 | exact term과 semantic question이 섞임 | `hybrid` | sparse와 dense retrieval signal을 함께 씁니다. |
 | 품질이 중요하고 latency budget이 있음 | `hybrid-rerank` | 추가 비용과 지연시간을 감수하고 candidate order를 개선할 수 있습니다. |
@@ -26,6 +27,7 @@
 - evidence recall이 낮으면 parser, chunking, retrieval, query routing 문제를 봐야 합니다.
 - embedding model 변경은 먼저 retrieval-only evidence recall, MRR, nDCG로 봅니다.
 - generator 변경은 gold evidence가 보장되는 oracle-context run으로 먼저 봅니다.
+- judge/evaluator 변경은 product stack ranking에 쓰기 전에 gold 또는 human label 기준으로 audit합니다.
 - citation validity는 finance, legal, compliance, support use case에서 특히 중요합니다.
 - query latency가 낮아도 ingestion/indexing cost가 높을 수 있습니다. tree 또는 graph 방식에서 자주 생깁니다.
 
@@ -37,7 +39,9 @@
 - `financebench-open-source`는 더 큰 실제 데이터 retrieval run을 위해 공개 FinanceBench 150문항 sample을 추가합니다.
 - 이제 `retrieval-only`, `generator-oracle`, `end-to-end` 세 track을 실행합니다.
 - end-to-end run은 RAG 방식, embedding profile, generator profile 조합을 함께 비교합니다.
-- `results/dashboard.html`에서 ranking, scatter, distribution, category heatmap을 볼 수 있습니다.
+- `axis_leaderboard.csv`에서 최고의 RAG 방식, embedding profile, generator profile을 축별로 분리해서 봅니다.
+- `judge_audit.csv`에서 judge/evaluator 신뢰성을 product stack 품질과 분리해서 봅니다.
+- `results/dashboard.html`에서 ranking, scatter, distribution, category heatmap, axis leaderboard, judge audit을 볼 수 있습니다.
 - Finance에는 capex, deferred revenue, backlog, covenant, lease obligation 같은 semantic financial term이 포함됩니다.
 - General-docs에는 semantic question, section-navigation, multi-section, multi-document distractor가 포함됩니다.
 - synonym-heavy 또는 structure-heavy question에서 `pageindex-oss`, dense-style retrieval, reranking이 BM25와 분리됩니다.
@@ -97,6 +101,7 @@ recommendation ranking은 quality, efficiency, stability를 조합합니다. 이
 - 실제 top-k와 context-token budget으로 실행.
 - RAG 방식을 탓하기 전에 최소 두 개 이상의 embedding model/profile 비교.
 - LLM을 탓하기 전에 oracle-context generator check 실행.
+- LLM judge를 정답 채점 기준으로 쓰기 전에 human label 기준 judge audit 실행.
 - 답변의 10-20% 이상을 사람이 검토.
 - parser failure를 retrieval failure와 분리해서 기록.
 - chunking, parsing, embedding model, reranker를 바꿀 때마다 재실행.

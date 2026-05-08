@@ -28,7 +28,7 @@ PageIndex scope:
 Comparison goal:
 
 - Product operations comparison, not only retrieval accuracy.
-- Separate retrieval quality, generator quality, and full end-to-end quality.
+- Separate retrieval quality, generator quality, judge/evaluator reliability, and full end-to-end quality.
 - Measure ingestion, indexing, query quality, latency, cost, failure modes,
   citation quality, and maintenance complexity.
 
@@ -54,6 +54,12 @@ MVP generator profiles:
 - `extractive-strict`: conservative context-bound answer generation.
 - `balanced-oss-llm`: stronger multi-section and table handling.
 - `reasoning-oss-llm`: stronger table, calculation, and integration handling.
+
+MVP judge profiles:
+
+- `exact-match-gold`: canonical deterministic gold-label evaluator for product stack ranking.
+- `llm-judge-balanced-proxy`: local deterministic proxy for a more lenient LLM-as-judge.
+- `citation-strict-judge-proxy`: local deterministic proxy for citation-first compliance judging.
 
 These are local deterministic profiles so the benchmark remains OSS-only,
 fast, and reproducible. They are model-selection proxies, not claims about
@@ -86,6 +92,8 @@ then produce a scorecard covering:
 - retrieval-only evidence quality
 - oracle-context generator quality
 - end-to-end stack quality
+- judge/evaluator reliability audit
+- separate RAG, embedding, generator, and judge leaderboards
 - retrieval evidence recall and precision
 - answer correctness
 - groundedness and citation validity
@@ -160,6 +168,8 @@ Each run writes:
 - `runs/<run_id>/summary.csv`: domain/system scorecard.
 - `runs/<run_id>/category_summary.csv`: domain/category/system scorecard.
 - `runs/<run_id>/recommendations.csv`: quality/efficiency/stability recommendation ranking.
+- `runs/<run_id>/axis_leaderboard.csv`: best RAG, embedding, and generator candidates separated by axis.
+- `runs/<run_id>/judge_audit.csv`: evaluator/judge reliability and risk summary.
 - `runs/<run_id>/failure_summary.csv`: failure type counts by domain/system.
 - `runs/<run_id>/results.csv`: per-question metrics.
 - `runs/<run_id>/traces.jsonl`: full retrieval, answer, and evaluation traces.
@@ -172,6 +182,8 @@ The latest run is also copied to:
 - `results/summary.csv`
 - `results/category_summary.csv`
 - `results/recommendations.csv`
+- `results/axis_leaderboard.csv`
+- `results/judge_audit.csv`
 - `results/failure_summary.csv`
 - `results/results.csv`
 - `results/report.md`
@@ -188,6 +200,11 @@ Use the benchmark as an operations decision aid:
   guaranteed.
 - Use `end-to-end` to choose deployable combinations of RAG method, embedding
   profile, and generator profile.
+- Use `axis_leaderboard.csv` when you want to see the best RAG system,
+  embedding model, and generator model separately.
+- Use `judge_audit.csv` to compare evaluation models. Treat judges as measuring
+  instruments; validate them against human labels before using them to rank
+  production stacks.
 - Choose `bm25` when exact terms, speed, and low cost matter most.
 - Choose `hybrid` or `hybrid-rerank` when semantic matching and exact terms both matter.
 - Choose `parent-child` when chunk-level search works but answer generation needs more surrounding context.

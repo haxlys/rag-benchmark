@@ -13,6 +13,7 @@ number.
 | Situation | Recommended Starting Point | Why |
 |---|---|---|
 | Unsure whether retrieval or LLM is the bottleneck | `retrieval-only` then `generator-oracle` | Separates search failures from answer synthesis failures. |
+| Unsure whether the evaluator is reliable | `judge_audit.csv` | Keeps judge reliability separate from product stack quality. |
 | Exact names, numbers, IDs, and short policies | `bm25` | Cheap, fast, strong lexical matching. |
 | Mixed exact and semantic questions | `hybrid` | Combines sparse and dense retrieval signals. |
 | High quality required and latency budget exists | `hybrid-rerank` | Reranking can improve candidate order at extra cost. |
@@ -28,6 +29,7 @@ number.
 - Low evidence recall points to parser, chunking, retrieval, or query routing problems.
 - Embedding model changes should first be judged with retrieval-only evidence recall, MRR, and nDCG.
 - Generator changes should first be judged with oracle-context runs, where gold evidence is guaranteed.
+- Judge/evaluator changes should be audited against gold or human labels before being used for product stack ranking.
 - High citation validity is important for finance, legal, compliance, and support use cases.
 - Low query latency can hide high ingestion/indexing cost, especially for tree or graph methods.
 
@@ -39,7 +41,9 @@ The included fixture run shows:
 - `financebench-open-source` adds the public 150-question FinanceBench sample for a larger real-data retrieval run.
 - The benchmark now runs three tracks: `retrieval-only`, `generator-oracle`, and `end-to-end`.
 - End-to-end runs compare RAG method, embedding profile, and generator profile together.
-- `results/dashboard.html` provides ranking, scatter, distribution, and category heatmap views.
+- `axis_leaderboard.csv` separates the best RAG method, embedding profile, and generator profile.
+- `judge_audit.csv` separates judge/evaluator reliability from product-stack quality.
+- `results/dashboard.html` provides ranking, scatter, distribution, category heatmap, axis leaderboard, and judge audit views.
 - Finance includes semantic financial terms such as capex, deferred revenue, backlog, covenant, and lease obligations.
 - General-docs includes semantic, section-navigation, multi-section, and multi-document distractors.
 - `pageindex-oss`, dense-style retrieval, and reranking separate from BM25 on synonym-heavy and structure-heavy questions.
@@ -99,6 +103,7 @@ Before using results for a real product decision:
 - Run with realistic top-k and context-token budgets.
 - Compare at least two embedding models or profiles before blaming the RAG method.
 - Run oracle-context generator checks before blaming the LLM.
+- Audit judge models against human labels before using an LLM judge as the source of truth.
 - Review at least 10-20% of answers manually.
 - Track parser failures separately from retrieval failures.
 - Re-run after changing chunking, parsing, embedding model, or reranker.

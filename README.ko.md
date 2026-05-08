@@ -24,7 +24,7 @@ PageIndex 범위:
 비교 목표:
 
 - 검색 정확도만이 아니라 제품 운영 관점으로 비교합니다.
-- retrieval 품질, generator 품질, end-to-end 품질을 분리해서 봅니다.
+- retrieval 품질, generator 품질, judge/evaluator 신뢰성, end-to-end 품질을 분리해서 봅니다.
 - ingestion, indexing, query quality, latency, cost, failure mode, citation quality, maintenance complexity를 함께 측정합니다.
 
 ## 비교 대상
@@ -49,6 +49,12 @@ MVP 생성 LLM 프로필:
 - `extractive-strict`: 보수적인 context-bound 답변 생성.
 - `balanced-oss-llm`: multi-section, table 처리 능력을 더 높게 둔 profile.
 - `reasoning-oss-llm`: table, calculation, evidence integration을 더 강하게 둔 profile.
+
+MVP 평가 모델/Judge 프로필:
+
+- `exact-match-gold`: product stack ranking에 쓰는 canonical deterministic gold-label evaluator.
+- `llm-judge-balanced-proxy`: 더 관대한 LLM-as-judge를 흉내 내는 로컬 결정론적 proxy.
+- `citation-strict-judge-proxy`: citation-first compliance judge를 흉내 내는 로컬 결정론적 proxy.
 
 이 프로필들은 OSS-only, 빠른 실행, 재현성을 위해 만든 결정론적 로컬 proxy입니다. 실제 모델 weight를 다운로드해서 측정한 값은 아니므로, 모델 리더보드 성능 주장에는 실제 adapter 연결이 필요합니다.
 
@@ -75,6 +81,8 @@ MVP 생성 LLM 프로필:
 - retrieval-only evidence quality
 - oracle-context generator quality
 - end-to-end stack quality
+- judge/evaluator reliability audit
+- RAG, embedding, generator, judge를 분리한 leaderboard
 - retrieval evidence recall and precision
 - answer correctness
 - groundedness and citation validity
@@ -149,6 +157,8 @@ uv run --extra dev pytest -q
 - `runs/<run_id>/summary.csv`: domain/system scorecard.
 - `runs/<run_id>/category_summary.csv`: domain/category/system scorecard.
 - `runs/<run_id>/recommendations.csv`: quality, efficiency, stability 기반 추천 ranking.
+- `runs/<run_id>/axis_leaderboard.csv`: RAG, embedding, generator 후보를 축별로 분리한 ranking.
+- `runs/<run_id>/judge_audit.csv`: evaluator/judge 신뢰성 및 risk summary.
 - `runs/<run_id>/failure_summary.csv`: domain/system별 failure type count.
 - `runs/<run_id>/results.csv`: question별 metric.
 - `runs/<run_id>/traces.jsonl`: retrieval, answer, evaluation trace 전체.
@@ -161,6 +171,8 @@ uv run --extra dev pytest -q
 - `results/summary.csv`
 - `results/category_summary.csv`
 - `results/recommendations.csv`
+- `results/axis_leaderboard.csv`
+- `results/judge_audit.csv`
 - `results/failure_summary.csv`
 - `results/results.csv`
 - `results/report.md`
@@ -175,6 +187,8 @@ uv run --extra dev pytest -q
 - `retrieval-only`는 LLM 이야기를 하기 전에 검색/indexing layer가 정답 근거를 찾는지 확인합니다.
 - `generator-oracle`은 정답 근거가 주어졌을 때 generator profile 차이를 봅니다.
 - `end-to-end`는 실제 배포 후보인 RAG 방식, 임베딩 프로필, 생성 프로필 조합을 비교합니다.
+- `axis_leaderboard.csv`는 최고의 RAG 방식, embedding model, generator model을 따로 볼 때 사용합니다.
+- `judge_audit.csv`는 평가 모델을 비교할 때 사용합니다. Judge는 제품 후보가 아니라 측정 도구이므로, production ranking에 쓰기 전 human label 기준 검증이 필요합니다.
 - 정확한 용어, 숫자, ID, 짧은 정책이 중요하면 `bm25`를 먼저 봅니다.
 - exact match와 semantic match가 모두 필요하면 `hybrid` 또는 `hybrid-rerank`를 봅니다.
 - 검색 chunk는 잘 잡히지만 답변 context가 부족하면 `parent-child`를 봅니다.

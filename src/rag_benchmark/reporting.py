@@ -18,20 +18,29 @@ SUMMARY_FIELDS = [
     "embedding_model",
     "reranker_model",
     "generator_model",
+    "judge_model",
     "questions",
     "answer_correctness",
+    "gold_answer_correctness",
     "evidence_recall",
     "context_precision",
     "citation_validity",
+    "judge_human_agreement_proxy",
+    "judge_false_accept_risk",
+    "judge_false_reject_risk",
     "query_wall_time_ms",
     "query_wall_time_p50_ms",
     "query_wall_time_p95_ms",
     "generator_wall_time_ms",
     "generator_wall_time_p95_ms",
+    "judge_wall_time_ms",
+    "judge_wall_time_p95_ms",
     "index_wall_time_ms",
     "retrieved_token_count",
     "generator_input_tokens",
     "generator_output_tokens",
+    "judge_input_tokens",
+    "judge_estimated_cost",
     "estimated_cost",
     "failure_rate",
 ]
@@ -44,8 +53,10 @@ CATEGORY_FIELDS = [
     "rag_method",
     "embedding_model",
     "generator_model",
+    "judge_model",
     "questions",
     "answer_correctness",
+    "gold_answer_correctness",
     "evidence_recall",
     "context_precision",
     "failure_rate",
@@ -58,7 +69,9 @@ RECOMMENDATION_FIELDS = [
     "rag_method",
     "embedding_model",
     "generator_model",
+    "judge_model",
     "answer_correctness",
+    "gold_answer_correctness",
     "evidence_recall",
     "context_precision",
     "failure_rate",
@@ -69,7 +82,46 @@ RECOMMENDATION_FIELDS = [
     "role",
 ]
 
-FAILURE_FIELDS = ["track", "domain", "system_id", "embedding_model", "generator_model", "failure_type", "count"]
+AXIS_LEADERBOARD_FIELDS = [
+    "domain",
+    "axis",
+    "candidate",
+    "variants",
+    "answer_correctness",
+    "evidence_recall",
+    "context_precision",
+    "failure_rate",
+    "estimated_cost",
+    "recommendation_score",
+    "reading",
+]
+
+JUDGE_AUDIT_FIELDS = [
+    "domain",
+    "judge_model",
+    "variants",
+    "judge_score",
+    "answer_correctness",
+    "gold_answer_correctness",
+    "gold_delta",
+    "human_agreement_proxy",
+    "false_accept_risk",
+    "false_reject_risk",
+    "judge_wall_time_ms",
+    "estimated_cost",
+    "reading",
+]
+
+FAILURE_FIELDS = [
+    "track",
+    "domain",
+    "system_id",
+    "embedding_model",
+    "generator_model",
+    "judge_model",
+    "failure_type",
+    "count",
+]
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -87,7 +139,7 @@ def write_results(path: Path, results: list[EvaluationResult]) -> None:
 
 
 def aggregate(results: list[EvaluationResult]) -> list[dict]:
-    grouped: dict[tuple[str, str, str, str, str, str, str], list[EvaluationResult]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str, str, str, str, str], list[EvaluationResult]] = defaultdict(list)
     for result in results:
         grouped[
             (
@@ -98,6 +150,7 @@ def aggregate(results: list[EvaluationResult]) -> list[dict]:
                 result.embedding_model,
                 result.reranker_model,
                 result.generator_model,
+                result.judge_model,
             )
         ].append(result)
     rows = []
@@ -109,6 +162,7 @@ def aggregate(results: list[EvaluationResult]) -> list[dict]:
         embedding_model,
         reranker_model,
         generator_model,
+        judge_model,
     ), items in sorted(grouped.items()):
         rows.append(
             {
@@ -119,11 +173,16 @@ def aggregate(results: list[EvaluationResult]) -> list[dict]:
                 "embedding_model": embedding_model,
                 "reranker_model": reranker_model,
                 "generator_model": generator_model,
+                "judge_model": judge_model,
                 "questions": len(items),
                 "answer_correctness": avg(items, "answer_correctness"),
+                "gold_answer_correctness": avg(items, "gold_answer_correctness"),
                 "evidence_recall": avg(items, "evidence_recall"),
                 "context_precision": avg(items, "context_precision"),
                 "citation_validity": avg(items, "citation_validity"),
+                "judge_human_agreement_proxy": avg(items, "judge_human_agreement_proxy"),
+                "judge_false_accept_risk": avg(items, "judge_false_accept_risk"),
+                "judge_false_reject_risk": avg(items, "judge_false_reject_risk"),
                 "query_wall_time_ms": avg(items, "query_wall_time_ms"),
                 "query_wall_time_p50_ms": percentile(
                     [float(item.query_wall_time_ms) for item in items], 50
@@ -135,10 +194,16 @@ def aggregate(results: list[EvaluationResult]) -> list[dict]:
                 "generator_wall_time_p95_ms": percentile(
                     [float(item.generator_wall_time_ms) for item in items], 95
                 ),
+                "judge_wall_time_ms": avg(items, "judge_wall_time_ms"),
+                "judge_wall_time_p95_ms": percentile(
+                    [float(item.judge_wall_time_ms) for item in items], 95
+                ),
                 "index_wall_time_ms": avg(items, "index_wall_time_ms"),
                 "retrieved_token_count": avg(items, "retrieved_token_count"),
                 "generator_input_tokens": avg(items, "generator_input_tokens"),
                 "generator_output_tokens": avg(items, "generator_output_tokens"),
+                "judge_input_tokens": avg(items, "judge_input_tokens"),
+                "judge_estimated_cost": avg(items, "judge_estimated_cost"),
                 "estimated_cost": avg(items, "estimated_cost"),
                 "failure_rate": sum(1 for item in items if item.failure_type) / len(items),
             }
@@ -147,7 +212,7 @@ def aggregate(results: list[EvaluationResult]) -> list[dict]:
 
 
 def aggregate_by_category(results: list[EvaluationResult]) -> list[dict]:
-    grouped: dict[tuple[str, str, str, str, str, str], list[EvaluationResult]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str, str, str, str], list[EvaluationResult]] = defaultdict(list)
     for result in results:
         grouped[
             (
@@ -157,10 +222,13 @@ def aggregate_by_category(results: list[EvaluationResult]) -> list[dict]:
                 result.system_id,
                 result.embedding_model,
                 result.generator_model,
+                result.judge_model,
             )
         ].append(result)
     rows = []
-    for (track, domain, category, system_id, embedding_model, generator_model), items in sorted(grouped.items()):
+    for (track, domain, category, system_id, embedding_model, generator_model, judge_model), items in sorted(
+        grouped.items()
+    ):
         rows.append(
             {
                 "track": track,
@@ -170,8 +238,10 @@ def aggregate_by_category(results: list[EvaluationResult]) -> list[dict]:
                 "rag_method": items[0].rag_method,
                 "embedding_model": embedding_model,
                 "generator_model": generator_model,
+                "judge_model": judge_model,
                 "questions": len(items),
                 "answer_correctness": avg(items, "answer_correctness"),
+                "gold_answer_correctness": avg(items, "gold_answer_correctness"),
                 "evidence_recall": avg(items, "evidence_recall"),
                 "context_precision": avg(items, "context_precision"),
                 "failure_rate": sum(1 for item in items if item.failure_type) / len(items),
@@ -181,9 +251,13 @@ def aggregate_by_category(results: list[EvaluationResult]) -> list[dict]:
 
 
 def build_recommendations(summary_rows: list[dict]) -> list[dict]:
-    candidate_rows = [row for row in summary_rows if row.get("track") == "end-to-end"]
+    candidate_rows = [
+        row
+        for row in summary_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
+    ]
     if not candidate_rows:
-        candidate_rows = summary_rows
+        candidate_rows = [row for row in summary_rows if row.get("track") == "end-to-end"] or summary_rows
 
     grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in candidate_rows:
@@ -215,7 +289,9 @@ def build_recommendations(summary_rows: list[dict]) -> list[dict]:
                     "rag_method": row["rag_method"],
                     "embedding_model": row["embedding_model"],
                     "generator_model": row["generator_model"],
+                    "judge_model": row["judge_model"],
                     "answer_correctness": row["answer_correctness"],
+                    "gold_answer_correctness": row["gold_answer_correctness"],
                     "evidence_recall": row["evidence_recall"],
                     "context_precision": row["context_precision"],
                     "failure_rate": row["failure_rate"],
@@ -238,7 +314,7 @@ def build_recommendations(summary_rows: list[dict]) -> list[dict]:
 
 
 def failure_summary(results: list[EvaluationResult]) -> list[dict]:
-    grouped: dict[tuple[str, str, str, str, str, str], int] = defaultdict(int)
+    grouped: dict[tuple[str, str, str, str, str, str, str], int] = defaultdict(int)
     for result in results:
         if result.failure_type:
             grouped[
@@ -248,6 +324,7 @@ def failure_summary(results: list[EvaluationResult]) -> list[dict]:
                     result.system_id,
                     result.embedding_model,
                     result.generator_model,
+                    result.judge_model,
                     result.failure_type,
                 )
             ] += 1
@@ -258,13 +335,157 @@ def failure_summary(results: list[EvaluationResult]) -> list[dict]:
             "system_id": system_id,
             "embedding_model": embedding_model,
             "generator_model": generator_model,
+            "judge_model": judge_model,
             "failure_type": failure_type,
             "count": count,
         }
-        for (track, domain, system_id, embedding_model, generator_model, failure_type), count in sorted(
+        for (track, domain, system_id, embedding_model, generator_model, judge_model, failure_type), count in sorted(
             grouped.items()
         )
     ]
+
+
+def build_axis_leaderboard(summary_rows: list[dict]) -> list[dict]:
+    canonical = [
+        row
+        for row in summary_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
+    ]
+    rows = []
+    for domain in sorted({row["domain"] for row in canonical}):
+        domain_rows = [row for row in canonical if row["domain"] == domain]
+        rows.extend(axis_rows(domain_rows, domain, "rag_method", "best RAG system"))
+        rows.extend(
+            axis_rows(
+                [row for row in domain_rows if row["embedding_model"] != "none"],
+                domain,
+                "embedding_model",
+                "best embedding model",
+            )
+        )
+        rows.extend(axis_rows(domain_rows, domain, "generator_model", "best generator model"))
+    return sorted(rows, key=lambda row: (row["domain"], row["axis"], -row["recommendation_score"]))
+
+
+def axis_rows(rows: list[dict], domain: str, field: str, reading: str) -> list[dict]:
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    for row in rows:
+        grouped[row[field]].append(row)
+    axis = field.replace("_model", "").replace("_method", "")
+    output = []
+    for candidate, items in grouped.items():
+        output.append(
+            {
+                "domain": domain,
+                "axis": axis,
+                "candidate": candidate,
+                "variants": len(items),
+                "answer_correctness": avg_rows(items, "answer_correctness"),
+                "evidence_recall": avg_rows(items, "evidence_recall"),
+                "context_precision": avg_rows(items, "context_precision"),
+                "failure_rate": avg_rows(items, "failure_rate"),
+                "estimated_cost": avg_rows(items, "estimated_cost"),
+                "recommendation_score": axis_recommendation_score(items),
+                "reading": reading,
+            }
+        )
+    return output
+
+
+def build_judge_audit(summary_rows: list[dict]) -> list[dict]:
+    rows = [row for row in summary_rows if row.get("track") == "end-to-end"]
+    grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    for row in rows:
+        grouped[(row["domain"], row["judge_model"])].append(row)
+    audits = []
+    for (domain, judge_model), items in sorted(grouped.items()):
+        answer_score = avg_rows(items, "answer_correctness")
+        gold_score = avg_rows(items, "gold_answer_correctness")
+        agreement = avg_rows(items, "judge_human_agreement_proxy")
+        false_accept = avg_rows(items, "judge_false_accept_risk")
+        false_reject = avg_rows(items, "judge_false_reject_risk")
+        cost = avg_rows(items, "judge_estimated_cost")
+        latency = avg_rows(items, "judge_wall_time_ms")
+        judge_score = max(
+            0.0,
+            agreement
+            - 0.40 * false_accept
+            - 0.30 * false_reject
+            - 0.10 * min(cost / max_judge_cost(items), 1.0)
+            - 0.05 * min(latency / max_latency(items), 1.0),
+        )
+        audits.append(
+            {
+                "domain": domain,
+                "judge_model": judge_model,
+                "variants": len(items),
+                "judge_score": judge_score,
+                "answer_correctness": answer_score,
+                "gold_answer_correctness": gold_score,
+                "gold_delta": answer_score - gold_score,
+                "human_agreement_proxy": agreement,
+                "false_accept_risk": false_accept,
+                "false_reject_risk": false_reject,
+                "judge_wall_time_ms": latency,
+                "estimated_cost": cost,
+                "reading": judge_reading(judge_model),
+            }
+        )
+    return sorted(audits, key=lambda row: (row["domain"], -row["judge_score"]))
+
+
+def axis_recommendation_score(rows: list[dict]) -> float:
+    quality = (
+        avg_rows(rows, "answer_correctness") * 0.45
+        + avg_rows(rows, "evidence_recall") * 0.30
+        + avg_rows(rows, "context_precision") * 0.10
+        + (1.0 - avg_rows(rows, "failure_rate")) * 0.15
+    )
+    cost_penalty = min(avg_rows(rows, "estimated_cost") / max_cost(rows), 1.0)
+    return max(0.0, quality - 0.10 * cost_penalty)
+
+
+def avg_rows(rows: list[dict], field: str) -> float:
+    return mean(float(row[field]) for row in rows) if rows else 0.0
+
+
+def max_cost(rows: list[dict]) -> float:
+    return max((float(row["estimated_cost"]) for row in rows), default=1.0) or 1.0
+
+
+def max_latency(rows: list[dict]) -> float:
+    return max((float(row["judge_wall_time_ms"]) for row in rows), default=1.0) or 1.0
+
+
+def max_judge_cost(rows: list[dict]) -> float:
+    return max((float(row["judge_estimated_cost"]) for row in rows), default=1.0) or 1.0
+
+
+def judge_reading(judge_model: str) -> str:
+    readings = {
+        "exact-match-gold": "canonical factual label evaluator; use for stack ranking",
+        "llm-judge-balanced-proxy": "lenient LLM judge proxy; useful for paraphrase tolerance checks",
+        "citation-strict-judge-proxy": "strict citation judge proxy; useful for compliance-style risk checks",
+    }
+    return readings.get(judge_model, "candidate judge profile")
+
+
+def axis_reading_ko(axis: str) -> str:
+    readings = {
+        "rag": "RAG 방식 자체의 평균 운영 성능",
+        "embedding": "임베딩 모델만 따로 봤을 때의 평균 검색 기여도",
+        "generator": "생성 모델만 따로 봤을 때의 평균 답변 기여도",
+    }
+    return readings.get(axis, "후보 축별 성능")
+
+
+def judge_reading_ko(judge_model: str) -> str:
+    readings = {
+        "exact-match-gold": "정규화된 gold label 기반 canonical evaluator",
+        "llm-judge-balanced-proxy": "paraphrase 허용을 보는 관대한 LLM judge proxy",
+        "citation-strict-judge-proxy": "citation을 엄격하게 보는 compliance형 judge proxy",
+    }
+    return readings.get(judge_model, "후보 judge profile")
 
 
 def write_summary_csv(path: Path, rows: list[dict]) -> None:
@@ -291,6 +512,22 @@ def write_recommendations_csv(path: Path, rows: list[dict]) -> None:
             writer.writerow(row)
 
 
+def write_axis_leaderboard_csv(path: Path, rows: list[dict]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=AXIS_LEADERBOARD_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
+def write_judge_audit_csv(path: Path, rows: list[dict]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=JUDGE_AUDIT_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
 def write_failure_csv(path: Path, rows: list[dict]) -> None:
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=FAILURE_FIELDS)
@@ -304,15 +541,27 @@ def write_markdown_report(
     summary_rows: list[dict],
     category_rows: list[dict],
     recommendation_rows: list[dict],
+    axis_leaderboard_rows: list[dict],
+    judge_audit_rows: list[dict],
     failure_rows: list[dict],
     run_id: str,
     warnings: list[str] | None = None,
 ) -> None:
-    score_rows = [row for row in summary_rows if row.get("track") == "end-to-end"] or summary_rows
+    score_rows = [
+        row
+        for row in summary_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
+    ] or [row for row in summary_rows if row.get("track") == "end-to-end"] or summary_rows
     score_category_rows = [
-        row for row in category_rows if row.get("track") == "end-to-end"
+        row
+        for row in category_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
     ] or category_rows
-    score_failure_rows = [row for row in failure_rows if row.get("track") == "end-to-end"]
+    score_failure_rows = [
+        row
+        for row in failure_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
+    ]
     lines = [
         f"# RAG Benchmark Report: {run_id}",
         "",
@@ -349,6 +598,49 @@ def write_markdown_report(
             "| {domain} | {rank} | `{system_id}` | {recommendation_score:.3f} | "
             "{quality_score:.3f} | {efficiency_score:.3f} | {stability_score:.3f} | {role} |".format(
                 rank=rank_by_domain[row["domain"]], **row
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Best By Axis",
+            "",
+            "Product-stack ranking uses `exact-match-gold` as the canonical judge. Judge models are audited separately because they are measuring instruments, not deployable RAG components.",
+            "",
+            "| Domain | Axis | Rank | Candidate | Score | Answer | Evidence | Failure | Reading |",
+            "|---|---|---:|---|---:|---:|---:|---:|---|",
+        ]
+    )
+    rank_by_axis: dict[tuple[str, str], int] = defaultdict(int)
+    for row in axis_leaderboard_rows:
+        key = (row["domain"], row["axis"])
+        rank_by_axis[key] += 1
+        if rank_by_axis[key] > 3:
+            continue
+        lines.append(
+            "| {domain} | {axis} | {rank} | `{candidate}` | {recommendation_score:.3f} | "
+            "{answer_correctness:.3f} | {evidence_recall:.3f} | {failure_rate:.3f} | {reading} |".format(
+                rank=rank_by_axis[key],
+                **row,
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Judge Model Audit",
+            "",
+            "| Domain | Rank | Judge | Judge Score | Gold Delta | Agreement Proxy | False Accept Risk | False Reject Risk | Reading |",
+            "|---|---:|---|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    rank_by_judge_domain: dict[str, int] = defaultdict(int)
+    for row in judge_audit_rows:
+        rank_by_judge_domain[row["domain"]] += 1
+        lines.append(
+            "| {domain} | {rank} | `{judge_model}` | {judge_score:.3f} | {gold_delta:.3f} | "
+            "{human_agreement_proxy:.3f} | {false_accept_risk:.3f} | {false_reject_risk:.3f} | {reading} |".format(
+                rank=rank_by_judge_domain[row["domain"]],
+                **row,
             )
         )
     lines.extend(
@@ -433,8 +725,9 @@ def write_markdown_report(
             "",
             "## Notes",
             "",
-                "- `pageindex-oss` uses a local PageIndex-style tree adapter only; hosted PageIndex APIs are excluded.",
+            "- `pageindex-oss` uses a local PageIndex-style tree adapter only; hosted PageIndex APIs are excluded.",
             "- Embedding and generator comparisons use deterministic local profiles by default; plug in real model adapters before claiming model-leaderboard results.",
+            "- Judge comparisons are judge reliability audits. Do not rank product stacks with a judge until it is validated against human labels for the target domain.",
             "- `retrieval-only` isolates evidence retrieval, `generator-oracle` isolates answer generation with gold context, and `end-to-end` combines the full stack.",
             "- Add real corpora and human-graded questions before treating numbers as production proof.",
             "",
@@ -448,15 +741,27 @@ def write_markdown_report_ko(
     summary_rows: list[dict],
     category_rows: list[dict],
     recommendation_rows: list[dict],
+    axis_leaderboard_rows: list[dict],
+    judge_audit_rows: list[dict],
     failure_rows: list[dict],
     run_id: str,
     warnings: list[str] | None = None,
 ) -> None:
-    score_rows = [row for row in summary_rows if row.get("track") == "end-to-end"] or summary_rows
+    score_rows = [
+        row
+        for row in summary_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
+    ] or [row for row in summary_rows if row.get("track") == "end-to-end"] or summary_rows
     score_category_rows = [
-        row for row in category_rows if row.get("track") == "end-to-end"
+        row
+        for row in category_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
     ] or category_rows
-    score_failure_rows = [row for row in failure_rows if row.get("track") == "end-to-end"]
+    score_failure_rows = [
+        row
+        for row in failure_rows
+        if row.get("track") == "end-to-end" and row.get("judge_model") == "exact-match-gold"
+    ]
     lines = [
         f"# RAG 벤치마크 리포트: {run_id}",
         "",
@@ -500,6 +805,51 @@ def write_markdown_report_ko(
             "{quality_score:.3f} | {efficiency_score:.3f} | {stability_score:.3f} | {role} |".format(**row_ko)
         )
 
+    lines.extend(
+        [
+            "",
+            "## 축별 최고 후보",
+            "",
+            "제품 stack ranking은 canonical judge인 `exact-match-gold` 기준입니다. Judge model은 배포 후보가 아니라 측정 도구이므로 별도 audit으로 봅니다.",
+            "",
+            "| 도메인 | 축 | 순위 | 후보 | 점수 | 답변 | Evidence | 실패율 | 해석 |",
+            "|---|---|---:|---|---:|---:|---:|---:|---|",
+        ]
+    )
+    rank_by_axis: dict[tuple[str, str], int] = defaultdict(int)
+    for row in axis_leaderboard_rows:
+        key = (row["domain"], row["axis"])
+        rank_by_axis[key] += 1
+        if rank_by_axis[key] > 3:
+            continue
+        row_ko = {**row, "reading": axis_reading_ko(row["axis"])}
+        lines.append(
+            "| {domain} | {axis} | {rank} | `{candidate}` | {recommendation_score:.3f} | "
+            "{answer_correctness:.3f} | {evidence_recall:.3f} | {failure_rate:.3f} | {reading} |".format(
+                rank=rank_by_axis[key],
+                **row_ko,
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## 평가 모델 감사",
+            "",
+            "| 도메인 | 순위 | Judge | Judge Score | Gold Delta | Agreement Proxy | False Accept Risk | False Reject Risk | 해석 |",
+            "|---|---:|---|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    rank_by_judge_domain: dict[str, int] = defaultdict(int)
+    for row in judge_audit_rows:
+        rank_by_judge_domain[row["domain"]] += 1
+        row_ko = {**row, "reading": judge_reading_ko(row["judge_model"])}
+        lines.append(
+            "| {domain} | {rank} | `{judge_model}` | {judge_score:.3f} | {gold_delta:.3f} | "
+            "{human_agreement_proxy:.3f} | {false_accept_risk:.3f} | {false_reject_risk:.3f} | {reading} |".format(
+                rank=rank_by_judge_domain[row["domain"]],
+                **row_ko,
+            )
+        )
     lines.extend(["", "## 실패 유형", ""])
     if score_failure_rows:
         lines.extend(
@@ -584,6 +934,7 @@ def write_markdown_report_ko(
             "",
             "- `pageindex-oss`는 로컬 PageIndex-style tree adapter만 사용합니다. Hosted PageIndex API는 제외되어 있습니다.",
             "- 기본 임베딩/생성 비교는 결정론적 로컬 프로필입니다. 실제 모델 리더보드 성능으로 주장하려면 실제 모델 adapter를 연결해야 합니다.",
+            "- Judge 비교는 평가 모델 신뢰성 audit입니다. 대상 도메인 human label로 검증하기 전에는 product stack ranking에 그대로 쓰면 안 됩니다.",
             "- `retrieval-only`는 검색 품질, `generator-oracle`은 gold context 기반 생성 능력, `end-to-end`는 전체 조합을 봅니다.",
             "- 실제 production 근거로 사용하려면 대표 corpus와 사람이 검수한 question/evidence label을 추가해야 합니다.",
             "",

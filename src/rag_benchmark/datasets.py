@@ -54,6 +54,15 @@ def enabled_mvp_generators(config: dict) -> list[str]:
     ]
 
 
+def enabled_mvp_judges(config: dict) -> list[str]:
+    judges = config.get("judges", {})
+    return [
+        name
+        for name, item in judges.items()
+        if item.get("enabled") and item.get("stage") == "mvp"
+    ]
+
+
 def enabled_tracks(config: dict) -> list[str]:
     tracks = config.get("experiment_tracks", {})
     return [name for name, item in tracks.items() if item.get("enabled")]

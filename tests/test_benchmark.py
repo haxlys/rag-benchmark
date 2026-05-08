@@ -53,7 +53,7 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
         copy_to_results=False,
     )
     summary_rows = read_summary(out_dir / "summary.csv")
-    assert len(summary_rows) == 177
+    assert len(summary_rows) == 531
 
     rows_by_key = {
         (
@@ -62,11 +62,12 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
             row["system_id"],
             row["embedding_model"],
             row["generator_model"],
+            row["judge_model"],
         ): row
         for row in summary_rows
     }
     assert float(
-        rows_by_key[("end-to-end", "finance", "bm25", "none", "reasoning-oss-llm")][
+        rows_by_key[("end-to-end", "finance", "bm25", "none", "reasoning-oss-llm", "exact-match-gold")][
             "answer_correctness"
         ]
     ) < float(
@@ -77,6 +78,7 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
                 "pageindex-oss",
                 "bge-m3-proxy",
                 "reasoning-oss-llm",
+                "exact-match-gold",
             )
         ]["answer_correctness"]
     )
@@ -88,26 +90,33 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
                 "pageindex-oss",
                 "bge-m3-proxy",
                 "retrieval-probe",
+                "exact-match-gold",
             )
         ]["evidence_recall"]
     ) >= float(
-        rows_by_key[("retrieval-only", "general-docs", "bm25", "none", "retrieval-probe")][
-            "evidence_recall"
-        ]
+        rows_by_key[
+            ("retrieval-only", "general-docs", "bm25", "none", "retrieval-probe", "exact-match-gold")
+        ]["evidence_recall"]
     )
     assert (out_dir / "category_summary.csv").exists()
     assert (out_dir / "recommendations.csv").exists()
+    assert (out_dir / "axis_leaderboard.csv").exists()
+    assert (out_dir / "judge_audit.csv").exists()
     assert (out_dir / "failure_summary.csv").exists()
     assert (out_dir / "report.md").exists()
     assert (out_dir / "report.ko.md").exists()
     assert (out_dir / "dashboard.html").exists()
     assert "RAG 벤치마크 리포트" in (out_dir / "report.ko.md").read_text(encoding="utf-8")
     assert "RAG Benchmark Dashboard" in (out_dir / "dashboard.html").read_text(encoding="utf-8")
+    assert "Judge Model Audit" in (out_dir / "report.md").read_text(encoding="utf-8")
 
     discrimination_report = build_discrimination_report(out_dir)
-    assert "`end-to-end` / `finance`: **strongly discriminative**" in discrimination_report
-    assert "`end-to-end` / `financebench-open-source`: **moderately discriminative**" in discrimination_report
-    assert "`retrieval-only` / `general-docs`: **strongly discriminative**" in discrimination_report
+    assert "`end-to-end` / `finance` / `exact-match-gold`: **strongly discriminative**" in discrimination_report
+    assert (
+        "`end-to-end` / `financebench-open-source` / `exact-match-gold`: **moderately discriminative**"
+        in discrimination_report
+    )
+    assert "`retrieval-only` / `general-docs` / `exact-match-gold`: **strongly discriminative**" in discrimination_report
 
 
 def test_import_text_documents_and_questions(tmp_path: Path) -> None:

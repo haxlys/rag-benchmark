@@ -12,6 +12,7 @@ Date: 2026-05-07
 - 첫 구현 언어: Python.
 - 첫 평가 방식: offline, reproducible, trace-heavy benchmark run.
 - 모델 비교 방식: retrieval-only, generator-oracle, end-to-end track을 분리합니다.
+- 평가 모델 방식: judge/evaluator 신뢰성을 product stack 품질과 분리합니다.
 
 ## 설계 원칙
 
@@ -20,6 +21,7 @@ RAG 비교에서 자주 섞이는 세 가지 관심사를 분리합니다.
 1. 문서 준비: parsing, OCR, table handling, metadata extraction.
 2. 검색과 orchestration: BM25, dense, hybrid, rerank, tree search, agent.
 3. 답변 생성: 가능한 경우 common model과 common answer prompt 사용.
+4. 평가 모델: judge/evaluator behavior, agreement, bias risk.
 
 공정한 진단을 위해 모든 run은 failure를 분류할 수 있을 만큼 trace를 남겨야 합니다. 예를 들어 parsing, retrieval, ranking, orchestration, context packing, generation failure를 구분할 수 있어야 합니다.
 
@@ -290,13 +292,16 @@ Status: local/imported text fixture와 FinanceBench evidence-page import 기준 
 - domain, system, question category별 scorecard 생성.
 - embedding profile과 generator profile 축 추가.
 - retrieval-only와 oracle-context generator track 추가.
+- judge/evaluator profile 축과 judge reliability audit 추가.
 
-Status: deterministic local profile 기준 complete.
+Status: deterministic local profile과 judge audit profile 기준 complete.
 
 ### Phase 6: Operations Report
 
 - product-style report 생성:
   - domain별 recommended default
+  - RAG, embedding, generator, judge를 축별로 분리한 최고 후보
+  - judge/evaluator audit
   - cost/latency tradeoff
   - failure mode
   - maintenance note
@@ -310,11 +315,13 @@ Status: 영어/한국어 report와 정적 시각화 dashboard 기준 complete.
 - config flag 뒤에 sentence-transformers 또는 동급 OSS backend 추가.
 - 하드웨어가 있을 때 open-weight generator adapter 추가.
 - deterministic profile은 빠른 CI와 smoke-test mode로 유지.
+- LLM-as-judge 결과를 신뢰하기 전에 human-labeled judge validation set 추가.
 
 ## 다음 작업 후보
 
 1. table-native extraction을 포함한 full-PDF FinanceBench ingestion 추가.
 2. 최소 두 개 이상의 실제 OSS embedding adapter 추가.
 3. open-weight instruction model용 optional local generator adapter 추가.
-4. 주요 도메인별 100개 이상 labeled question으로 사용자 문서 run 확장.
-5. 실제 모델 run 기준 p95 latency와 memory tracking 추가.
+4. 실제 judge/evaluator adapter와 human-agreement check 추가.
+5. 주요 도메인별 100개 이상 labeled question으로 사용자 문서 run 확장.
+6. 실제 모델 run 기준 p95 latency와 memory tracking 추가.

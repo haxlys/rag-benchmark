@@ -1,0 +1,10 @@
+domain,judge_model,variants,judge_score,answer_correctness,gold_answer_correctness,gold_delta,human_agreement_proxy,false_accept_risk,false_reject_risk,judge_wall_time_ms,estimated_cost,reading
+finance,exact-match-gold,42,0.882,0.7030075187969924,0.7030075187969924,0.0,0.92,0.02,0.1,0.0,0.0,canonical factual label evaluator; use for stack ranking
+finance,llm-judge-balanced-proxy,42,0.662839369557598,0.650375939849624,0.7030075187969924,-0.05263157894736836,0.86,0.08,0.06,40.50788721804511,2.962675438596491e-05,lenient LLM judge proxy; useful for paraphrase tolerance checks
+finance,citation-strict-judge-proxy,42,0.628839829869773,0.650375939849624,0.7030075187969924,-0.05263157894736836,0.83,0.03,0.14,52.677182957393484,3.809154135338346e-05,strict citation judge proxy; useful for compliance-style risk checks
+financebench-open-source,exact-match-gold,42,0.882,0.3361904761904762,0.3361904761904762,0.0,0.92,0.02,0.1,0.0,0.0,canonical factual label evaluator; use for stack ranking
+financebench-open-source,llm-judge-balanced-proxy,42,0.6725554733765621,0.31603174603174605,0.3361904761904762,-0.020158730158730154,0.86,0.08,0.06,53.35695619047619,0.0007791557777777777,lenient LLM judge proxy; useful for paraphrase tolerance checks
+financebench-open-source,citation-strict-judge-proxy,42,0.6385833851174533,0.29793650793650794,0.3361904761904762,-0.03825396825396826,0.83,0.03,0.14,69.80927492063492,0.0010017717142857144,strict citation judge proxy; useful for compliance-style risk checks
+general-docs,exact-match-gold,42,0.882,0.8071428571428572,0.8071428571428572,0.0,0.92,0.02,0.1,0.0,0.0,canonical factual label evaluator; use for stack ranking
+general-docs,llm-judge-balanced-proxy,42,0.6730520280280379,0.8071428571428572,0.8071428571428572,0.0,0.86,0.08,0.06,40.46867857142857,2.7339583333333335e-05,lenient LLM judge proxy; useful for paraphrase tolerance checks
+general-docs,citation-strict-judge-proxy,42,0.6390542060932102,0.730952380952381,0.8071428571428572,-0.07619047619047614,0.83,0.03,0.14,52.62490476190476,3.5150892857142855e-05,strict citation judge proxy; useful for compliance-style risk checks

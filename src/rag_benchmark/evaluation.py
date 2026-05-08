@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from .schemas import AnswerTrace, EvaluationResult, Question, RetrievalTrace
+from .schemas import AnswerTrace, EvaluationResult, JudgementTrace, Question, RetrievalTrace
 
 
 def evaluate(
@@ -14,6 +14,7 @@ def evaluate(
     question: Question,
     retrieval: RetrievalTrace,
     answer: AnswerTrace,
+    judgement: JudgementTrace,
 ) -> EvaluationResult:
     relevant_flags = [
         any(context.chunk.overlaps(evidence) for evidence in question.evidence)
@@ -37,11 +38,8 @@ def evaluate(
     )
     mrr = reciprocal_rank(relevant_flags)
     ndcg = ndcg_at_k(relevant_flags)
-    answer_correctness = answer_correct(question, answer)
-    citation_validity = validate_citations(question, retrieval, answer)
-    groundedness = 1.0 if answer_correctness and citation_validity else 0.0
-    faithfulness = groundedness
-    abstention_correctness = 1.0 if question.no_answer and answer.abstained else 0.0
+    answer_correctness = judgement.answer_correctness
+    abstention_correctness = judgement.abstention_correctness
     hit_rate = 1.0 if evidence_recall > 0 or abstention_correctness else 0.0
     failure_type = classify_failure(question, evidence_recall, context_precision, answer_correctness)
 
@@ -54,6 +52,7 @@ def evaluate(
         embedding_model=retrieval.embedding_model,
         reranker_model=retrieval.reranker_model,
         generator_model=answer.generator_model,
+        judge_model=judgement.judge_model,
         question_id=question.question_id,
         category=question.category,
         hit_rate=hit_rate,
@@ -62,46 +61,29 @@ def evaluate(
         mrr=mrr,
         ndcg=ndcg,
         answer_correctness=answer_correctness,
-        faithfulness=faithfulness,
-        groundedness=groundedness,
-        citation_validity=citation_validity,
+        gold_answer_correctness=judgement.gold_answer_correctness,
+        faithfulness=judgement.faithfulness,
+        groundedness=judgement.groundedness,
+        citation_validity=judgement.citation_validity,
         abstention_correctness=abstention_correctness,
+        judge_human_agreement_proxy=judgement.human_agreement_proxy,
+        judge_false_accept_risk=judgement.false_accept_risk,
+        judge_false_reject_risk=judgement.false_reject_risk,
         retrieved_token_count=retrieval.retrieved_token_count,
         query_wall_time_ms=retrieval.query_wall_time_ms,
         generator_wall_time_ms=answer.wall_time_ms,
+        judge_wall_time_ms=judgement.wall_time_ms,
         index_wall_time_ms=retrieval.index_wall_time_ms,
         embedding_tokens=retrieval.embedding_tokens,
         generator_input_tokens=answer.input_token_count,
         generator_output_tokens=answer.output_token_count,
+        judge_input_tokens=judgement.input_token_count,
+        judge_estimated_cost=judgement.estimated_cost,
         reranker_calls=retrieval.reranker_calls,
         tool_calls=retrieval.tool_calls,
-        estimated_cost=retrieval.estimated_cost + answer.estimated_cost,
+        estimated_cost=retrieval.estimated_cost + answer.estimated_cost + judgement.estimated_cost,
         failure_type=failure_type,
     )
-
-
-def answer_correct(question: Question, answer: AnswerTrace) -> float:
-    if question.no_answer:
-        return 1.0 if answer.abstained else 0.0
-    if answer.abstained:
-        return 0.0
-    allowed = [question.answer, *question.answer_aliases]
-    normalized = answer.answer.strip().lower()
-    return 1.0 if any(item.strip().lower() == normalized for item in allowed) else 0.0
-
-
-def validate_citations(question: Question, retrieval: RetrievalTrace, answer: AnswerTrace) -> float:
-    if question.no_answer:
-        return 1.0 if not answer.cited_chunk_ids else 0.0
-    if not answer.cited_chunk_ids:
-        return 0.0
-    by_id = {context.chunk.chunk_id: context for context in retrieval.contexts}
-    valid = 0
-    for chunk_id in answer.cited_chunk_ids:
-        context = by_id.get(chunk_id)
-        if context and any(context.chunk.overlaps(evidence) for evidence in question.evidence):
-            valid += 1
-    return valid / len(answer.cited_chunk_ids)
 
 
 def reciprocal_rank(relevant_flags: list[bool]) -> float:

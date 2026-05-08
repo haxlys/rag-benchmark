@@ -5,7 +5,13 @@ import yaml
 from rich.console import Console
 from rich.table import Table
 
-from .datasets import enabled_domains, enabled_mvp_embeddings, enabled_mvp_generators, enabled_tracks
+from .datasets import (
+    enabled_domains,
+    enabled_mvp_embeddings,
+    enabled_mvp_generators,
+    enabled_mvp_judges,
+    enabled_tracks,
+)
 from .discrimination import build_discrimination_report
 from .importers import import_financebench, import_questions, import_text_documents
 from .runner import read_report, read_summary, run_benchmark
@@ -54,6 +60,11 @@ def plan(config: Path = Path("configs/benchmark.yaml")) -> None:
         item = data.get("generators", {}).get(name, {})
         console.print(f"- {name} ({item.get('family', 'profile')})")
 
+    console.print("\n[bold]Enabled judge profiles[/bold]")
+    for name in enabled_mvp_judges(data):
+        item = data.get("judges", {}).get(name, {})
+        console.print(f"- {name} ({item.get('family', 'profile')})")
+
     console.print("\n[bold]Enabled experiment tracks[/bold]")
     for name in enabled_tracks(data):
         console.print(f"- {name}")
@@ -76,6 +87,12 @@ def run(
         "-g",
         help="Generator profile to run.",
     ),
+    judge: list[str] | None = typer.Option(
+        None,
+        "--judge",
+        "-j",
+        help="Judge/evaluator profile to run.",
+    ),
     track: list[str] | None = typer.Option(
         None,
         "--track",
@@ -93,6 +110,7 @@ def run(
         systems=system or None,
         embeddings=embedding or None,
         generators=generator or None,
+        judges=judge or None,
         tracks=track or None,
         top_k=top_k,
         output_dir=output_dir,
@@ -146,6 +164,7 @@ def recommend(path: Path = Path("results/recommendations.csv")) -> None:
     table.add_column("System")
     table.add_column("Embedding")
     table.add_column("Generator")
+    table.add_column("Judge")
     table.add_column("Score", justify="right")
     table.add_column("Quality", justify="right")
     table.add_column("Efficiency", justify="right")
@@ -158,6 +177,7 @@ def recommend(path: Path = Path("results/recommendations.csv")) -> None:
             row["system_id"],
             row.get("embedding_model", "none"),
             row.get("generator_model", "unknown"),
+            row.get("judge_model", "unknown"),
             f"{float(row['recommendation_score']):.3f}",
             f"{float(row['quality_score']):.3f}",
             f"{float(row['efficiency_score']):.3f}",
@@ -269,6 +289,7 @@ def show_summary(path: Path) -> None:
     table.add_column("System")
     table.add_column("Embedding")
     table.add_column("Generator")
+    table.add_column("Judge")
     table.add_column("Answer", justify="right")
     table.add_column("Evidence", justify="right")
     table.add_column("Precision", justify="right")
@@ -283,6 +304,7 @@ def show_summary(path: Path) -> None:
             row["system_id"],
             row.get("embedding_model", "none"),
             row.get("generator_model", "unknown"),
+            row.get("judge_model", "unknown"),
             f"{float(row['answer_correctness']):.3f}",
             f"{float(row['evidence_recall']):.3f}",
             f"{float(row['context_precision']):.3f}",

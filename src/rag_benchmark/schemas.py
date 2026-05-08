@@ -105,6 +105,22 @@ class AnswerTrace(BaseModel):
     estimated_cost: float = 0.0
 
 
+class JudgementTrace(BaseModel):
+    judge_model: str = "exact-match-gold"
+    answer_correctness: float
+    gold_answer_correctness: float
+    faithfulness: float
+    groundedness: float
+    citation_validity: float
+    abstention_correctness: float
+    human_agreement_proxy: float
+    false_accept_risk: float
+    false_reject_risk: float
+    input_token_count: int = 0
+    wall_time_ms: float = 0.0
+    estimated_cost: float = 0.0
+
+
 class EvaluationResult(BaseModel):
     run_id: str
     track: str
@@ -114,6 +130,7 @@ class EvaluationResult(BaseModel):
     embedding_model: str
     reranker_model: str
     generator_model: str
+    judge_model: str
     question_id: str
     category: str
     hit_rate: float
@@ -122,17 +139,24 @@ class EvaluationResult(BaseModel):
     mrr: float
     ndcg: float
     answer_correctness: float
+    gold_answer_correctness: float
     faithfulness: float
     groundedness: float
     citation_validity: float
     abstention_correctness: float
+    judge_human_agreement_proxy: float
+    judge_false_accept_risk: float
+    judge_false_reject_risk: float
     retrieved_token_count: int
     query_wall_time_ms: float
     generator_wall_time_ms: float
+    judge_wall_time_ms: float
     index_wall_time_ms: float
     embedding_tokens: int
     generator_input_tokens: int
     generator_output_tokens: int
+    judge_input_tokens: int
+    judge_estimated_cost: float
     reranker_calls: int
     tool_calls: int
     estimated_cost: float

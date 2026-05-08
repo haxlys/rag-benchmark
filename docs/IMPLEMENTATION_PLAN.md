@@ -12,6 +12,7 @@ Date: 2026-05-07
 - First implementation language: Python.
 - First evaluation style: offline, reproducible, trace-heavy benchmark runs.
 - Model comparison style: separate retrieval-only, generator-oracle, and end-to-end tracks.
+- Evaluation-model style: keep judge/evaluator reliability separate from product stack quality.
 
 ## Design Principle
 
@@ -20,6 +21,7 @@ Separate three concerns that are often mixed together in RAG comparisons:
 1. Document preparation: parsing, OCR, table handling, metadata extraction.
 2. Retrieval and orchestration: BM25, dense, hybrid, rerank, tree search, agents.
 3. Answer generation: common model and common answer prompt where possible.
+4. Evaluation model: judge/evaluator behavior, agreement, and bias risk.
 
 For fair diagnosis, every run must record enough trace data to classify failures
 as parsing, retrieval, ranking, orchestration, context packing, or generation
@@ -301,13 +303,16 @@ production-readiness expansion.
 - Generate scorecards by domain, system, and question category.
 - Add embedding profile and generator profile axes.
 - Add retrieval-only and oracle-context generator tracks.
+- Add judge/evaluator profile axis and judge reliability audit.
 
-Status: complete for deterministic local profiles.
+Status: complete for deterministic local profiles and judge audit profiles.
 
 ### Phase 6: Operations Report
 
 - Produce product-style report:
   - recommended default per domain
+  - best RAG, embedding, generator, and judge separated by axis
+  - judge/evaluator audit
   - cost/latency tradeoffs
   - failure modes
   - maintenance notes
@@ -321,11 +326,13 @@ Status: complete for English/Korean reports and static visual dashboard.
 - Add sentence-transformers or equivalent OSS backend behind a config flag.
 - Add local generator adapters for open-weight models when hardware is available.
 - Keep deterministic profiles as fast CI and smoke-test mode.
+- Add human-labeled judge validation sets before trusting LLM-as-judge outputs.
 
 ## Immediate Next Tasks
 
 1. Add full-PDF FinanceBench ingestion, including table-native extraction.
 2. Add actual OSS embedding adapters for at least two open-weight models.
 3. Add optional local generator adapters for open-weight instruction models.
-4. Expand user-document import runs with 100+ labeled questions per major domain.
-5. Add deployment-oriented p95 latency and memory tracking for real model runs.
+4. Add real judge/evaluator adapters and human-agreement checks.
+5. Expand user-document import runs with 100+ labeled questions per major domain.
+6. Add deployment-oriented p95 latency and memory tracking for real model runs.

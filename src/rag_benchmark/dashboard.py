@@ -10,6 +10,8 @@ def write_dashboard(
     summary_rows: list[dict],
     category_rows: list[dict],
     recommendation_rows: list[dict],
+    axis_leaderboard_rows: list[dict],
+    judge_audit_rows: list[dict],
     result_rows: list[dict],
     run_id: str,
 ) -> None:
@@ -18,6 +20,8 @@ def write_dashboard(
         "summary": summary_rows,
         "categories": category_rows,
         "recommendations": recommendation_rows,
+        "axisLeaderboards": axis_leaderboard_rows,
+        "judgeAudits": judge_audit_rows,
         "results": compact_result_rows(result_rows),
     }
     html = DASHBOARD_TEMPLATE.replace("__RAG_BENCHMARK_DATA__", json.dumps(payload, ensure_ascii=False))
@@ -33,7 +37,9 @@ def compact_result_rows(rows: list[dict]) -> list[dict]:
         "system_id",
         "embedding_model",
         "generator_model",
+        "judge_model",
         "answer_correctness",
+        "gold_answer_correctness",
         "evidence_recall",
         "context_precision",
         "failure_type",
@@ -304,6 +310,7 @@ DASHBOARD_TEMPLATE = """<!doctype html>
       <div class="filters">
         <label>Track<select id="trackFilter"></select></label>
         <label>Domain<select id="domainFilter"></select></label>
+        <label>Judge<select id="judgeFilter"></select></label>
         <label>Metric<select id="metricFilter"></select></label>
       </div>
     </div>
@@ -333,6 +340,14 @@ DASHBOARD_TEMPLATE = """<!doctype html>
         <div class="panel-title"><h2>Top Operating Choices</h2><span class="sub">quality, efficiency, stability</span></div>
         <div id="table"></div>
       </div>
+      <div class="panel wide">
+        <div class="panel-title"><h2>Best By Axis</h2><span class="sub">RAG, embedding, generator separated</span></div>
+        <div id="axisTable"></div>
+      </div>
+      <div class="panel wide">
+        <div class="panel-title"><h2>Judge Model Audit</h2><span class="sub">evaluation model reliability, not product ranking</span></div>
+        <div id="judgeTable"></div>
+      </div>
     </section>
   </main>
 
@@ -357,11 +372,12 @@ DASHBOARD_TEMPLATE = """<!doctype html>
       byId("runId").textContent = `run ${data.runId}`;
       fillSelect("trackFilter", ["all", ...uniq(data.summary.map(row => row.track))], "end-to-end");
       fillSelect("domainFilter", ["all", ...uniq(data.summary.map(row => row.domain))], "all");
+      fillSelect("judgeFilter", ["all", ...uniq(data.summary.map(row => row.judge_model))], "exact-match-gold");
       fillSelect("metricFilter", metrics.map(item => item[0]), "answer_correctness", key => {
         const found = metrics.find(item => item[0] === key);
         return found ? found[1] : key;
       });
-      ["trackFilter", "domainFilter", "metricFilter"].forEach(id => {
+      ["trackFilter", "domainFilter", "judgeFilter", "metricFilter"].forEach(id => {
         byId(id).addEventListener("change", render);
       });
       render();
@@ -377,7 +393,17 @@ DASHBOARD_TEMPLATE = """<!doctype html>
     function selectedRows(rows) {
       const track = byId("trackFilter").value;
       const domain = byId("domainFilter").value;
-      return rows.filter(row => (track === "all" || row.track === track) && (domain === "all" || row.domain === domain));
+      const judge = byId("judgeFilter").value;
+      return rows.filter(row =>
+        (track === "all" || row.track === track)
+        && (domain === "all" || row.domain === domain)
+        && (judge === "all" || !row.judge_model || row.judge_model === judge)
+      );
+    }
+
+    function selectedDomainRows(rows) {
+      const domain = byId("domainFilter").value;
+      return rows.filter(row => domain === "all" || row.domain === domain);
     }
 
     function render() {
@@ -385,12 +411,16 @@ DASHBOARD_TEMPLATE = """<!doctype html>
       const categories = selectedRows(data.categories);
       const results = selectedRows(data.results);
       const recommendations = selectedRows(data.recommendations);
+      const axisRows = selectedDomainRows(data.axisLeaderboards);
+      const judgeRows = selectedDomainRows(data.judgeAudits);
       renderKpis(summary, results);
       renderBar(summary);
       renderScatter(summary);
       renderHistogram(results);
       renderHeatmap(categories);
       renderTable(recommendations.length ? recommendations : summary);
+      renderAxisTable(axisRows);
+      renderJudgeTable(judgeRows);
     }
 
     function renderKpis(summary, results) {
@@ -511,7 +541,7 @@ DASHBOARD_TEMPLATE = """<!doctype html>
       byId("table").innerHTML = `
         <table>
           <thead><tr>
-            <th>Domain</th><th>RAG</th><th>Embedding</th><th>Generator</th>
+            <th>Domain</th><th>RAG</th><th>Embedding</th><th>Generator</th><th>Judge</th>
             <th class="num">Answer</th><th class="num">Evidence</th><th class="num">Failure</th><th class="num">Score</th>
           </tr></thead>
           <tbody>
@@ -521,6 +551,7 @@ DASHBOARD_TEMPLATE = """<!doctype html>
                 <td><span class="pill">${escapeHtml(row.rag_method || row.system_id || "")}</span></td>
                 <td>${escapeHtml(row.embedding_model || "none")}</td>
                 <td>${escapeHtml(row.generator_model || "")}</td>
+                <td>${escapeHtml(row.judge_model || "")}</td>
                 <td class="num">${fmt(row.answer_correctness)}</td>
                 <td class="num">${fmt(row.evidence_recall)}</td>
                 <td class="num">${fmt(row.failure_rate)}</td>
@@ -531,8 +562,65 @@ DASHBOARD_TEMPLATE = """<!doctype html>
         </table>`;
     }
 
+    function renderAxisTable(rows) {
+      const ranked = [...rows].sort((a, b) => {
+        if (a.domain !== b.domain) return String(a.domain).localeCompare(String(b.domain));
+        if (a.axis !== b.axis) return String(a.axis).localeCompare(String(b.axis));
+        return Number(b.recommendation_score || 0) - Number(a.recommendation_score || 0);
+      });
+      byId("axisTable").innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Domain</th><th>Axis</th><th>Candidate</th>
+            <th class="num">Score</th><th class="num">Answer</th><th class="num">Evidence</th><th class="num">Failure</th><th>Reading</th>
+          </tr></thead>
+          <tbody>
+            ${ranked.map(row => `
+              <tr>
+                <td>${escapeHtml(row.domain || "")}</td>
+                <td><span class="pill">${escapeHtml(row.axis || "")}</span></td>
+                <td>${escapeHtml(row.candidate || "")}</td>
+                <td class="num">${fmt(row.recommendation_score)}</td>
+                <td class="num">${fmt(row.answer_correctness)}</td>
+                <td class="num">${fmt(row.evidence_recall)}</td>
+                <td class="num">${fmt(row.failure_rate)}</td>
+                <td>${escapeHtml(row.reading || "")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`;
+    }
+
+    function renderJudgeTable(rows) {
+      const ranked = [...rows].sort((a, b) => {
+        if (a.domain !== b.domain) return String(a.domain).localeCompare(String(b.domain));
+        return Number(b.judge_score || 0) - Number(a.judge_score || 0);
+      });
+      byId("judgeTable").innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Domain</th><th>Judge</th><th class="num">Judge Score</th>
+            <th class="num">Gold Delta</th><th class="num">Agreement</th><th class="num">False Accept</th><th class="num">False Reject</th><th>Reading</th>
+          </tr></thead>
+          <tbody>
+            ${ranked.map(row => `
+              <tr>
+                <td>${escapeHtml(row.domain || "")}</td>
+                <td><span class="pill">${escapeHtml(row.judge_model || "")}</span></td>
+                <td class="num">${fmt(row.judge_score)}</td>
+                <td class="num">${fmt(row.gold_delta)}</td>
+                <td class="num">${fmt(row.human_agreement_proxy)}</td>
+                <td class="num">${fmt(row.false_accept_risk)}</td>
+                <td class="num">${fmt(row.false_reject_risk)}</td>
+                <td>${escapeHtml(row.reading || "")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`;
+    }
+
     function variantLabel(row) {
-      return `${row.rag_method || row.system_id} / ${row.embedding_model || "none"} / ${row.generator_model || ""}`;
+      return `${row.rag_method || row.system_id} / ${row.embedding_model || "none"} / ${row.generator_model || ""} / ${row.judge_model || ""}`;
     }
 
     function colorFor(key) {

@@ -1,3 +1,4 @@
+import csv
 from pathlib import Path
 
 import typer
@@ -13,8 +14,11 @@ from .datasets import (
     enabled_tracks,
 )
 from .discrimination import build_discrimination_report
+from .dashboard import write_dashboard
 from .importers import import_financebench, import_questions, import_text_documents
+from .production import build_production_readiness
 from .promptfoo import export_promptfoo_bundle
+from .promptfoo_analysis import analyze_promptfoo_results, write_promptfoo_analysis
 from .runner import read_report, read_summary, run_benchmark
 from .validation import validate_domain_data
 
@@ -188,6 +192,37 @@ def recommend(path: Path = Path("results/recommendations.csv")) -> None:
     console.print(table)
 
 
+@app.command("analyze-promptfoo")
+def analyze_promptfoo(
+    input_path: Path = typer.Option(
+        Path("integrations/promptfoo/promptfoo-results.json"),
+        "--input",
+        "-i",
+        help="Promptfoo JSON output path.",
+    ),
+    output_dir: Path = typer.Option(Path("results"), "--output-dir", "-o", help="Directory for analysis CSVs."),
+    update_dashboard: bool = typer.Option(
+        True,
+        "--update-dashboard/--no-update-dashboard",
+        help="Attach promptfoo analysis and production readiness to results/dashboard.html.",
+    ),
+    benchmark_results_dir: Path = typer.Option(
+        Path("results"),
+        "--benchmark-results-dir",
+        help="Directory containing canonical benchmark CSVs.",
+    ),
+) -> None:
+    """Aggregate promptfoo results and attach production-readiness guidance."""
+    analysis = analyze_promptfoo_results(input_path)
+    write_promptfoo_analysis(output_dir, analysis)
+    console.print(f"[green]wrote[/green] promptfoo analysis to {output_dir}")
+    show_promptfoo_summary(analysis.summary_rows)
+
+    if update_dashboard:
+        update_dashboard_with_promptfoo(benchmark_results_dir, analysis)
+        console.print(f"[green]updated[/green] {benchmark_results_dir / 'dashboard.html'}")
+
+
 @app.command("validate-data")
 def validate_data(
     config: Path = Path("configs/benchmark.yaml"),
@@ -249,9 +284,9 @@ def export_promptfoo(
     ),
     top_k: int = typer.Option(4, "--top-k", help="Number of contexts to retrieve."),
     max_questions_per_domain: int = typer.Option(
-        25,
+        0,
         "--max-questions-per-domain",
-        help="Limit exported tests per domain. Use 0 for all questions.",
+        help="Limit exported tests per domain. Default 0 exports all questions.",
     ),
     include_model_graded: bool = typer.Option(
         False,
@@ -389,6 +424,65 @@ def show_summary(path: Path) -> None:
             f"{float(row['failure_rate']):.3f}",
         )
     console.print(table)
+
+
+def show_promptfoo_summary(rows: list[dict]) -> None:
+    table = Table(title="Promptfoo Quality Gate Summary")
+    table.add_column("Domain")
+    table.add_column("System")
+    table.add_column("Pass", justify="right")
+    table.add_column("Answer", justify="right")
+    table.add_column("Evidence", justify="right")
+    table.add_column("Citation", justify="right")
+    for row in rows:
+        table.add_row(
+            row["domain"],
+            row["system_id"],
+            f"{float(row['pass_rate']):.3f}",
+            f"{float(row['answer_correctness']):.3f}",
+            f"{float(row['evidence_recall']):.3f}",
+            f"{float(row['citation_validity']):.3f}",
+        )
+    console.print(table)
+
+
+def update_dashboard_with_promptfoo(results_dir: Path, analysis) -> None:
+    summary_rows = read_csv(results_dir / "summary.csv")
+    category_rows = read_csv(results_dir / "category_summary.csv")
+    recommendation_rows = read_csv(results_dir / "recommendations.csv")
+    axis_rows = read_csv(results_dir / "axis_leaderboard.csv")
+    judge_rows = read_csv(results_dir / "judge_audit.csv")
+    result_rows = read_csv(results_dir / "results.csv")
+    readiness_path = results_dir / "production_readiness.csv"
+    if readiness_path.exists():
+        readiness_rows = read_csv(readiness_path)
+    else:
+        readiness_rows = build_production_readiness(
+            summary_rows,
+            category_rows,
+            result_rows,
+            source="benchmark",
+        )
+    run_id = result_rows[0].get("run_id", "latest") if result_rows else "latest"
+    write_dashboard(
+        results_dir / "dashboard.html",
+        summary_rows=summary_rows,
+        category_rows=category_rows,
+        recommendation_rows=recommendation_rows,
+        axis_leaderboard_rows=axis_rows,
+        judge_audit_rows=judge_rows,
+        production_readiness_rows=readiness_rows,
+        promptfoo_summary_rows=analysis.summary_rows,
+        promptfoo_category_rows=analysis.category_rows,
+        promptfoo_readiness_rows=analysis.readiness_rows,
+        result_rows=result_rows,
+        run_id=run_id,
+    )
+
+
+def read_csv(path: Path) -> list[dict]:
+    with path.open("r", newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
 
 
 def load_yaml(path: Path) -> dict:

@@ -10,6 +10,8 @@
 ```bash
 cd integrations/promptfoo
 npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --output promptfoo-results.json --no-share
+cd ../..
+uv run rag-benchmark analyze-promptfoo --input integrations/promptfoo/promptfoo-results.json --output-dir results
 ```
 
 HTML 결과:
@@ -24,6 +26,9 @@ integrations/promptfoo/promptfoo-results.html
 uv run rag-benchmark export-promptfoo
 ```
 
+기본값은 활성화된 모든 질문을 export합니다. 빠른 smoke run만 필요하면
+`--max-questions-per-domain`을 지정하세요.
+
 자주 쓰는 옵션:
 
 ```bash
@@ -35,5 +40,6 @@ uv run rag-benchmark export-promptfoo --include-model-graded --grader-provider o
 ## 해석
 
 - 여기서 promptfoo는 CI 품질 게이트와 외부 평가 화면으로 사용합니다.
+- `analyze-promptfoo`를 실행하면 promptfoo quality-gate 결과가 `results/dashboard.html`에 반영됩니다.
 - 운영 판단의 canonical dashboard는 `results/dashboard.html`입니다.
 - OSS-only 실행이 필요하면 model-graded assertion을 켤 때 반드시 로컬/OSS grader를 지정하세요.

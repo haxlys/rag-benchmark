@@ -13,6 +13,7 @@
 | retrieval 문제인지 LLM 문제인지 애매함 | `retrieval-only` 후 `generator-oracle` | 검색 실패와 답변 생성 실패를 분리해서 봅니다. |
 | 평가 모델이 믿을 만한지 애매함 | `judge_audit.csv` | judge 신뢰성을 product stack 품질과 분리해서 봅니다. |
 | CI quality gate 또는 외부 eval UI가 필요함 | `export-promptfoo` | promptfoo가 로컬 Python provider를 통해 이 benchmark를 호출하게 합니다. |
+| promptfoo 결과를 운영 판단으로 바꾸고 싶음 | `analyze-promptfoo` | promptfoo JSON을 summary, failure, production-readiness 결과로 집계합니다. |
 | 정확한 이름, 숫자, ID, 짧은 정책 검색 | `bm25` | 저렴하고 빠르며 exact lexical matching이 강합니다. |
 | exact term과 semantic question이 섞임 | `hybrid` | sparse와 dense retrieval signal을 함께 씁니다. |
 | 품질이 중요하고 latency budget이 있음 | `hybrid-rerank` | 추가 비용과 지연시간을 감수하고 candidate order를 개선할 수 있습니다. |
@@ -43,7 +44,8 @@
 - `axis_leaderboard.csv`에서 최고의 RAG 방식, embedding profile, generator profile을 축별로 분리해서 봅니다.
 - `judge_audit.csv`에서 judge/evaluator 신뢰성을 product stack 품질과 분리해서 봅니다.
 - `integrations/promptfoo/`는 결정론적 CI check 또는 선택적 model-graded RAG assertion을 위한 promptfoo config, tests, Python provider를 export합니다.
-- `results/dashboard.html`에서 ranking, scatter, distribution, category heatmap, axis leaderboard, judge audit을 볼 수 있습니다.
+- `analyze-promptfoo`는 promptfoo JSON 결과를 CSV 리포트와 같은 dashboard에 반영합니다.
+- `results/dashboard.html`에서 ranking, scatter, distribution, category heatmap, axis leaderboard, judge audit, promptfoo, 운영 적합성 판단을 볼 수 있습니다.
 - Finance에는 capex, deferred revenue, backlog, covenant, lease obligation 같은 semantic financial term이 포함됩니다.
 - General-docs에는 semantic question, section-navigation, multi-section, multi-document distractor가 포함됩니다.
 - synonym-heavy 또는 structure-heavy question에서 `pageindex-oss`, dense-style retrieval, reranking이 BM25와 분리됩니다.
@@ -95,7 +97,9 @@
    ```bash
    uv run rag-benchmark export-promptfoo --domain my-domain
    cd integrations/promptfoo
-   npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+   npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --output promptfoo-results.json --no-share
+   cd ../..
+   uv run rag-benchmark analyze-promptfoo --input integrations/promptfoo/promptfoo-results.json --output-dir results
    ```
 
 recommendation ranking은 quality, efficiency, stability를 조합합니다. 이 값으로 시작점을 고르고, 실패한 case는 `traces.jsonl`에서 확인합니다.
@@ -104,6 +108,7 @@ recommendation ranking은 quality, efficiency, stability를 조합합니다. 이
 
 실제 제품 결정을 위해서는 최소한 다음을 충족하는 것이 좋습니다.
 
+- 운영 후보로 보려면 제안 기준을 모두 통과해야 합니다. 기준은 pass rate 80% 이상, answer correctness 80% 이상, evidence recall 85% 이상, citation validity 90% 이상, no-answer hallucination rate 5% 이하, 계산 문항이 있으면 FinanceBench calculation pass rate 80% 이상입니다.
 - 주요 도메인별 최소 100개 질문 추가.
 - answerable question마다 evidence page 또는 section label 추가.
 - no-answer question 포함.

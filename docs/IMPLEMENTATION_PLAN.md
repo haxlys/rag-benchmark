@@ -57,6 +57,7 @@ eval views, and later red-team workflows.
 - Use a local Python provider that calls the benchmark runner for one question.
 - Default to deterministic local assertions to preserve OSS-only reproducibility.
 - Allow optional model-graded promptfoo assertions only when an explicit local or OSS grader is configured.
+- Analyze promptfoo JSON output into summary, failure, and production-readiness CSVs.
 - Keep `results/dashboard.html`, `axis_leaderboard.csv`, and `judge_audit.csv` as the canonical operations outputs.
 
 ## MVP Systems

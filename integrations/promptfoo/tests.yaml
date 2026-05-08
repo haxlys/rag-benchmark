@@ -640,6 +640,1807 @@
     domain: financebench-open-source
     category: direct_lookup
     question_id: financebench_id_01079
+- description: financebench-open-source:financebench_id_01148
+  vars:
+    query: What industry does AMCOR primarily operate in?
+    question_id: financebench_id_01148
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: Amcor is a global leader in packaging production for various use cases.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01148
+- description: financebench-open-source:financebench_id_00684
+  vars:
+    query: Does AMCOR have an improving gross margin profile as of FY2023? If gross margin is not a useful metric for a company
+      like this, then state that and explain why.
+    question_id: financebench_id_00684
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: No. For AMCOR there has been a slight decline in gross margins by 0.8%.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00684
+- description: financebench-open-source:financebench_id_01936
+  vars:
+    query: What is the nature & purpose of AMCOR's restructuring liability as oF Q2 of FY2023 close?
+    question_id: financebench_id_01936
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: 87% of the total restructuring liability is related Employee liabilities.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01936
+- description: financebench-open-source:financebench_id_01928
+  vars:
+    query: What Was AMCOR's Adjusted Non GAAP EBITDA for FY 2023
+    question_id: financebench_id_01928
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: AMCOR's Adj. EBITDA was $2,018mn in FY 2023
+    expected_aliases: '["AMCOR''s Adj. EBITDA was $2018mn in FY 2023"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01928
+- description: financebench-open-source:financebench_id_01930
+  vars:
+    query: How much was the Real change in Sales for AMCOR in FY 2023 vs FY 2022, if we exclude the impact of FX movement,
+      passthrough costs and one-off items?
+    question_id: financebench_id_01930
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: The Real Growth was flat in FY 2023 vs FY 2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01930
+- description: financebench-open-source:financebench_id_03069
+  vars:
+    query: Answer the following question as if you are an equity research analyst and have lost internet connection so you
+      do not have access to financial metric providers. According to the details clearly outlined within the P&L statement
+      and the statement of cash flows, what is the FY2015 depreciation and amortization (D&A from cash flow statement) % margin
+      for AMD?
+    question_id: financebench_id_03069
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 4.2%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03069
+- description: financebench-open-source:financebench_id_00222
+  vars:
+    query: Does AMD have a reasonably healthy liquidity profile based on its quick ratio for FY22? If the quick ratio is not
+      relevant to measure liquidity, please state that and explain why.
+    question_id: financebench_id_00222
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes. The quick ratio is 1.57, calculated as (cash and cash equivalents+Short term investments+Accounts
+      receivable, net+receivables from related parties)/ (current liabilities).
+    expected_aliases: '["Yes. The quick ratio is 1.57 calculated as (cash and cash equivalents+Short term investments+Accounts
+      receivable net+receivables from related parties)/ (current liabilities)."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00222
+- description: financebench-open-source:financebench_id_00995
+  vars:
+    query: What are the major products and services that AMD sells as of FY22?
+    question_id: financebench_id_00995
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: AMD sells server microprocessors (CPUs) and graphics processing units (GPUs), data processing units (DPUs),
+      Field Programmable Gate Arrays (FPGAs), and Adaptive System-on-Chip (SoC) products for data centers; CPUs, accelerated
+      processing units (APUs) that integrate CPUs and GPUs, and chipsets for desktop and notebook personal computers; discrete
+      GPUs, and semi-custom SoC products and development services; and embedded CPUs, GPUs, APUs, FPGAs, and Adaptive SoC
+      products.
+    expected_aliases: '["AMD sells server microprocessors (CPUs) and graphics processing units (GPUs) data processing units
+      (DPUs) Field Programmable Gate Arrays (FPGAs) and Adaptive System-on-Chip (SoC) products for data centers; CPUs accelerated
+      processing units (APUs) that integrate CPUs and GPUs and chipsets for desktop and notebook personal computers; discrete
+      GPUs and semi-custom SoC products and development services; and embedded CPUs GPUs APUs FPGAs and Adaptive SoC products."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_00995
+- description: financebench-open-source:financebench_id_01198
+  vars:
+    query: What drove revenue change as of the FY22 for AMD?
+    question_id: financebench_id_01198
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: In 2022, AMD reported Higher sales of their EPYC server processors, higher semi-custom product sales,
+      and the inclusion of Xilinx embedded product sales
+    expected_aliases: '["In 2022 AMD reported Higher sales of their EPYC server processors higher semi-custom product sales
+      and the inclusion of Xilinx embedded product sales"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01198
+- description: financebench-open-source:financebench_id_00917
+  vars:
+    query: What drove operating margin change as of the FY22 for AMD? If operating margin is not a useful metric for a company
+      like this, then please state that and explain why.
+    question_id: financebench_id_00917
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: The decrease in AMD's operating income was primarily driven by amortization of intangible assets associated
+      with the Xilinx acquisition
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00917
+- description: financebench-open-source:financebench_id_01279
+  vars:
+    query: Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow
+      for AMD in FY22?
+    question_id: financebench_id_01279
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: In 2022, AMD brought in the most cashflow from Operations
+    expected_aliases: '["In 2022 AMD brought in the most cashflow from Operations"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_01279
+- description: financebench-open-source:financebench_id_00563
+  vars:
+    query: From FY21 to FY22, excluding Embedded, in which AMD reporting segment did sales proportionally increase the most?
+    question_id: financebench_id_00563
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Data Center
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00563
+- description: financebench-open-source:financebench_id_00757
+  vars:
+    query: Did AMD report customer concentration in FY22?
+    question_id: financebench_id_00757
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, one customer accounted for 16% of consolidated net revenue
+    expected_aliases: '["Yes one customer accounted for 16% of consolidated net revenue"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00757
+- description: financebench-open-source:financebench_id_00476
+  vars:
+    query: Which debt securities are registered to trade on a national securities exchange under American Express' name as
+      of 2022?
+    question_id: financebench_id_00476
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: There are none
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_00476
+- description: financebench-open-source:financebench_id_01028
+  vars:
+    query: What are the geographies that American Express primarily operates in as of 2022?
+    question_id: financebench_id_01028
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: United States, EMEA, APAC, and LACC
+    expected_aliases: '["United States EMEA APAC and LACC"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01028
+- description: financebench-open-source:financebench_id_00723
+  vars:
+    query: Does AMEX have an improving operating margin profile as of 2022? If operating margin is not a useful metric for
+      a company like this, then state that and explain why.
+    question_id: financebench_id_00723
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Performance is not measured through operating margin
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00723
+- description: financebench-open-source:financebench_id_00720
+  vars:
+    query: What drove gross margin change as of the FY2022 for American Express? If gross margin is not a useful metric for
+      a company like this, then please state that and explain why.
+    question_id: financebench_id_00720
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Performance is not measured through gross margin
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00720
+- description: financebench-open-source:financebench_id_01351
+  vars:
+    query: How much has the effective tax rate of American Express changed between FY2021 and FY2022?
+    question_id: financebench_id_01351
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: The effective tax rate for American Express has changed/dropped from 24.6% in FY 2021 to 21.6% in FY
+      2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_01351
+- description: financebench-open-source:financebench_id_01964
+  vars:
+    query: What was the largest liability in American Express's Balance Sheet in 2022?
+    question_id: financebench_id_01964
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Customer deposits
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01964
+- description: financebench-open-source:financebench_id_01981
+  vars:
+    query: Was American Express able to retain card members during 2022?
+    question_id: financebench_id_01981
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: 'Yes'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01981
+- description: financebench-open-source:financebench_id_05718
+  vars:
+    query: How much (in USD billions) did American Water Works pay out in cash dividends for FY2020? Compute or extract the
+      answer by primarily using the details outlined in the statement of cash flows.
+    question_id: financebench_id_05718
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $0.40
+    expected_aliases: '["0.40"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_05718
+- description: financebench-open-source:financebench_id_04254
+  vars:
+    query: Basing your judgments off of the cash flow statement and the income statement, what is American Water Works's FY2021
+      unadjusted operating income + depreciation and amortization from the cash flow statement (unadjusted EBITDA) in USD
+      millions?
+    question_id: financebench_id_04254
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: $1832.00
+    expected_aliases: '["1832.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04254
+- description: financebench-open-source:financebench_id_00070
+  vars:
+    query: Does American Water Works have positive working capital based on FY2022 data? If working capital is not a useful
+      or relevant metric for this company, then please state that and explain why.
+    question_id: financebench_id_00070
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: No, American Water Works had negative working capital of -$1561M in FY 2022.
+    expected_aliases: '["No American Water Works had negative working capital of -$1561M in FY 2022."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00070
+- description: financebench-open-source:financebench_id_02608
+  vars:
+    query: In agreement with the information outlined in the income statement, what is the FY2015 - FY2017 3 year average
+      net profit margin (as a %) for Best Buy? Answer in units of percents and round to one decimal place.
+    question_id: financebench_id_02608
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 2.8%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_02608
+- description: financebench-open-source:financebench_id_04417
+  vars:
+    query: What is the year end FY2019 total amount of inventories for Best Buy? Answer in USD millions. Base your judgments
+      on the information provided primarily in the balance sheet.
+    question_id: financebench_id_04417
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $5409.00
+    expected_aliases: '["5409.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_04417
+- description: financebench-open-source:financebench_id_00685
+  vars:
+    query: Are Best Buy's gross margins historically consistent (not fluctuating more than roughly 2% each year)? If gross
+      margins are not a relevant metric for a company like this, then please state that and explain why.
+    question_id: financebench_id_00685
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes, the margins have been consistent, there has been a minor decline of 1.1% in gross margins between
+      FY2022 and FY2023.
+    expected_aliases: '["Yes the margins have been consistent there has been a minor decline of 1.1% in gross margins between
+      FY2022 and FY2023."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00685
+- description: financebench-open-source:financebench_id_01077
+  vars:
+    query: What are major acquisitions that Best Buy has done in FY2023, FY2022 and FY2021?
+    question_id: financebench_id_01077
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: 'Best Buy closed two acquisitions, both these companies were already partially owned by Best Buy, but
+      Best Buy acquired all outstanding shares of these two companies during FY 2022: (1) Current Health Ltd and (2) Two Peaks,
+      LLC d/b/a Yardbird Furniture'
+    expected_aliases: '["Best Buy closed two acquisitions both these companies were already partially owned by Best Buy but
+      Best Buy acquired all outstanding shares of these two companies during FY 2022: (1) Current Health Ltd and (2) Two Peaks
+      LLC d/b/a Yardbird Furniture"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01077
+- description: financebench-open-source:financebench_id_01275
+  vars:
+    query: Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow
+      for Best Buy in FY2023?
+    question_id: financebench_id_01275
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Best Buy generated the most cash flow from operating activities in FY 2023 ($1.8 bn)
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_01275
+- description: financebench-open-source:financebench_id_00288
+  vars:
+    query: Was there any drop in Cash & Cash equivalents between FY 2023 and Q2 of FY2024?
+    question_id: financebench_id_00288
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, there was a decline of ~42% between FY2023 and Q2 of FY 2024.
+    expected_aliases: '["Yes there was a decline of ~42% between FY2023 and Q2 of FY 2024."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00288
+- description: financebench-open-source:financebench_id_00460
+  vars:
+    query: Was there any change in the number of Best Buy stores between Q2 of FY2024 and FY2023?
+    question_id: financebench_id_00460
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, there is decline in number stores by 1.32% from 982 stores in Q2 FY 2023 to 969 by the end of Q2
+      FY2024.
+    expected_aliases: '["Yes there is decline in number stores by 1.32% from 982 stores in Q2 FY 2023 to 969 by the end of
+      Q2 FY2024."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00460
+- description: financebench-open-source:financebench_id_01902
+  vars:
+    query: Which Best Buy product category performed the best (by top line) in the domestic (USA) Market during Q2 of FY2024?
+    question_id: financebench_id_01902
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: The entertainment segment experienced the highest growth of 9% during Q2 FY2024, primarily from gaming
+      division.
+    expected_aliases: '["The entertainment segment experienced the highest growth of 9% during Q2 FY2024 primarily from gaming
+      division."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01902
+- description: financebench-open-source:financebench_id_04660
+  vars:
+    query: Considering the data in the balance sheet, what is Block's (formerly known as Square) FY2016 working capital ratio?
+      Define working capital ratio as total current assets divided by total current liabilities. Round your answer to two
+      decimal places.
+    question_id: financebench_id_04660
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '1.73'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04660
+- description: financebench-open-source:financebench_id_03838
+  vars:
+    query: What is the FY2019 - FY2020 total revenue growth rate for Block (formerly known as Square)? Answer in units of
+      percents and round to one decimal place. Approach the question asked by assuming the standpoint of an investment banking
+      analyst who only has access to the statement of income.
+    question_id: financebench_id_03838
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 101.5%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03838
+- description: financebench-open-source:financebench_id_07661
+  vars:
+    query: 'Using the cash flow statement, answer the following question to the best of your abilities: how much did Block
+      (formerly known as Square) generate in cash flow from operating activities in FY2020? Answer in USD millions.'
+    question_id: financebench_id_07661
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $382.00
+    expected_aliases: '["382.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_07661
+- description: financebench-open-source:financebench_id_10285
+  vars:
+    query: 'We need to calculate a financial metric by using information only provided within the balance sheet. Please answer
+      the following question: what is Boeing''s year end FY2018 net property, plant, and equipment (in USD millions)?'
+    question_id: financebench_id_10285
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $12645.00
+    expected_aliases: '["12645.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_10285
+- description: financebench-open-source:financebench_id_00517
+  vars:
+    query: Are there any product categories / service categories that represent more than 20% of Boeing's revenue for FY2022?
+    question_id: financebench_id_00517
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes. Boeing has product and service categories that represent more than 20% of Boeing's revenue for FY2022.
+      These categories are Commercial Airplanes which comprises 39% of total revenue, Defence which comprises 35% of total
+      revenue and Services which comprises 26% of total revenue.
+    expected_aliases: '["Yes. Boeing has product and service categories that represent more than 20% of Boeing''s revenue
+      for FY2022. These categories are Commercial Airplanes which comprises 39% of total revenue Defence which comprises 35%
+      of total revenue and Services which comprises 26% of total revenue."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00517
+- description: financebench-open-source:financebench_id_01091
+  vars:
+    query: Has Boeing reported any materially important ongoing legal battles from FY2022?
+    question_id: financebench_id_01091
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: Yes. Multiple lawsuits have been filed against Boeing resulting from a 2018 Lion Air crash and a 2019
+      Ethiopian Airlines crash.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01091
+- description: financebench-open-source:financebench_id_00678
+  vars:
+    query: Does Boeing have an improving gross margin profile as of FY2022? If gross margin is not a useful metric for a company
+      like this, then state that and explain why.
+    question_id: financebench_id_00678
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes. Boeing has an improving gross margin profile as of FY2022. Gross profit improved from $3,017 million
+      in FY2021 to $3,502 million in FY2022. Gross margin % improved from 4.8% in FY2021 to 5.3% in FY2022.
+    expected_aliases: '["Yes. Boeing has an improving gross margin profile as of FY2022. Gross profit improved from $3017
+      million in FY2021 to $3502 million in FY2022. Gross margin % improved from 4.8% in FY2021 to 5.3% in FY2022."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00678
+- description: financebench-open-source:financebench_id_01290
+  vars:
+    query: Who are the primary customers of Boeing as of FY2022?
+    question_id: financebench_id_01290
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: Boeing's primary customers as of FY2022 are a limited number of commercial airlines and the US government.
+      The US government accounted for 40% of Boeing's total revenues in FY2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01290
+- description: financebench-open-source:financebench_id_00464
+  vars:
+    query: Is Boeing's business subject to cyclicality?
+    question_id: financebench_id_00464
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, Boeing's business is subject to cyclicality due to its exposure to the airline industry which is
+      a cyclical industry.
+    expected_aliases: '["Yes Boeing''s business is subject to cyclicality due to its exposure to the airline industry which
+      is a cyclical industry."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00464
+- description: financebench-open-source:financebench_id_00494
+  vars:
+    query: What production rate changes is Boeing forecasting for FY2023?
+    question_id: financebench_id_00494
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Boeing forecasts an increase in the production rates for the 737, 777X and 787 aircrafts in 2023.
+    expected_aliases: '["Boeing forecasts an increase in the production rates for the 737 777X and 787 aircrafts in 2023."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00494
+- description: financebench-open-source:financebench_id_00585
+  vars:
+    query: How does Boeing's effective tax rate in FY2022 compare to FY2021?
+    question_id: financebench_id_00585
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Effective tax rate in FY2022 was 0.62%, compared to  -14.76% in FY2021.
+    expected_aliases: '["Effective tax rate in FY2022 was 0.62% compared to  -14.76% in FY2021."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00585
+- description: financebench-open-source:financebench_id_03473
+  vars:
+    query: 'What is the FY2017 return on assets (ROA) for Coca Cola? ROA is defined as: FY2017 net income / (average total
+      assets between FY2016 and FY2017). Round your answer to two decimal places. Give a response to the question by relying
+      on the details shown in the balance sheet and the P&L statement.'
+    question_id: financebench_id_03473
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '0.01'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03473
+- description: financebench-open-source:financebench_id_09724
+  vars:
+    query: What is Coca Cola's FY2021 COGS % margin? Calculate what was asked by utilizing the line items clearly shown in
+      the income statement.
+    question_id: financebench_id_09724
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 39.7%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_09724
+- description: financebench-open-source:financebench_id_06272
+  vars:
+    query: What is Coca Cola's FY2022 dividend payout ratio (using total cash dividends paid and net income attributable to
+      shareholders)? Round answer to two decimal places. Answer the question asked by assuming you only have access to information
+      clearly displayed in the cash flow statement and the income statement.
+    question_id: financebench_id_06272
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '0.8'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_06272
+- description: financebench-open-source:financebench_id_10130
+  vars:
+    query: 'Based on the information provided primarily in the balance sheet and the statement of income, what is FY2020 days
+      payable outstanding (DPO) for Corning? DPO is defined as: 365 * (average accounts payable between FY2019 and FY2020)
+      / (FY2020 COGS + change in inventory between FY2019 and FY2020). Round your answer to two decimal places.'
+    question_id: financebench_id_10130
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '63.86'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_10130
+- description: financebench-open-source:financebench_id_02981
+  vars:
+    query: Taking into account the information outlined in the income statement, what is the FY2019 - FY2021 3 year average
+      unadjusted operating income % margin for Corning? Answer in units of percents and round to one decimal place.
+    question_id: financebench_id_02981
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 10.3%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_02981
+- description: financebench-open-source:financebench_id_01346
+  vars:
+    query: How much has the effective tax rate of Corning changed between FY2021 and FY2022?
+    question_id: financebench_id_01346
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: The effective tax rate of Corning has changed from 20% in FY2021 to 23% in FY 2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_01346
+- description: financebench-open-source:financebench_id_00005
+  vars:
+    query: Does Corning have positive working capital based on FY2022 data? If working capital is not a useful or relevant
+      metric for this company, then please state that and explain why.
+    question_id: financebench_id_00005
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes. Corning had a positive working capital amount of $831 million by FY 2022 close. This answer considers
+      only operating current assets and current liabilities that were clearly shown in the balance sheet.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00005
+- description: financebench-open-source:financebench_id_04209
+  vars:
+    query: Using only the information within the balance sheet, how much total assets did Costco have at the end of FY2021?
+      Answer in USD millions.
+    question_id: financebench_id_04209
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $59268.00
+    expected_aliases: '["59268.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_04209
+- description: financebench-open-source:financebench_id_05915
+  vars:
+    query: 'What is the FY2018 fixed asset turnover ratio for CVS Health? Fixed asset turnover ratio is defined as: FY2018
+      revenue / (average PP&E between FY2017 and FY2018). Round your answer to two decimal places. Calculate what was asked
+      by utilizing the line items clearly shown in the P&L statement and the balance sheet.'
+    question_id: financebench_id_05915
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '17.98'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_05915
+- description: financebench-open-source:financebench_id_00790
+  vars:
+    query: Is CVS Health a capital-intensive business based on FY2022 data?
+    question_id: financebench_id_00790
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes, CVS Health requires an extensive asset base to operate, which is evident from its ROA of only 1.82%
+      in 2022 and 3.39% in 2021, though it should be noted that a significant portion of this asset base is goodwill, and
+      CVS's fixed assets/total assets ratio is on the lower side of 5.6%.
+    expected_aliases: '["Yes CVS Health requires an extensive asset base to operate which is evident from its ROA of only
+      1.82% in 2022 and 3.39% in 2021 though it should be noted that a significant portion of this asset base is goodwill
+      and CVS''s fixed assets/total assets ratio is on the lower side of 5.6%."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00790
+- description: financebench-open-source:financebench_id_01107
+  vars:
+    query: Has CVS Health reported any materially important ongoing legal battles from 2022, 2021 and 2020?
+    question_id: financebench_id_01107
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: "Yes, CVS Health has been involved in multiple ongoing legal battles. Some notable legal dispute areas\
+      \ for CVS are: (1) usual and customary pricing litigation: where it's claimed that CVSâ\x80\x99s retail pharmacies overcharged\
+      \ for prescription drugs; (2) PBM litigation and investigations: where it's claimed that that rebate agreements between\
+      \ the drug manufacturers and PBMs caused inflated prices for certain drug products; and (3) controlled substances litigation:\
+      \ legal matters around opioids for which CVS has agreed to pay up to $4.3 billion to claimants in remediation and $625\
+      \ million to attorneys and fees"
+    expected_aliases: "[\"Yes CVS Health has been involved in multiple ongoing legal battles. Some notable legal dispute areas\
+      \ for CVS are: (1) usual and customary pricing litigation: where it's claimed that CVSâ\x80\x99s retail pharmacies overcharged\
+      \ for prescription drugs; (2) PBM litigation and investigations: where it's claimed that that rebate agreements between\
+      \ the drug manufacturers and PBMs caused inflated prices for certain drug products; and (3) controlled substances litigation:\
+      \ legal matters around opioids for which CVS has agreed to pay up to $4.3 billion to claimants in remediation and $625\
+      \ million to attorneys and fees\"]"
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01107
+- description: financebench-open-source:financebench_id_01244
+  vars:
+    query: Has CVS Health paid dividends to common shareholders in Q2 of FY2022?
+    question_id: financebench_id_01244
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: Yes, CVS paid a $ 0.55 dividend per share every quarter in FY2022
+    expected_aliases: '["Yes CVS paid a $ 0.55 dividend per share every quarter in FY2022"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01244
+- description: financebench-open-source:financebench_id_00839
+  vars:
+    query: Does Foot Locker's new CEO have previous CEO experience in a similar company to Footlocker?
+    question_id: financebench_id_00839
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes. She was previous CEO of Ulta Beauty which means she had to manage a large retail company that has
+      brick and mortar + online business. So yes she was a CEO in a similar company to Foot Locker before this.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00839
+- description: financebench-open-source:financebench_id_00822
+  vars:
+    query: Were there any board member nominees who had substantially more votes against joining than the other nominees?
+    question_id: financebench_id_00822
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, his name is Richard A. Johnson
+    expected_aliases: '["Yes his name is Richard A. Johnson"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00822
+- description: financebench-open-source:financebench_id_04103
+  vars:
+    query: 'What is the FY2019 cash conversion cycle (CCC) for General Mills? CCC is defined as: DIO + DSO - DPO. DIO is defined
+      as: 365 * (average inventory between FY2018 and FY2019) / (FY2019 COGS). DSO is defined as: 365 * (average accounts
+      receivable between FY2018 and FY2019) / (FY2019 Revenue). DPO is defined as: 365 * (average accounts payable between
+      FY2018 and FY2019) / (FY2019 COGS + change in inventory between FY2018 and FY2019). Round your answer to two decimal
+      places. Address the question by using the line items and information shown within the income statement and the balance
+      sheet.'
+    question_id: financebench_id_04103
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '-3.7'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04103
+- description: financebench-open-source:financebench_id_03471
+  vars:
+    query: By drawing conclusions from the information stated only in the statement of financial position, what is General
+      Mills's FY2020 working capital ratio? Define working capital ratio as total current assets divided by total current
+      liabilities. Round your answer to two decimal places.
+    question_id: financebench_id_03471
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '0.68'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03471
+- description: financebench-open-source:financebench_id_04854
+  vars:
+    query: 'According to the information provided in the statement of cash flows, what is the FY2020 free cash flow (FCF)
+      for General Mills? FCF here is defined as: (cash from operations - capex). Answer in USD millions.'
+    question_id: financebench_id_04854
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: $3215.00
+    expected_aliases: '["3215.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04854
+- description: financebench-open-source:financebench_id_10136
+  vars:
+    query: 'We want to calculate a financial metric. Please help us compute it by basing your answers off of the cash flow
+      statement and the income statement. Here''s the question: what is the FY2022 retention ratio (using total cash dividends
+      paid and net income attributable to shareholders) for General Mills? Round answer to two decimal places.'
+    question_id: financebench_id_10136
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '0.54'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_10136
+- description: financebench-open-source:financebench_id_00956
+  vars:
+    query: Are JnJ's FY2022 financials that of a high growth company?
+    question_id: financebench_id_00956
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: No, JnJ's FY2022 financials are not of a high growth company as sales grew by 1.3% in FY2022.
+    expected_aliases: '["No JnJ''s FY2022 financials are not of a high growth company as sales grew by 1.3% in FY2022."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00956
+- description: financebench-open-source:financebench_id_00669
+  vars:
+    query: What drove gross margin change as of FY2022 for JnJ? If gross margin is not a useful metric for a company like
+      this, then please state that and explain why.
+    question_id: financebench_id_00669
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 'For FY22, JnJ had changes in gross margin due to: One-time COVID-19 vaccine manufacturing exit related
+      costs, Currency impacts in the Pharmaceutical segment, Commodity inflation in the MedTech and Consumer Health segments,
+      partially offset by Supply chain benefits in the Consumer Health segment.'
+    expected_aliases: '["For FY22 JnJ had changes in gross margin due to: One-time COVID-19 vaccine manufacturing exit related
+      costs Currency impacts in the Pharmaceutical segment Commodity inflation in the MedTech and Consumer Health segments
+      partially offset by Supply chain benefits in the Consumer Health segment."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00669
+- description: financebench-open-source:financebench_id_00711
+  vars:
+    query: Roughly how many times has JnJ sold its inventory in FY2022? Calculate inventory turnover ratio for FY2022; if
+      conventional inventory management is not meaningful for the company then state that and explain why.
+    question_id: financebench_id_00711
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: JnJ sold its inventory 2.7 times in FY2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00711
+- description: financebench-open-source:financebench_id_00651
+  vars:
+    query: Is growth in JnJ's adjusted EPS expected to accelerate in FY2023?
+    question_id: financebench_id_00651
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: No, rate of growth in adjusted EPS is expected to decelerate slightly from 3.6% in FY2022 to 3.5% in
+      FY2023.
+    expected_aliases: '["No rate of growth in adjusted EPS is expected to decelerate slightly from 3.6% in FY2022 to 3.5%
+      in FY2023."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00651
+- description: financebench-open-source:financebench_id_01484
+  vars:
+    query: How did JnJ's US sales growth compare to international sales growth in FY2022?
+    question_id: financebench_id_01484
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: US sales increased 3.0% vs international sales decline of 0.6%.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01484
+- description: financebench-open-source:financebench_id_01488
+  vars:
+    query: Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?
+    question_id: financebench_id_01488
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: The Consumer Health business segment will be treated as a discontinued operation from August 30, 2023
+      onward.
+    expected_aliases: '["The Consumer Health business segment will be treated as a discontinued operation from August 30 2023
+      onward."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01488
+- description: financebench-open-source:financebench_id_01490
+  vars:
+    query: What is the amount of the gain accruing to JnJ as a result of the separation of its Consumer Health business segment,
+      as of August 30, 2023?
+    question_id: financebench_id_01490
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: JnJ will make a gain of approximately $20 billion from the separation of its Consumer Health business
+      segment.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01490
+- description: financebench-open-source:financebench_id_01491
+  vars:
+    query: What is the amount of the cash proceeds that JnJ realised from the separation of Kenvue (formerly Consumer Health
+      business segment), as of August 30, 2023?
+    question_id: financebench_id_01491
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: JnJ realised $13.2 billion in cash proceeds from the separation of Kenvue.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01491
+- description: financebench-open-source:financebench_id_01487
+  vars:
+    query: Did JnJ's net earnings as a percent of sales increase in Q2 of FY2023 compared to Q2 of FY2022?
+    question_id: financebench_id_01487
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, net earnings as a percent of sales increased from 20% in Q2 of FY2022 to 20.1% in Q2 of FY2023.
+    expected_aliases: '["Yes net earnings as a percent of sales increased from 20% in Q2 of FY2022 to 20.1% in Q2 of FY2023."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01487
+- description: financebench-open-source:financebench_id_00299
+  vars:
+    query: Which of JPM's business segments had the lowest net revenue in 2021 Q1?
+    question_id: financebench_id_00299
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Corporate. Its net revenue was -$473 million.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00299
+- description: financebench-open-source:financebench_id_02119
+  vars:
+    query: If JPM went bankrupted by the end by 2021 Q1 and liquidated all of its assets to pay its shareholders, how much
+      could each shareholder get?
+    question_id: financebench_id_02119
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: They could receive $66.56 per share.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_02119
+- description: financebench-open-source:financebench_id_00206
+  vars:
+    query: Are JPM's gross margins historically consistent (not fluctuating more than roughly 2% each year)? If gross margins
+      are not a relevant metric for a company like this, then please state that and explain why.
+    question_id: financebench_id_00206
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Since JPM is a financial institution, gross margin is not a relevant metric.
+    expected_aliases: '["Since JPM is a financial institution gross margin is not a relevant metric."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00206
+- description: financebench-open-source:financebench_id_00394
+  vars:
+    query: In 2022 Q2, which of JPM's business segments had the highest net income?
+    question_id: financebench_id_00394
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Corporate & Investment Bank. Its net income was $3725 million.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00394
+- description: financebench-open-source:financebench_id_02049
+  vars:
+    query: Looking at VaR, did the risk that JPM faced in the second fiscal quarter of 2023 decrease compared to the same
+      period in the prior year?
+    question_id: financebench_id_02049
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes. It decreased.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_02049
+- description: financebench-open-source:financebench_id_10499
+  vars:
+    query: 'What is Kraft Heinz''s FY2019 inventory turnover ratio? Inventory turnover ratio is defined as: (FY2019 COGS)
+      / (average inventory between FY2018 and FY2019). Round your answer to two decimal places. Please base your judgments
+      on the information provided primarily in the balance sheet and the P&L statement.'
+    question_id: financebench_id_10499
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '6.25'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_10499
+- description: financebench-open-source:financebench_id_04412
+  vars:
+    query: 'We need to calculate a reasonable approximation (or exact number if possible) of a financial metric. Basing your
+      judgment by information plainly provided in the balance sheet and the P&L statement, what is Lockheed Martin''s FY2020
+      asset turnover ratio? Asset turnover ratio is defined as: FY2020 revenue / (average total assets between FY2019 and
+      FY2020). Round your answer to two decimal places.'
+    question_id: financebench_id_04412
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '1.33'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04412
+- description: financebench-open-source:financebench_id_03031
+  vars:
+    query: What is Lockheed Martin's FY2021 net working capital? Define net working capital as total current assets less total
+      current liabilities. Answer in USD millions. Respond to the question by assuming the perspective of an investment analyst
+      who can only use the details shown within the balance sheet.
+    question_id: financebench_id_03031
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: $5818.00
+    expected_aliases: '["5818.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03031
+- description: financebench-open-source:financebench_id_03718
+  vars:
+    query: What is Lockheed Martin's 2 year total revenue CAGR from FY2020 to FY2022 (in units of percents and round to one
+      decimal place)? Provide a response to the question by primarily using the statement of income.
+    question_id: financebench_id_03718
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 0.4%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03718
+- description: financebench-open-source:financebench_id_04171
+  vars:
+    query: Basing your judgments off of the balance sheet, what is the year end FY2018 amount of accounts payable for MGM
+      Resorts? Answer in USD millions.
+    question_id: financebench_id_04171
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $303.00
+    expected_aliases: '["303.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_04171
+- description: financebench-open-source:financebench_id_03849
+  vars:
+    query: What is the FY2018 - FY2020 3 year average of capex as a % of revenue for MGM Resorts? Answer in units of percents
+      and round to one decimal place. Please utilize information provided primarily within the statement of cash flows and
+      the statement of income.
+    question_id: financebench_id_03849
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 7.9%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03849
+- description: financebench-open-source:financebench_id_01254
+  vars:
+    query: Has MGM Resorts paid dividends to common shareholders in FY2022?
+    question_id: financebench_id_01254
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: Yes. MGM maintained 0.01$ per share annual dividend through out FY 2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01254
+- description: financebench-open-source:financebench_id_00382
+  vars:
+    query: Which region had the Highest EBITDAR Contribution for MGM during FY2022?
+    question_id: financebench_id_00382
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Las Vegas resorts contributed ~90% of company level EBITDAR during FY2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00382
+- description: financebench-open-source:financebench_id_01911
+  vars:
+    query: What was MGM's interest coverage ratio using FY2022 Adjusted EBIT as the numerator and annual Interest Expense
+      as the denominator?
+    question_id: financebench_id_01911
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: As adjusted EBIT is negative, coverage ratio is zero
+    expected_aliases: '["As adjusted EBIT is negative coverage ratio is zero"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01911
+- description: financebench-open-source:financebench_id_01912
+  vars:
+    query: Which region had the worst topline performance for MGM during FY2022?
+    question_id: financebench_id_01912
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: MGM China experienced the worst topline performance amongst the other regions presented. Its revenue
+      declined 44% in FY2022 whereas the other regions presented increased their revenues.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01912
+- description: financebench-open-source:financebench_id_00407
+  vars:
+    query: Which type of debt received the largest investment among the short term investments for MGM in H1 FY2023?
+    question_id: financebench_id_00407
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: the biggest short term investment is in corporate bonds (almost 82% of the total investment)
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00407
+- description: financebench-open-source:financebench_id_04700
+  vars:
+    query: What is the FY2016 COGS for Microsoft? Please state answer in USD millions. Provide a response to the question
+      by primarily using the statement of income.
+    question_id: financebench_id_04700
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $32780.00
+    expected_aliases: '["32780.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_04700
+- description: financebench-open-source:financebench_id_00552
+  vars:
+    query: Has Microsoft increased its debt on balance sheet between FY2023 and the FY2022 period?
+    question_id: financebench_id_00552
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: No. Microsoft decreased its debt by $2.5bn in FY 2023 vs FY 2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00552
+- description: financebench-open-source:financebench_id_04458
+  vars:
+    query: 'We want to calculate a financial metric. Please help us compute it by basing your answers off of the statement
+      of income and the statement of cash flows. Here''s the question: what is the FY2015 unadjusted EBITDA % margin for Netflix?
+      Calculate unadjusted EBITDA using unadjusted operating income and D&A (from cash flow statement).'
+    question_id: financebench_id_04458
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 5.4%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04458
+- description: financebench-open-source:financebench_id_03282
+  vars:
+    query: What is Netflix's year end FY2017 total current liabilities (in USD millions)? Base your judgments on the information
+      provided primarily in the balance sheet.
+    question_id: financebench_id_03282
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $5466.00
+    expected_aliases: '["5466.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_03282
+- description: financebench-open-source:financebench_id_04302
+  vars:
+    query: We need to calculate a reasonable approximation (or exact number if possible) of a financial metric. Basing your
+      judgment by information plainly provided in the statement of income, what is Nike's three year average of cost of goods
+      sold as a % of revenue from FY2016 to FY2018? Answer in units of percents and round to one decimal place.
+    question_id: financebench_id_04302
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 55.1%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04302
+- description: financebench-open-source:financebench_id_03531
+  vars:
+    query: According to the details clearly outlined within the balance sheet, how much total current assets did Nike have
+      at the end of FY2019? Answer in USD millions.
+    question_id: financebench_id_03531
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $16525.00
+    expected_aliases: '["16525.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_03531
+- description: financebench-open-source:financebench_id_04080
+  vars:
+    query: 'When primarily referencing the income statement and the statement of financial position, what is the FY2021 inventory
+      turnover ratio for Nike? Inventory turnover ratio is defined as: (FY2021 COGS) / (average inventory between FY2020 and
+      FY2021). Round your answer to two decimal places.'
+    question_id: financebench_id_04080
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '3.46'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04080
+- description: financebench-open-source:financebench_id_01163
+  vars:
+    query: Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow
+      for Nike in FY2023?
+    question_id: financebench_id_01163
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Among the three, cash flow from operations was the highest for Nike in FY2023.
+    expected_aliases: '["Among the three cash flow from operations was the highest for Nike in FY2023."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_01163
+- description: financebench-open-source:financebench_id_00080
+  vars:
+    query: Does Paypal have positive working capital based on FY2022 data? If working capital is not a useful or relevant
+      metric for this company, then please state that and explain why.
+    question_id: financebench_id_00080
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes. Paypal has a positive working capital of $ 1.6Bn as of FY2022 end.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00080
+- description: financebench-open-source:financebench_id_04980
+  vars:
+    query: What is the FY2021 capital expenditure amount (in USD billions) for PepsiCo? Respond to the question by assuming
+      the perspective of an investment analyst who can only use the details shown within the statement of cash flows.
+    question_id: financebench_id_04980
+    domain: financebench-open-source
+    category: table_numeric
+    expected_answer: $4.60
+    expected_aliases: '["4.60"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: table_numeric
+    question_id: financebench_id_04980
+- description: financebench-open-source:financebench_id_01009
+  vars:
+    query: What are the geographies that Pepsico primarily operates in as of FY2022?
+    question_id: financebench_id_01009
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: 'As of FY2022, Pepsico primarily operates in the following geographies: North America, Latin America,
+      Europe, Africa, Middle East, South Asia, Asia Pacific, Australia, New Zealand and China.'
+    expected_aliases: '["As of FY2022 Pepsico primarily operates in the following geographies: North America Latin America
+      Europe Africa Middle East South Asia Asia Pacific Australia New Zealand and China."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01009
+- description: financebench-open-source:financebench_id_00735
+  vars:
+    query: Has Pepsico reported any materially important ongoing legal battles from FY2022 and FY2021?
+    question_id: financebench_id_00735
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: No, Pepsico is not involved in material legal battles.
+    expected_aliases: '["No Pepsico is not involved in material legal battles."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_00735
+- description: financebench-open-source:financebench_id_01328
+  vars:
+    query: What is the quantity of restructuring costs directly outlined in Pepsico's income statements for FY2022? If restructuring
+      costs are not explicitly outlined then state 0.
+    question_id: financebench_id_01328
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: Pepsico's restructuring costs in FY2022 amounted to $411 million .
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_01328
+- description: financebench-open-source:financebench_id_03620
+  vars:
+    query: What is the FY2022 unadjusted EBITDA less capex for PepsiCo? Define unadjusted EBITDA as unadjusted operating income
+      + depreciation and amortization [from cash flow statement]. Answer in USD millions. Respond to the question by assuming
+      the perspective of an investment analyst who can only use the details shown within the statement of cash flows and the
+      income statement.
+    question_id: financebench_id_03620
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: $9068.00
+    expected_aliases: '["9068.00"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_03620
+- description: financebench-open-source:financebench_id_04481
+  vars:
+    query: What is the FY2022 unadjusted EBITDA % margin for PepsiCo? Calculate unadjusted EBITDA using unadjusted operating
+      income and D&A (from cash flow statement). Give a response to the question by relying on the details shown in the statement
+      of cash flows and the P&L statement.
+    question_id: financebench_id_04481
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 16.5%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04481
+- description: financebench-open-source:financebench_id_01482
+  vars:
+    query: At the Pepsico AGM held on May 3, 2023, what was the outcome of the shareholder vote on the shareholder proposal
+      for a congruency report by Pepsico on net-zero emissions policies?
+    question_id: financebench_id_01482
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: The shareholder proposal for a congruency report by Pepsico on net-zero emissions policies was defeated.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01482
+- description: financebench-open-source:financebench_id_00705
+  vars:
+    query: By how much did Pepsico increase its unsecured five year revolving credit agreement on May 26, 2023?
+    question_id: financebench_id_00705
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: $400,000,000 increase.
+    expected_aliases: '["$400000000 increase.", "400000000 increase."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00705
+- description: financebench-open-source:financebench_id_00882
+  vars:
+    query: As of May 26, 2023, what is the total amount Pepsico may borrow under its unsecured revolving credit agreements?
+    question_id: financebench_id_00882
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Total amount Pepsico may borrow under unsecured revolving credit agreements = $8,400,000,000.
+    expected_aliases: '["Total amount Pepsico may borrow under unsecured revolving credit agreements = $8400000000."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00882
+- description: financebench-open-source:financebench_id_01474
+  vars:
+    query: As of FY2023Q1, why did Pepsico raise full year guidance for FY2023?
+    question_id: financebench_id_01474
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Pepsico experienced a strong start to FY2023.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01474
+- description: financebench-open-source:financebench_id_01476
+  vars:
+    query: As of FY2023Q1, by how many percentage points did Pepsico raise full year guidance in respect of core constant
+      currency EPS growth?
+    question_id: financebench_id_01476
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Pepsico raised full year guidance in respect of core constant currency EPS growth by 1 percentage point.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_01476
+- description: financebench-open-source:financebench_id_00302
+  vars:
+    query: Did Pfizer grow its PPNE between FY20 and FY21?
+    question_id: financebench_id_00302
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, change in PPNE was positive year over year
+    expected_aliases: '["Yes change in PPNE was positive year over year"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00302
+- description: financebench-open-source:financebench_id_00702
+  vars:
+    query: Were there any potential events that are not in Pfizer's standard business operations that substantially increased
+      net income in 2019?
+    question_id: financebench_id_00702
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, the gain on completion of Consumer Healthcare JV Transaction
+    expected_aliases: '["Yes the gain on completion of Consumer Healthcare JV Transaction"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00702
+- description: financebench-open-source:financebench_id_02416
+  vars:
+    query: What are three main companies acquired by Pfizer mentioned in this 10K report?
+    question_id: financebench_id_02416
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Trillium, Array, and Therachon
+    expected_aliases: '["Trillium Array and Therachon"]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_02416
+- description: financebench-open-source:financebench_id_00283
+  vars:
+    query: How much does Pfizer expect to pay to spin off Upjohn in the future in USD million?
+    question_id: financebench_id_00283
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: '77.78'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00283
+- description: financebench-open-source:financebench_id_00724
+  vars:
+    query: For Pfizer, which geographic region had the biggest drop in Q22023 year over year revenues (on a percentage basis)?
+    question_id: financebench_id_00724
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Developed Rest of the World
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00724
+- description: financebench-open-source:financebench_id_02419
+  vars:
+    query: As of Q2'2023, is Pfizer spinning off any large business segments?
+    question_id: financebench_id_02419
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Yes, it's spinning off Upjohn.
+    expected_aliases: '["Yes it''s spinning off Upjohn."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_02419
+- description: financebench-open-source:financebench_id_00746
+  vars:
+    query: Which debt securities are registered to trade on a national securities exchange under Ulta Beauty's name as of
+      FY2023?
+    question_id: financebench_id_00746
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: There are none
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_00746
+- description: financebench-open-source:financebench_id_00521
+  vars:
+    query: What are major acquisitions that Ulta Beauty has done in FY2023 and FY2022?
+    question_id: financebench_id_00521
+    domain: financebench-open-source
+    category: direct_lookup
+    expected_answer: Ulta Beauty did not make any acquisitions in FY2023 and FY2022.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: direct_lookup
+    question_id: financebench_id_00521
+- description: financebench-open-source:financebench_id_00601
+  vars:
+    query: What drove the reduction in SG&A expense as a percent of net sales in FY2023?
+    question_id: financebench_id_00601
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Lower marketing expenses and leverage of incentive compensation due to higher sales. The answer here
+      assumes FY2023 refers to the 12 months ended on January 28, 2023 (although the company refers to this period as its
+      fiscal 2022.
+    expected_aliases: '["Lower marketing expenses and leverage of incentive compensation due to higher sales. The answer here
+      assumes FY2023 refers to the 12 months ended on January 28 2023 (although the company refers to this period as its fiscal
+      2022."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00601
+- description: financebench-open-source:financebench_id_00603
+  vars:
+    query: What drove the increase in Ulta Beauty's merchandise inventories balance at end of FY2023?
+    question_id: financebench_id_00603
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Increase in Merchandise inventories balance was driven by the opening of 47 new stores. The answer here
+      assumes FY2023 refers to the 12 months ended on January 28, 2023 (although the company refers to this period as its
+      fiscal 2022.
+    expected_aliases: '["Increase in Merchandise inventories balance was driven by the opening of 47 new stores. The answer
+      here assumes FY2023 refers to the 12 months ended on January 28 2023 (although the company refers to this period as
+      its fiscal 2022."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00603
+- description: financebench-open-source:financebench_id_00605
+  vars:
+    query: What percent of Ulta Beauty's total spend on stock repurchases for FY 2023 occurred in Q4 of FY2023?
+    question_id: financebench_id_00605
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: 36%. The answer here assumes FY2023 refers to the 12 months ended on January 28, 2023 (although the company
+      refers to this period as its fiscal 2022.
+    expected_aliases: '["36%. The answer here assumes FY2023 refers to the 12 months ended on January 28 2023 (although the
+      company refers to this period as its fiscal 2022."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00605
+- description: financebench-open-source:financebench_id_00606
+  vars:
+    query: Did Ulta Beauty's wages expense as a percent of net sales increase or decrease in FY2023?
+    question_id: financebench_id_00606
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Wages expense as a percent of net sales increased in FY2023. The answer here assumes FY2023 refers to
+      the 12 months ended on January 28, 2023 (although the company refers to this period as its fiscal 2022.
+    expected_aliases: '["Wages expense as a percent of net sales increased in FY2023. The answer here assumes FY2023 refers
+      to the 12 months ended on January 28 2023 (although the company refers to this period as its fiscal 2022."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00606
+- description: financebench-open-source:financebench_id_00859
+  vars:
+    query: Among all of the derivative instruments that Verizon used to manage the exposure to fluctuations of foreign currencies
+      exchange rates or interest rates, which one had the highest notional value in FY 2021?
+    question_id: financebench_id_00859
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: Cross currency swaps. Its notional value was $32,502 million.
+    expected_aliases: '["Cross currency swaps. Its notional value was $32502 million."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_00859
+- description: financebench-open-source:financebench_id_02024
+  vars:
+    query: As of FY 2021, how much did Verizon expect to pay for its retirees in 2024?
+    question_id: financebench_id_02024
+    domain: financebench-open-source
+    category: section_navigation
+    expected_answer: The estimated pension benefits were $1097 million, and the estimated health care and life insurance benefits
+      were $862 million.
+    expected_aliases: '["The estimated pension benefits were $1097 million and the estimated health care and life insurance
+      benefits were $862 million."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: section_navigation
+    question_id: financebench_id_02024
+- description: financebench-open-source:financebench_id_00216
+  vars:
+    query: Does Verizon have a reasonably healthy liquidity profile based on its quick ratio for FY 2022? If the quick ratio
+      is not relevant to measure liquidity, please state that and explain why.
+    question_id: financebench_id_00216
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: No. The quick ratio was approximately 0.54 for Verizon. It indicated that Verizon does not have a healthy
+      liquidity profile.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00216
+- description: financebench-open-source:financebench_id_00215
+  vars:
+    query: Is Verizon a capital intensive business based on FY 2022 data?
+    question_id: financebench_id_00215
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: Yes. Verizon's capital intensity ratio was approximately 2.774729. This means that it took approximately
+      $2.77 of assets to generate $1 of revenue and thus, Verizon can be considered capital intensive.
+    expected_aliases: '["Yes. Verizon''s capital intensity ratio was approximately 2.774729. This means that it took approximately
+      $2.77 of assets to generate $1 of revenue and thus Verizon can be considered capital intensive."]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00215
+- description: financebench-open-source:financebench_id_00566
+  vars:
+    query: Has Verizon increased its debt on balance sheet between 2022 and the 2021 fiscal period?
+    question_id: financebench_id_00566
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: No. Verizon's debt decreased by $229 million.
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_00566
+- description: financebench-open-source:financebench_id_06247
+  vars:
+    query: 'What is FY2018 days payable outstanding (DPO) for Walmart? DPO is defined as: 365 * (average accounts payable
+      between FY2017 and FY2018) / (FY2018 COGS + change in inventory between FY2017 and FY2018). Round your answer to two
+      decimal places. Please base your judgments on the information provided primarily in the statement of financial position
+      and the P&L statement.'
+    question_id: financebench_id_06247
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: '42.69'
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_06247
+- description: financebench-open-source:financebench_id_04784
+  vars:
+    query: Based on the information provided primarily in the statement of income, what is the FY2018 - FY2019 change in unadjusted
+      operating income % margin for Walmart? Answer in units of percents and round to one decimal place.
+    question_id: financebench_id_04784
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 0.2%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_04784
+- description: financebench-open-source:financebench_id_06741
+  vars:
+    query: What is the FY2018 - FY2020 3 year average unadjusted EBITDA % margin for Walmart? Define unadjusted EBITDA as
+      unadjusted operating income + depreciation and amortization from the cash flow statement. Answer in units of percents
+      and round to one decimal place. Calculate what was asked by utilizing the line items clearly shown in the P&L statement
+      and the cash flow statement.
+    question_id: financebench_id_06741
+    domain: financebench-open-source
+    category: calculation
+    expected_answer: 6.2%
+    expected_aliases: '[]'
+    no_answer: false
+  metadata:
+    domain: financebench-open-source
+    category: calculation
+    question_id: financebench_id_06741
 - description: general-docs:gen_direct_api_limit
   vars:
     query: What is the public API rate limit per tenant?

@@ -15,6 +15,7 @@ number.
 | Unsure whether retrieval or LLM is the bottleneck | `retrieval-only` then `generator-oracle` | Separates search failures from answer synthesis failures. |
 | Unsure whether the evaluator is reliable | `judge_audit.csv` | Keeps judge reliability separate from product stack quality. |
 | Need a CI quality gate or external eval UI | `export-promptfoo` | Lets promptfoo call this benchmark through a local Python provider. |
+| Need to turn promptfoo results into a product decision | `analyze-promptfoo` | Aggregates promptfoo JSON into summary, failure, and production-readiness outputs. |
 | Exact names, numbers, IDs, and short policies | `bm25` | Cheap, fast, strong lexical matching. |
 | Mixed exact and semantic questions | `hybrid` | Combines sparse and dense retrieval signals. |
 | High quality required and latency budget exists | `hybrid-rerank` | Reranking can improve candidate order at extra cost. |
@@ -45,7 +46,8 @@ The included fixture run shows:
 - `axis_leaderboard.csv` separates the best RAG method, embedding profile, and generator profile.
 - `judge_audit.csv` separates judge/evaluator reliability from product-stack quality.
 - `integrations/promptfoo/` exports a promptfoo config, tests, and Python provider for deterministic CI checks or optional model-graded RAG assertions.
-- `results/dashboard.html` provides ranking, scatter, distribution, category heatmap, axis leaderboard, and judge audit views.
+- `analyze-promptfoo` folds promptfoo JSON results into CSV reports and the same dashboard.
+- `results/dashboard.html` provides ranking, scatter, distribution, category heatmap, axis leaderboard, judge audit, promptfoo, and production-readiness views.
 - Finance includes semantic financial terms such as capex, deferred revenue, backlog, covenant, and lease obligations.
 - General-docs includes semantic, section-navigation, multi-section, and multi-document distractors.
 - `pageindex-oss`, dense-style retrieval, and reranking separate from BM25 on synonym-heavy and structure-heavy questions.
@@ -96,7 +98,9 @@ The included fixture run shows:
    ```bash
    uv run rag-benchmark export-promptfoo --domain my-domain
    cd integrations/promptfoo
-   npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+   npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --output promptfoo-results.json --no-share
+   cd ../..
+   uv run rag-benchmark analyze-promptfoo --input integrations/promptfoo/promptfoo-results.json --output-dir results
    ```
 
 The recommendation ranking combines quality, efficiency, and stability. Use it
@@ -106,6 +110,10 @@ to pick a starting point, then inspect `traces.jsonl` for the cases that failed.
 
 Before using results for a real product decision:
 
+- Treat a stack as a production candidate only when it clears the proposed gates:
+  pass rate >= 80%, answer correctness >= 80%, evidence recall >= 85%,
+  citation validity >= 90%, no-answer hallucination rate <= 5%, and
+  FinanceBench calculation pass rate >= 80% when calculation questions exist.
 - Add at least 100 questions per major domain.
 - Label evidence pages or sections for every answerable question.
 - Include no-answer questions.

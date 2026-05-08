@@ -160,7 +160,9 @@ Export a promptfoo quality gate:
 ```bash
 uv run rag-benchmark export-promptfoo
 cd integrations/promptfoo
-npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --output promptfoo-results.json --no-share
+cd ../..
+uv run rag-benchmark analyze-promptfoo --input integrations/promptfoo/promptfoo-results.json --output-dir results
 ```
 
 Run tests:
@@ -176,6 +178,7 @@ Each run writes:
 - `runs/<run_id>/summary.csv`: domain/system scorecard.
 - `runs/<run_id>/category_summary.csv`: domain/category/system scorecard.
 - `runs/<run_id>/recommendations.csv`: quality/efficiency/stability recommendation ranking.
+- `runs/<run_id>/production_readiness.csv`: proposed production gate status per deployable stack.
 - `runs/<run_id>/axis_leaderboard.csv`: best RAG, embedding, and generator candidates separated by axis.
 - `runs/<run_id>/judge_audit.csv`: evaluator/judge reliability and risk summary.
 - `runs/<run_id>/failure_summary.csv`: failure type counts by domain/system.
@@ -183,13 +186,14 @@ Each run writes:
 - `runs/<run_id>/traces.jsonl`: full retrieval, answer, and evaluation traces.
 - `runs/<run_id>/report.md`: operations-oriented markdown report.
 - `runs/<run_id>/report.ko.md`: Korean operations-oriented markdown report.
-- `runs/<run_id>/dashboard.html`: static visual dashboard with ranking, scatter, histogram, and heatmap views.
+- `runs/<run_id>/dashboard.html`: static visual dashboard with ranking, scatter, histogram, heatmap, axis, judge, and production-readiness views.
 
 The latest run is also copied to:
 
 - `results/summary.csv`
 - `results/category_summary.csv`
 - `results/recommendations.csv`
+- `results/production_readiness.csv`
 - `results/axis_leaderboard.csv`
 - `results/judge_audit.csv`
 - `results/failure_summary.csv`
@@ -203,6 +207,15 @@ Promptfoo integration files are generated under:
 - `integrations/promptfoo/promptfooconfig.yaml`
 - `integrations/promptfoo/tests.yaml`
 - `integrations/promptfoo/rag_benchmark_provider.py`
+
+Promptfoo analysis outputs are written under `results/` after `analyze-promptfoo`:
+
+- `results/promptfoo_summary.csv`
+- `results/promptfoo_category_summary.csv`
+- `results/promptfoo_failure_summary.csv`
+- `results/promptfoo_production_readiness.csv`
+- `results/promptfoo_report.md`
+- `results/promptfoo_report.ko.md`
 
 ## How To Interpret Results
 
@@ -222,6 +235,11 @@ Use the benchmark as an operations decision aid:
 - Use `integrations/promptfoo/` as a CI quality gate or external eval view. The
   default export uses deterministic local assertions; model-graded assertions
   should use an OSS/local grader when the run must stay OSS-only.
+- Use `production_readiness.csv` and the dashboard readiness panels for the
+  operations decision. The proposed gates are pass rate >= 80%, answer
+  correctness >= 80%, evidence recall >= 85%, citation validity >= 90%,
+  no-answer hallucination rate <= 5%, and FinanceBench calculation pass rate
+  >= 80%.
 - Choose `bm25` when exact terms, speed, and low cost matter most.
 - Choose `hybrid` or `hybrid-rerank` when semantic matching and exact terms both matter.
 - Choose `parent-child` when chunk-level search works but answer generation needs more surrounding context.

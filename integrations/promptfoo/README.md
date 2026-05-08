@@ -10,6 +10,8 @@ The generated provider config points promptfoo at `.venv/bin/python` when that i
 ```bash
 cd integrations/promptfoo
 npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --output promptfoo-results.json --no-share
+cd ../..
+uv run rag-benchmark analyze-promptfoo --input integrations/promptfoo/promptfoo-results.json --output-dir results
 ```
 
 Open the HTML output:
@@ -24,6 +26,9 @@ integrations/promptfoo/promptfoo-results.html
 uv run rag-benchmark export-promptfoo
 ```
 
+By default this exports every enabled question. Use `--max-questions-per-domain`
+when you want a smaller smoke run.
+
 Useful options:
 
 ```bash
@@ -35,5 +40,6 @@ uv run rag-benchmark export-promptfoo --include-model-graded --grader-provider o
 ## Interpretation
 
 - Use promptfoo here as a CI quality gate and external eval view.
+- Use `analyze-promptfoo` to attach promptfoo quality-gate results to `results/dashboard.html`.
 - Keep `results/dashboard.html` as the canonical operations benchmark dashboard.
 - Use model-graded assertions only after choosing an OSS/local grader if the run must stay OSS-only.

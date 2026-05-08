@@ -12,6 +12,10 @@ def write_dashboard(
     recommendation_rows: list[dict],
     axis_leaderboard_rows: list[dict],
     judge_audit_rows: list[dict],
+    production_readiness_rows: list[dict] | None = None,
+    promptfoo_summary_rows: list[dict] | None = None,
+    promptfoo_category_rows: list[dict] | None = None,
+    promptfoo_readiness_rows: list[dict] | None = None,
     result_rows: list[dict],
     run_id: str,
 ) -> None:
@@ -22,7 +26,19 @@ def write_dashboard(
         "recommendations": recommendation_rows,
         "axisLeaderboards": axis_leaderboard_rows,
         "judgeAudits": judge_audit_rows,
+        "productionReadiness": production_readiness_rows or [],
+        "promptfooSummary": promptfoo_summary_rows or [],
+        "promptfooCategories": promptfoo_category_rows or [],
+        "promptfooReadiness": promptfoo_readiness_rows or [],
         "results": compact_result_rows(result_rows),
+        "productionThresholds": {
+            "pass_rate": 0.80,
+            "answer_correctness": 0.80,
+            "evidence_recall": 0.85,
+            "citation_validity": 0.90,
+            "no_answer_hallucination_rate": 0.05,
+            "financebench_calculation_pass_rate": 0.80,
+        },
     }
     html = DASHBOARD_TEMPLATE.replace("__RAG_BENCHMARK_DATA__", json.dumps(payload, ensure_ascii=False))
     path.write_text(html, encoding="utf-8")
@@ -144,7 +160,7 @@ DASHBOARD_TEMPLATE = """<!doctype html>
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      grid-template-columns: repeat(6, minmax(140px, 1fr));
       gap: 12px;
       margin-bottom: 14px;
     }
@@ -267,6 +283,32 @@ DASHBOARD_TEMPLATE = """<!doctype html>
       white-space: nowrap;
     }
 
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.production_candidate {
+      background: #d6eadf;
+      color: #0f5f46;
+    }
+
+    .status.pilot_candidate {
+      background: #f3e8b7;
+      color: #745400;
+    }
+
+    .status.not_ready {
+      background: #f2d2cc;
+      color: #8c2f24;
+    }
+
     .legend {
       display: flex;
       flex-wrap: wrap;
@@ -319,6 +361,14 @@ DASHBOARD_TEMPLATE = """<!doctype html>
   <main class="wrap">
     <section class="kpis" id="kpis"></section>
     <section class="grid">
+      <div class="panel wide">
+        <div class="panel-title"><h2>Production Readiness</h2><span class="sub">proposed operating gates</span></div>
+        <div id="readinessTable"></div>
+      </div>
+      <div class="panel wide">
+        <div class="panel-title"><h2>Promptfoo Quality Gate</h2><span class="sub">external eval and CI-style pass/fail</span></div>
+        <div id="promptfooTable"></div>
+      </div>
       <div class="panel">
         <div class="panel-title"><h2>Quality Ranking</h2><span class="sub" id="rankingCount"></span></div>
         <div id="barChart"></div>
@@ -413,7 +463,12 @@ DASHBOARD_TEMPLATE = """<!doctype html>
       const recommendations = selectedRows(data.recommendations);
       const axisRows = selectedDomainRows(data.axisLeaderboards);
       const judgeRows = selectedDomainRows(data.judgeAudits);
+      const readinessRows = selectedDomainRows(data.productionReadiness || []);
+      const promptfooRows = selectedDomainRows(data.promptfooSummary || []);
+      const promptfooReadinessRows = selectedDomainRows(data.promptfooReadiness || []);
       renderKpis(summary, results);
+      renderReadinessTable([...readinessRows, ...promptfooReadinessRows]);
+      renderPromptfooTable(promptfooRows);
       renderBar(summary);
       renderScatter(summary);
       renderHistogram(results);
@@ -428,17 +483,91 @@ DASHBOARD_TEMPLATE = """<!doctype html>
       const avgAnswer = average(summary, "answer_correctness");
       const avgEvidence = average(summary, "evidence_recall");
       const avgFailure = average(summary, "failure_rate");
+      const readyCount = [...(data.productionReadiness || []), ...(data.promptfooReadiness || [])]
+        .filter(row => row.status === "production_candidate" || row.status === "pilot_candidate").length;
       const questions = uniq(results.map(row => `${row.domain}:${row.question_id}`)).length;
       const items = [
         ["Best answer", pct(best)],
         ["Avg answer", pct(avgAnswer)],
         ["Avg evidence", pct(avgEvidence)],
         ["Avg failure", pct(avgFailure)],
+        ["Prod candidates", String(readyCount || 0)],
         ["Questions", String(questions)]
       ];
       byId("kpis").innerHTML = items.map(([label, value]) => `
         <div class="kpi"><div class="label">${label}</div><div class="value">${value}</div></div>
       `).join("");
+    }
+
+    function renderReadinessTable(rows) {
+      const ranked = [...rows].sort((a, b) => {
+        const rank = { production_candidate: 0, pilot_candidate: 1, not_ready: 2 };
+        const left = rank[a.status] ?? 3;
+        const right = rank[b.status] ?? 3;
+        if (left !== right) return left - right;
+        return Number(b.readiness_score || 0) - Number(a.readiness_score || 0);
+      }).slice(0, 18);
+      if (!ranked.length) {
+        byId("readinessTable").innerHTML = `<div class="sub">Run the benchmark or analyze promptfoo results to populate readiness guidance.</div>`;
+        return;
+      }
+      byId("readinessTable").innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Source</th><th>Domain</th><th>System</th><th>Status</th>
+            <th class="num">Ready</th><th class="num">Pass</th><th class="num">Answer</th>
+            <th class="num">Evidence</th><th class="num">Citation</th><th class="num">No-answer Halluc.</th><th>Guidance</th>
+          </tr></thead>
+          <tbody>
+            ${ranked.map(row => `
+              <tr>
+                <td>${escapeHtml(row.source || "")}</td>
+                <td>${escapeHtml(row.domain || "")}</td>
+                <td><span class="pill">${escapeHtml(row.system_id || row.rag_method || "")}</span></td>
+                <td><span class="status ${escapeHtml(row.status || "")}">${escapeHtml(row.status_ko || row.status || "")}</span></td>
+                <td class="num">${fmt(row.readiness_score)}</td>
+                <td class="num">${fmt(row.pass_rate)}</td>
+                <td class="num">${fmt(row.answer_correctness)}</td>
+                <td class="num">${fmt(row.evidence_recall)}</td>
+                <td class="num">${fmt(row.citation_validity)}</td>
+                <td class="num">${fmt(row.no_answer_hallucination_rate)}</td>
+                <td>${escapeHtml(row.guidance_ko || row.guidance || "")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`;
+    }
+
+    function renderPromptfooTable(rows) {
+      if (!rows.length) {
+        byId("promptfooTable").innerHTML = `<div class="sub">No promptfoo analysis has been attached to this dashboard yet.</div>`;
+        return;
+      }
+      const ranked = [...rows].sort((a, b) => Number(b.pass_rate || 0) - Number(a.pass_rate || 0));
+      byId("promptfooTable").innerHTML = `
+        <table>
+          <thead><tr>
+            <th>Domain</th><th>System</th><th>Embedding</th><th>Generator</th>
+            <th class="num">Cases</th><th class="num">Pass</th><th class="num">Score</th>
+            <th class="num">Answer</th><th class="num">Evidence</th><th class="num">Citation</th>
+          </tr></thead>
+          <tbody>
+            ${ranked.map(row => `
+              <tr>
+                <td>${escapeHtml(row.domain || "")}</td>
+                <td><span class="pill">${escapeHtml(row.system_id || "")}</span></td>
+                <td>${escapeHtml(row.embedding_model || "none")}</td>
+                <td>${escapeHtml(row.generator_model || "")}</td>
+                <td class="num">${escapeHtml(row.questions || "")}</td>
+                <td class="num">${fmt(row.pass_rate)}</td>
+                <td class="num">${fmt(row.score)}</td>
+                <td class="num">${fmt(row.answer_correctness)}</td>
+                <td class="num">${fmt(row.evidence_recall)}</td>
+                <td class="num">${fmt(row.citation_validity)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`;
     }
 
     function renderBar(rows) {

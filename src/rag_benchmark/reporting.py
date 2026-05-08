@@ -7,6 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 from statistics import mean
 
+from .production import PRODUCTION_READINESS_FIELDS
 from .schemas import EvaluationResult
 
 
@@ -536,6 +537,14 @@ def write_failure_csv(path: Path, rows: list[dict]) -> None:
             writer.writerow(row)
 
 
+def write_production_readiness_csv(path: Path, rows: list[dict]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=PRODUCTION_READINESS_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+
 def write_markdown_report(
     path: Path,
     summary_rows: list[dict],
@@ -546,6 +555,7 @@ def write_markdown_report(
     failure_rows: list[dict],
     run_id: str,
     warnings: list[str] | None = None,
+    production_readiness_rows: list[dict] | None = None,
 ) -> None:
     score_rows = [
         row
@@ -599,6 +609,24 @@ def write_markdown_report(
             "{quality_score:.3f} | {efficiency_score:.3f} | {stability_score:.3f} | {role} |".format(
                 rank=rank_by_domain[row["domain"]], **row
             )
+        )
+    lines.extend(
+        [
+            "",
+            "## Production Readiness",
+            "",
+            "Suggested production gates: pass rate >= 0.80, answer correctness >= 0.80, evidence recall >= 0.85, citation validity >= 0.90, no-answer hallucination <= 0.05, and FinanceBench calculation pass rate >= 0.80 when applicable.",
+            "",
+            "| Source | Domain | System | Status | Readiness | Pass | Answer | Evidence | Citation | No-answer Hallucination | Calc Pass | Guidance |",
+            "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for row in production_readiness_rows or []:
+        lines.append(
+            "| {source} | {domain} | `{system_id}` | {status} | {readiness_score:.3f} | "
+            "{pass_rate:.3f} | {answer_correctness:.3f} | {evidence_recall:.3f} | "
+            "{citation_validity:.3f} | {no_answer_hallucination_rate:.3f} | "
+            "{calculation_pass_rate:.3f} | {guidance} |".format(**row)
         )
     lines.extend(
         [
@@ -746,6 +774,7 @@ def write_markdown_report_ko(
     failure_rows: list[dict],
     run_id: str,
     warnings: list[str] | None = None,
+    production_readiness_rows: list[dict] | None = None,
 ) -> None:
     score_rows = [
         row
@@ -803,6 +832,25 @@ def write_markdown_report_ko(
         lines.append(
             "| {domain} | {rank} | `{system_id}` | {recommendation_score:.3f} | "
             "{quality_score:.3f} | {efficiency_score:.3f} | {stability_score:.3f} | {role} |".format(**row_ko)
+        )
+
+    lines.extend(
+        [
+            "",
+            "## 운영 적합성 판단",
+            "",
+            "제안 기준: 통과율 0.80 이상, 답변 정확도 0.80 이상, evidence recall 0.85 이상, citation validity 0.90 이상, no-answer hallucination 0.05 이하, FinanceBench 계산 문항은 해당 pass rate 0.80 이상입니다.",
+            "",
+            "| Source | 도메인 | 시스템 | 상태 | 적합성 | 통과율 | 답변 | Evidence | Citation | No-answer Hallucination | 계산 Pass | 안내 |",
+            "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
+        ]
+    )
+    for row in production_readiness_rows or []:
+        lines.append(
+            "| {source} | {domain} | `{system_id}` | {status_ko} | {readiness_score:.3f} | "
+            "{pass_rate:.3f} | {answer_correctness:.3f} | {evidence_recall:.3f} | "
+            "{citation_validity:.3f} | {no_answer_hallucination_rate:.3f} | "
+            "{calculation_pass_rate:.3f} | {guidance_ko} |".format(**row)
         )
 
     lines.extend(

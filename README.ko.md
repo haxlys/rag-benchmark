@@ -149,7 +149,9 @@ promptfoo quality gate export:
 ```bash
 uv run rag-benchmark export-promptfoo
 cd integrations/promptfoo
-npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --no-share
+npx promptfoo@latest eval -c promptfooconfig.yaml --output promptfoo-results.html --output promptfoo-results.json --no-share
+cd ../..
+uv run rag-benchmark analyze-promptfoo --input integrations/promptfoo/promptfoo-results.json --output-dir results
 ```
 
 테스트 실행:
@@ -165,6 +167,7 @@ uv run --extra dev pytest -q
 - `runs/<run_id>/summary.csv`: domain/system scorecard.
 - `runs/<run_id>/category_summary.csv`: domain/category/system scorecard.
 - `runs/<run_id>/recommendations.csv`: quality, efficiency, stability 기반 추천 ranking.
+- `runs/<run_id>/production_readiness.csv`: 운영 투입 기준에 따른 stack별 판단 결과.
 - `runs/<run_id>/axis_leaderboard.csv`: RAG, embedding, generator 후보를 축별로 분리한 ranking.
 - `runs/<run_id>/judge_audit.csv`: evaluator/judge 신뢰성 및 risk summary.
 - `runs/<run_id>/failure_summary.csv`: domain/system별 failure type count.
@@ -172,13 +175,14 @@ uv run --extra dev pytest -q
 - `runs/<run_id>/traces.jsonl`: retrieval, answer, evaluation trace 전체.
 - `runs/<run_id>/report.md`: 운영 관점 Markdown report.
 - `runs/<run_id>/report.ko.md`: 한국어 운영 관점 Markdown report.
-- `runs/<run_id>/dashboard.html`: ranking, scatter, histogram, heatmap을 포함한 정적 시각화 대시보드.
+- `runs/<run_id>/dashboard.html`: ranking, scatter, histogram, heatmap, axis, judge, 운영 적합성 판단을 포함한 정적 시각화 대시보드.
 
 최신 실행 결과는 다음 위치에도 복사됩니다.
 
 - `results/summary.csv`
 - `results/category_summary.csv`
 - `results/recommendations.csv`
+- `results/production_readiness.csv`
 - `results/axis_leaderboard.csv`
 - `results/judge_audit.csv`
 - `results/failure_summary.csv`
@@ -194,6 +198,15 @@ Promptfoo 통합 파일은 다음 위치에 생성됩니다.
 - `integrations/promptfoo/tests.yaml`
 - `integrations/promptfoo/rag_benchmark_provider.py`
 
+`analyze-promptfoo` 실행 후 promptfoo 분석 결과는 `results/`에 생성됩니다.
+
+- `results/promptfoo_summary.csv`
+- `results/promptfoo_category_summary.csv`
+- `results/promptfoo_failure_summary.csv`
+- `results/promptfoo_production_readiness.csv`
+- `results/promptfoo_report.md`
+- `results/promptfoo_report.ko.md`
+
 ## 결과 해석 방법
 
 벤치마크는 운영 의사결정 보조 도구로 사용합니다.
@@ -204,6 +217,7 @@ Promptfoo 통합 파일은 다음 위치에 생성됩니다.
 - `axis_leaderboard.csv`는 최고의 RAG 방식, embedding model, generator model을 따로 볼 때 사용합니다.
 - `judge_audit.csv`는 평가 모델을 비교할 때 사용합니다. Judge는 제품 후보가 아니라 측정 도구이므로, production ranking에 쓰기 전 human label 기준 검증이 필요합니다.
 - `integrations/promptfoo/`는 CI quality gate 또는 외부 eval view로 사용합니다. 기본 export는 결정론적 로컬 assertion만 쓰며, OSS-only run이 필요하면 model-graded assertion에는 로컬/OSS grader를 지정해야 합니다.
+- `production_readiness.csv`와 dashboard의 운영 적합성 패널은 실제 운영 판단에 사용합니다. 제안 기준은 pass rate 80% 이상, answer correctness 80% 이상, evidence recall 85% 이상, citation validity 90% 이상, no-answer hallucination rate 5% 이하, FinanceBench calculation pass rate 80% 이상입니다.
 - 정확한 용어, 숫자, ID, 짧은 정책이 중요하면 `bm25`를 먼저 봅니다.
 - exact match와 semantic match가 모두 필요하면 `hybrid` 또는 `hybrid-rerank`를 봅니다.
 - 검색 chunk는 잘 잡히지만 답변 context가 부족하면 `parent-child`를 봅니다.

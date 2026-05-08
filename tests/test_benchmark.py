@@ -7,6 +7,7 @@ from rag_benchmark.datasets import load_domain, read_jsonl
 from rag_benchmark.discrimination import build_discrimination_report
 from rag_benchmark.embeddings import embedding_counter
 from rag_benchmark.importers import import_financebench, import_questions, import_text_documents
+from rag_benchmark.promptfoo_analysis import analyze_promptfoo_results, write_promptfoo_analysis
 from rag_benchmark.promptfoo import call_promptfoo_provider, export_promptfoo_bundle
 from rag_benchmark.runner import read_summary, run_benchmark
 from rag_benchmark.schemas import Document
@@ -107,12 +108,14 @@ def test_full_benchmark_smoke(tmp_path: Path) -> None:
     assert (out_dir / "axis_leaderboard.csv").exists()
     assert (out_dir / "judge_audit.csv").exists()
     assert (out_dir / "failure_summary.csv").exists()
+    assert (out_dir / "production_readiness.csv").exists()
     assert (out_dir / "report.md").exists()
     assert (out_dir / "report.ko.md").exists()
     assert (out_dir / "dashboard.html").exists()
     assert "RAG 벤치마크 리포트" in (out_dir / "report.ko.md").read_text(encoding="utf-8")
     assert "RAG Benchmark Dashboard" in (out_dir / "dashboard.html").read_text(encoding="utf-8")
     assert "Judge Model Audit" in (out_dir / "report.md").read_text(encoding="utf-8")
+    assert "Production Readiness" in (out_dir / "dashboard.html").read_text(encoding="utf-8")
 
     discrimination_report = build_discrimination_report(out_dir)
     assert "`end-to-end` / `finance` / `exact-match-gold`: **strongly discriminative**" in discrimination_report
@@ -241,3 +244,70 @@ def test_promptfoo_export_and_provider(tmp_path: Path) -> None:
     assert payload["metrics"]["answer_correctness"] == 1.0
     assert payload["metrics"]["evidence_recall"] == 1.0
     assert provider_response["tokenUsage"]["total"] > 0
+
+
+def test_promptfoo_analysis_outputs(tmp_path: Path) -> None:
+    provider_response = call_promptfoo_provider(
+        "What was ACME Robotics revenue in fiscal 2025?",
+        {
+            "config": {
+                "basePath": str(tmp_path),
+                "repoRoot": str(ROOT),
+                "configPath": str(ROOT / "configs" / "benchmark.yaml"),
+                "track": "end-to-end",
+                "system": "hybrid",
+                "embedding": "bge-m3-proxy",
+                "generator": "reasoning-oss-llm",
+                "judge": "exact-match-gold",
+                "topK": 4,
+            }
+        },
+        {
+            "vars": {
+                "domain": "finance",
+                "question_id": "fin_direct_revenue",
+                "query": "What was ACME Robotics revenue in fiscal 2025?",
+            }
+        },
+    )
+    result_path = tmp_path / "promptfoo-results.json"
+    result_path.write_text(
+        json.dumps(
+            {
+                "evalId": "eval-test",
+                "results": {
+                    "results": [
+                        {
+                            "provider": {
+                                "label": "end-to-end:hybrid:bge-m3-proxy:reasoning-oss-llm:exact-match-gold"
+                            },
+                            "response": provider_response,
+                            "gradingResult": {
+                                "componentResults": [{"pass": True, "assertion": {"metric": "answer_correctness"}}]
+                            },
+                            "vars": {
+                                "domain": "finance",
+                                "category": "direct_lookup",
+                                "question_id": "fin_direct_revenue",
+                            },
+                            "success": True,
+                            "score": 1.0,
+                            "latencyMs": 10,
+                            "cost": 0.001,
+                        }
+                    ]
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    analysis = analyze_promptfoo_results(result_path)
+    assert analysis.summary_rows[0]["pass_rate"] == 1.0
+    assert analysis.readiness_rows[0]["status"] == "production_candidate"
+
+    output_dir = tmp_path / "analysis"
+    write_promptfoo_analysis(output_dir, analysis)
+    assert (output_dir / "promptfoo_summary.csv").exists()
+    assert (output_dir / "promptfoo_production_readiness.csv").exists()
+    assert "Promptfoo RAG 평가 리포트" in (output_dir / "promptfoo_report.ko.md").read_text(encoding="utf-8")

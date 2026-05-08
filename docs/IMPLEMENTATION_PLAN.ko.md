@@ -55,6 +55,7 @@ RAG 비교에서 자주 섞이는 세 가지 관심사를 분리합니다.
 - 로컬 Python provider가 question 1개 단위로 benchmark runner를 호출합니다.
 - OSS-only reproducibility를 유지하기 위해 기본값은 결정론적 로컬 assertion입니다.
 - model-graded promptfoo assertion은 명시적인 local 또는 OSS grader를 설정했을 때만 사용합니다.
+- promptfoo JSON output을 summary, failure, production-readiness CSV로 분석합니다.
 - canonical operations output은 계속 `results/dashboard.html`, `axis_leaderboard.csv`, `judge_audit.csv`입니다.
 
 ## MVP 시스템

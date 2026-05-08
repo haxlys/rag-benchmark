@@ -21,6 +21,7 @@ from .datasets import (
 )
 from .evaluation import evaluate
 from .judges import judge_answer
+from .production import build_production_readiness
 from .reporting import (
     aggregate,
     aggregate_by_category,
@@ -35,6 +36,7 @@ from .reporting import (
     write_jsonl,
     write_markdown_report,
     write_markdown_report_ko,
+    write_production_readiness_csv,
     write_recommendations_csv,
     write_results,
     write_summary_csv,
@@ -175,6 +177,12 @@ def run_benchmark(
     axis_leaderboard_rows = build_axis_leaderboard(summary_rows)
     judge_audit_rows = build_judge_audit(summary_rows)
     failure_rows = failure_summary(all_results)
+    production_readiness_rows = build_production_readiness(
+        summary_rows,
+        category_rows,
+        [result.model_dump() for result in all_results],
+        source="benchmark",
+    )
     write_results(out_dir / "results.csv", all_results)
     write_summary_csv(out_dir / "summary.csv", summary_rows)
     write_category_csv(out_dir / "category_summary.csv", category_rows)
@@ -182,6 +190,7 @@ def run_benchmark(
     write_axis_leaderboard_csv(out_dir / "axis_leaderboard.csv", axis_leaderboard_rows)
     write_judge_audit_csv(out_dir / "judge_audit.csv", judge_audit_rows)
     write_failure_csv(out_dir / "failure_summary.csv", failure_rows)
+    write_production_readiness_csv(out_dir / "production_readiness.csv", production_readiness_rows)
     write_jsonl(out_dir / "traces.jsonl", traces)
     write_markdown_report(
         out_dir / "report.md",
@@ -193,6 +202,7 @@ def run_benchmark(
         failure_rows,
         run_id,
         interpretation_warnings,
+        production_readiness_rows,
     )
     write_markdown_report_ko(
         out_dir / "report.ko.md",
@@ -204,6 +214,7 @@ def run_benchmark(
         failure_rows,
         run_id,
         interpretation_warnings,
+        production_readiness_rows,
     )
     write_dashboard(
         out_dir / "dashboard.html",
@@ -212,6 +223,7 @@ def run_benchmark(
         recommendation_rows=recommendation_rows,
         axis_leaderboard_rows=axis_leaderboard_rows,
         judge_audit_rows=judge_audit_rows,
+        production_readiness_rows=production_readiness_rows,
         result_rows=[result.model_dump() for result in all_results],
         run_id=run_id,
     )
@@ -331,6 +343,7 @@ def copy_latest(root: Path, out_dir: Path) -> None:
         "axis_leaderboard.csv",
         "judge_audit.csv",
         "failure_summary.csv",
+        "production_readiness.csv",
         "results.csv",
         "report.md",
         "report.ko.md",
